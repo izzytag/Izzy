@@ -1,0 +1,4 @@
+ALTER TABLE public.links ADD COLUMN image_urls text[] NOT NULL DEFAULT '{}', ADD COLUMN category text;
+CREATE POLICY "owners upload catalogue images" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'catalogue' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
+CREATE POLICY "owners read catalogue images" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'catalogue' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
+CREATE POLICY "owners delete catalogue images" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'catalogue' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
