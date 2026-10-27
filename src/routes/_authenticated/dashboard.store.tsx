@@ -12,6 +12,7 @@ import { TESTING_FREE, TESTING_BANNER, PRO_PRICE_DISPLAY_LINE, effectiveIsPro } 
 import { getPageMode } from "@/lib/page-mode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PhonePreview } from "@/components/PhonePreview";
 import { DashboardLinkItem, reorderSubset, type LinkRow } from "@/components/DashboardLinkItem";
@@ -37,6 +38,7 @@ function StorePage() {
   const p = acc.profile;
   const [name, setName] = useState(p.display_name ?? "");
   const [bio, setBio] = useState(p.bio ?? "");
+  const [whatsapp, setWhatsapp] = useState(p.whatsapp ?? "");
   const [avatar, setAvatar] = useState(p.avatar_url);
   const fileRef = useRef<HTMLInputElement>(null);
   const [pageUrl, setPageUrl] = useState(`/${p.username}`);
@@ -48,7 +50,7 @@ function StorePage() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
 
   async function saveProfile() {
-    const { error } = await supabase.from("profiles").update({ display_name: name.slice(0, 60), bio: bio.slice(0, 160) }).eq("id", acc.user.id);
+    const { error } = await supabase.from("profiles").update({ display_name: name.slice(0, 60), bio: bio.slice(0, 160), whatsapp: whatsapp.trim() || null }).eq("id", acc.user.id);
     if (error) return void toast.error(error.message);
     toast.success("Store saved");
     qc.invalidateQueries({ queryKey: ["account"] });
@@ -102,7 +104,7 @@ function StorePage() {
   }
 
   const preview = {
-    ...p, display_name: name, bio, avatar_url: avatar,
+    ...p, display_name: name, bio, avatar_url: avatar, whatsapp: whatsapp || null,
     socials: (p.socials as Record<string, string>) ?? {},
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };
@@ -127,6 +129,11 @@ function StorePage() {
             <div className="flex-1 space-y-3">
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Store name" maxLength={60} />
               <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Short store description (160 characters)" maxLength={160} rows={2} />
+              <div className="space-y-1.5">
+                <Label>WhatsApp number for orders</Label>
+                <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="98765 43210" inputMode="tel" />
+                <p className="text-xs text-muted-foreground">Visitors use this number to order on WhatsApp. The same number can also be changed in Appearance.</p>
+              </div>
               <Button size="sm" onClick={saveProfile}>Save store</Button>
             </div>
           </div>
@@ -160,9 +167,9 @@ function StorePage() {
               <Button variant="outline" onClick={() => addItem("service")} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
             </div>
           )}
-          {!p.whatsapp && storeRows.some((l) => l.enabled) && (
+          {!whatsapp && storeRows.some((l) => l.enabled) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-              Add your WhatsApp number in <Link to="/dashboard/appearance" className="font-semibold underline">Appearance</Link> so visitors can order or book on WhatsApp.
+              Add your WhatsApp number above, in Your store, so visitors can order or book on WhatsApp.
             </p>
           )}
           {pageMode !== "links" && !canAddLink(links.length, acc.isPro) && (

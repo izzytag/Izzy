@@ -92,10 +92,14 @@ function LinksPage() {
     }
   }
 
+  // Preview shows what a visitor actually sees: pass ALL enabled rows
+  // and let PublicProfile's mode logic decide (links OR shop/services,
+  // never a mix). Filtering to link rows only used to show an empty
+  // page in shop mode, which is not what visitors see.
   const preview = {
     ...p,
     socials: (p.socials as Record<string, string>) ?? {},
-    links: links.filter((l) => l.enabled && l.kind === "link" && l.url.length > 8),
+    links: links.filter((l) => l.enabled),
   };
 
   return (

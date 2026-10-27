@@ -18,10 +18,14 @@ export type PublicData = {
   links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null }[];
 };
 
-export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref }: {
+export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref, onShopClick }: {
   data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; compact?: boolean;
   /** Set only when the seller has enabled products — shows one clear "Visit my Shop" button. */
   shopHref?: string | null;
+  /** When set (dashboard live preview), "Visit my Shop" is a button that
+      calls this instead of a real link, so the preview never navigates
+      away from the dashboard. The live page never passes this. */
+  onShopClick?: (() => void) | null;
 }) {
   const [showUpi, setShowUpi] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -86,11 +90,15 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
               <MessageCircle className="h-5 w-5" /> WhatsApp me
             </a>
           )}
-          {shopHref && (
+          {onShopClick ? (
+            <button type="button" onClick={onShopClick} className={btn}>
+              <ShoppingBag className="h-5 w-5" /> Visit my Shop →
+            </button>
+          ) : shopHref ? (
             <a href={shopHref} className={btn}>
               <ShoppingBag className="h-5 w-5" /> Visit my Shop →
             </a>
-          )}
+          ) : null}
           {linkItems.map((l) => (
             <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)} className={btn}>
               {l.title}
@@ -117,11 +125,13 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
         </div>
 
         {productItems.length > 0 && (
-          // Simple ecom grid: uniform cards, 2 columns on phone,
-          // 3 on tablet, 4 on desktop. Tapping a card opens its details
-          // (all photos, full description, WhatsApp order) — there is no
-          // order button on the card itself.
-          <div className="mt-8 grid w-full grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          // Pinterest-style pins: masonry, image-first. Tapping a pin
+          // opens its details (all photos, full description, WhatsApp
+          // order) — there is no order button on the pin itself.
+          // In the compact dashboard preview the frame is only 300px
+          // wide, so it always stays 2 columns like a real phone;
+          // the live page widens to 3/4 columns on bigger screens.
+          <div className={`mt-8 w-full columns-2 gap-4 ${compact ? "" : "sm:columns-3 lg:columns-4"}`}>
             {productItems.map((l) => (
               <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} />
             ))}

@@ -93,10 +93,9 @@ function ShopPage() {
             No products yet. Check back soon — or message the seller on WhatsApp.
           </p>
         ) : (
-          // Simple ecom grid: uniform cards, 2 columns on phone,
-          // 3 on tablet, 4 on desktop. Tapping a card opens its details
-          // — there is no order button on the card itself.
-          <div className="mt-6 grid w-full grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          // Pinterest-style pins: masonry, image-first. Tapping a pin
+          // opens its details — there is no order button on the pin itself.
+          <div className="mt-6 w-full columns-2 gap-4 sm:columns-3 lg:columns-4">
             {products.map((p) => (
               <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />
             ))}

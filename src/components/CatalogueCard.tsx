@@ -16,11 +16,13 @@ export function CatalogueCard({ item, whatsapp, pageUrl, onLinkClick }: {
   const href = whatsapp && /\d{6,}/.test(whatsapp.replace(/\D/g, "")) ? waCardLink(whatsapp, item.kind ?? "product", item.title, `${pageUrl}#item-${item.id}`) : null;
   const [open, setOpen] = useState(false);
   const action = href ? <Button asChild className="min-h-[48px] w-full rounded-full bg-page-fg text-base text-page-bg hover:bg-page-fg/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button> : null;
-  // Simple ecom card: ONE uniform square image for every product, so the
-  // grid lines up evenly. (No more varied Pinterest aspect ratios.)
-  return <article id={`item-${item.id}`} className="overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
+  // Pinterest-style pin: varied image aspect per item (from the item id),
+  // so pins have natural, varied heights in the masonry grid.
+  const aspects = ["aspect-[3/4]", "aspect-square", "aspect-[4/5]"];
+  const aspect = aspects[Math.abs([...item.id].reduce((a, c) => a + c.charCodeAt(0), 0)) % aspects.length];
+  return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left hover:bg-page-btn" onClick={() => setOpen(true)} aria-label={`View ${item.title}`}>
-      {photos[0] ? <img src={photos[0]} alt={item.title} loading="lazy" className="aspect-square w-full object-cover" /> : <div className="flex aspect-square items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
+      {photos[0] ? <img src={photos[0]} alt={item.title} loading="lazy" className={`${aspect} w-full object-cover`} /> : <div className={`flex ${aspect} items-center justify-center bg-page-bg`}><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1.5 p-4">
         <h3 className="break-words text-base font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-base font-bold">{item.price}</p>}
