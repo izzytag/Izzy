@@ -82,44 +82,48 @@ function AuthPage() {
   // project and allow the Vercel redirect URL, then restore a signInWithOAuth button here.
 
   return (
-    <div className="flex min-h-screen flex-col bg-hero px-5 py-6">
+    <div className="flex min-h-dvh flex-col bg-hero px-4 py-6">
       <Logo />
-      <div className="mx-auto mt-12 w-full max-w-sm rounded-3xl border bg-card p-6 shadow-soft">
+      <div className="mx-auto mt-8 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-soft sm:mt-12 sm:p-8">
         {sent ? (
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Check your email</h1>
-            <p className="mt-2 text-sm text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your page. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
+            <h1 className="text-3xl font-bold">Check your email</h1>
+            <p className="mt-2 text-base leading-relaxed text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your page. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
+            <button className="mt-6 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => setSent(false)}>Use a different email</button>
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold">{mode === "signup" ? "Create your page" : "Welcome back"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{mode === "signup" ? "Free forever. No card needed." : "Log in to your izzy dashboard."}</p>
-            <p className="mt-6 rounded-xl bg-muted p-3 text-sm text-muted-foreground">Google sign-in is not set up yet for this version — please use email for now.</p>
+            <div className="flex rounded-full bg-muted p-1" role="tablist" aria-label="Sign up or log in">
+              <button type="button" onClick={() => { setFormError(""); setMode("signup"); }} className={`min-h-[44px] flex-1 rounded-full text-base font-semibold ${mode === "signup" ? "bg-card shadow-sm" : "text-muted-foreground"}`}>Sign up</button>
+              <button type="button" onClick={() => { setFormError(""); setMode("signin"); }} className={`min-h-[44px] flex-1 rounded-full text-base font-semibold ${mode === "signin" ? "bg-card shadow-sm" : "text-muted-foreground"}`}>Log in</button>
+            </div>
+            <h1 className="mt-6 text-3xl font-bold">{mode === "signup" ? "Create your page" : "Welcome back"}</h1>
+            <p className="mt-1 text-base text-muted-foreground">{mode === "signup" ? "Free forever. No card needed." : "Log in to your izzy dashboard."}</p>
             {mode === "signin" && (
               <p className="mt-3 rounded-xl bg-muted p-3 text-sm text-muted-foreground">Signed up with Google before? Enter that Google email above, tap Forgot password, set a password, then log in here.</p>
             )}
             {formError && (
-              <p role="alert" className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm font-medium text-destructive">{formError}</p>
+              <p role="alert" className="mt-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-base font-medium leading-relaxed text-destructive">{formError}</p>
             )}
             <form onSubmit={submit} className="mt-4 space-y-4">
-              <div className="space-y-1.5"><Label htmlFor="email">Email</Label><Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" /></div>
+              <div className="space-y-2"><Label htmlFor="email" className="text-base font-medium">Email</Label><Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="pw">Password</Label>
+                  <Label htmlFor="pw" className="text-base font-medium">Password</Label>
                   {mode === "signin" && (
                     <button type="button" onClick={forgotPassword} className="text-xs font-semibold text-primary">Forgot password?</button>
                   )}
                 </div>
-                <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} className="h-11" />
+                <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
                 {mode === "signup" && (
-                  <p className="text-xs text-muted-foreground">Use a strong, unique password. Common or leaked passwords are rejected — if signup seems to do nothing, try a stronger password.</p>
+                  <p className="text-sm text-muted-foreground">Use a strong, unique password. Common or leaked passwords are rejected.</p>
                 )}
               </div>
-              <Button type="submit" disabled={busy} className="h-12 w-full rounded-xl text-base">{mode === "signup" ? "Sign up" : "Log in"}</Button>
+              <Button type="submit" disabled={busy} className="min-h-[52px] w-full rounded-xl text-lg">{mode === "signup" ? "Sign up" : "Log in"}</Button>
+            <p className="text-center text-sm text-muted-foreground">Google sign-in is not set up yet for this version — please use email for now.</p>
             </form>
-            <button className="mt-5 w-full text-center text-sm text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
-              {mode === "signup" ? "Already have an account? " : "New here? "}
-              <span className="font-semibold text-primary">{mode === "signup" ? "Log in" : "Sign up"}</span>
+            <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
+              {mode === "signup" ? "Already have an account? Log in" : "New here? Sign up"}
             </button>
           </>
         )}

@@ -35,8 +35,8 @@ const FEATURES = [
 
 const DEMO = {
   display_name: "Priya's Kitchen", username: "priya", bio: "Homemade tiffins in Pune 🍛 Order by 10am for lunch", avatar_url: null,
-  socials: {}, whatsapp: null, upi_id: null,
-  links: [{ id: "1", title: "This week's menu", url: "#" }, { id: "2", title: "Order on Swiggy", url: "#" }, { id: "3", title: "Watch my recipes", url: "#" }],
+  socials: {}, whatsapp: "9876543210", upi_id: null,
+  links: [{ id: "1", title: "This week's menu", url: "#" }, { id: "2", title: "Watch my recipes", url: "#" }, { id: "3", title: "Chocolate cake", url: "", kind: "product", price: "₹499", description: "Fresh, baked today" }],
 };
 
 function Landing() {
@@ -50,9 +50,8 @@ function Landing() {
             <span className="inline-block rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-accent-foreground">Free during testing</span>
             <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] sm:text-6xl">{t.tagline}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{t.sub}</p>
-            <p className="mt-4 text-base font-medium">Izzy is one simple page for your business: your links, your shop, and your services — all at one link.</p>
-            <Link to="/auth" className="mt-8 inline-block rounded-full bg-primary px-7 py-4 text-base font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5">{t.create} →</Link>
-            <p className="mt-3 text-sm text-muted-foreground">Free to start · No card needed</p>
+            <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 sm:inline-flex sm:w-auto">{t.create} →</Link>
+            <p className="mt-3 text-base text-muted-foreground">Free to start · No card needed</p>
           </div>
           <div className="mx-auto w-full max-w-[300px]">
             <div className="overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
@@ -63,44 +62,44 @@ function Landing() {
         </section>
       </div>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-center text-3xl font-extrabold">How it works</h2>
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">How it works</h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           {STEPS.map((s) => (
             <div key={s.n} className="rounded-3xl border bg-card p-6">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">{s.n}</span>
-              <h3 className="mt-3 font-bold">{s.t}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
+              <h3 className="mt-3 text-lg font-bold">{s.t}</h3>
+              <p className="mt-1 text-base text-muted-foreground">{s.d}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-center text-3xl font-extrabold">Everything a small business needs</h2>
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">Everything a small business needs</h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div key={f.t} className="rounded-3xl border bg-card p-6">
               <f.icon className="h-7 w-7 text-primary" />
-              <h3 className="mt-3 font-bold">{f.t}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{f.d}</p>
+              <h3 className="mt-3 text-lg font-bold">{f.t}</h3>
+              <p className="mt-1 text-base text-muted-foreground">{f.d}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-3xl px-5 pb-20">
-        <h2 className="text-center text-3xl font-extrabold">Free vs Pro</h2>
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">Free vs Pro</h2>
         <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{TESTING_BANNER}</p>
         <div className="mt-8">
           <PricingCards
-            freeCta={<Link to="/auth" className="block rounded-xl border py-3 text-center font-semibold">Start free</Link>}
-            proCta={<Link to="/auth" className="block rounded-xl bg-primary py-3 text-center font-semibold text-primary-foreground">Go Pro</Link>}
+            freeCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl border text-base font-semibold">Start free</Link>}
+            proCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground">Go Pro</Link>}
           />
         </div>
       </section>
       <footer className="border-t py-8">
-        <nav className="flex justify-center gap-6 text-sm font-medium text-muted-foreground">
+        <nav className="flex flex-wrap justify-center gap-2 text-base font-medium text-muted-foreground">
           <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
           <Link to="/terms" className="hover:text-foreground">Terms</Link>
           <Link to="/contact" className="hover:text-foreground">Contact</Link>

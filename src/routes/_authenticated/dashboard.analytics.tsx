@@ -65,13 +65,13 @@ function AnalyticsPage() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Stat label="Total views" value={stats.totalViews} />
         <Stat label={`Clicks · ${days}d`} value={clicks.length} />
         <Stat label="Click rate" value={`${ctr}%`} />
       </div>
-      <section className="rounded-3xl border bg-card p-5">
-        <h2 className="font-bold">Views & clicks · last {days} days</h2>
+      <section className="rounded-3xl border bg-card p-5 sm:p-6">
+        <h2 className="text-lg font-bold">Views & clicks · last {days} days</h2>
         <div className="mt-4 h-56">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={daily}>
@@ -85,8 +85,8 @@ function AnalyticsPage() {
           </ResponsiveContainer>
         </div>
       </section>
-      <section className="rounded-3xl border bg-card p-5">
-        <h2 className="font-bold">Clicks per link</h2>
+      <section className="rounded-3xl border bg-card p-5 sm:p-6">
+        <h2 className="text-lg font-bold">Clicks per link</h2>
         <ul className="mt-4 space-y-3">
           {perLink.map((l) => (
             <li key={l.id}>
@@ -108,8 +108,8 @@ function AnalyticsPage() {
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border bg-card p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div className="rounded-2xl border bg-card p-5">
+      <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 font-display text-2xl font-bold">{value}</p>
     </div>
   );

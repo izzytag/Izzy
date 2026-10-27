@@ -19,10 +19,10 @@ function UpgradePage() {
       <p className="mt-1 text-sm font-medium text-muted-foreground">{TESTING_BANNER}</p>
       <div className="mt-6">
         <PricingCards
-          freeCta={<Button variant="outline" disabled className="w-full rounded-xl">{acc.isPro ? "Free plan" : "Current plan"}</Button>}
+          freeCta={<Button variant="outline" disabled className="min-h-[52px] w-full rounded-xl text-base">{acc.isPro ? "Free plan" : "Current plan"}</Button>}
           proCta={acc.isPro
-            ? <Button disabled className="w-full rounded-xl">Current plan</Button>
-            : <Button onClick={startProSubscription} className="h-12 w-full rounded-xl text-base">Upgrade ({PRO_PRICE_DISPLAY_LINE})</Button>}
+            ? <Button disabled className="min-h-[52px] w-full rounded-xl text-base">Current plan</Button>
+            : <Button onClick={startProSubscription} className="min-h-[52px] w-full rounded-xl text-lg">Upgrade ({PRO_PRICE_DISPLAY_LINE})</Button>}
         />
       </div>
     </div>

@@ -39,7 +39,7 @@ function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-5">
           <div className="flex items-center gap-2">
             <Logo />
             <Badge variant={data.isPro ? "default" : "secondary"}>{data.isPro ? "Pro" : "Free"}</Badge>
@@ -50,7 +50,7 @@ function DashboardLayout() {
           <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2">
             {NAV.map((n) => (
               <Link key={n.to} to={n.to} activeOptions={{ exact: true }}
-                className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted"
+                className="flex h-11 items-center whitespace-nowrap rounded-full px-4 text-base font-medium text-muted-foreground transition hover:bg-muted"
                 activeProps={{ className: "bg-primary-soft text-accent-foreground" }}>
                 {n.label}
               </Link>
@@ -58,7 +58,7 @@ function DashboardLayout() {
           </nav>
         )}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-5">
         {data.profile.username ? <Outlet /> : <UsernamePicker />}
       </main>
     </div>
@@ -100,10 +100,10 @@ function UsernamePicker() {
   }
 
   return (
-    <form onSubmit={save} className="mx-auto mt-10 max-w-md rounded-3xl border bg-card p-6 shadow-soft">
-      <h1 className="text-2xl font-bold">Pick your username</h1>
-      <p className="mt-1 text-sm text-muted-foreground">This will be your unique page link. Share it in your bio.</p>
-      <p className="mt-3 rounded-xl bg-muted p-3 text-xs text-muted-foreground">3–30 lowercase letters, numbers or _ only. Hyphens and spaces are removed.</p>
+    <form onSubmit={save} className="mx-auto mt-10 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-soft sm:p-8">
+      <h1 className="text-3xl font-bold">Pick your username</h1>
+      <p className="mt-1 text-base text-muted-foreground">This will be your unique page link. Share it in your bio.</p>
+      <p className="mt-3 rounded-xl bg-muted p-3 text-sm text-muted-foreground">3–30 lowercase letters, numbers or _ only. Hyphens and spaces are removed.</p>
       <div className="mt-4 flex items-center rounded-xl border bg-background pl-3 focus-within:ring-2 focus-within:ring-ring">
         <span className="text-sm text-muted-foreground">{origin || "izzy"}/</span>
         <Input autoFocus value={raw} onChange={(e) => setRaw(e.target.value)}
@@ -116,7 +116,7 @@ function UsernamePicker() {
       {!err && availability === "checking" && <p className="mt-2 text-sm text-muted-foreground">Checking…</p>}
       {!err && availability === "available" && <p className="mt-2 text-sm font-medium text-green-600">Available</p>}
       {!err && availability === "taken" && <p className="mt-2 text-sm text-destructive">That username is taken</p>}
-      <Button type="submit" disabled={!u || !!err || availability !== "available" || busy} className="mt-5 h-12 w-full rounded-xl text-base">Claim my page</Button>
+      <Button type="submit" disabled={!u || !!err || availability !== "available" || busy} className="mt-5 min-h-[52px] w-full rounded-xl text-lg">Claim my page</Button>
     </form>
   );
 }

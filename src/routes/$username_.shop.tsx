@@ -36,8 +36,8 @@ export const Route = createFileRoute("/$username_/shop")({
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
       <h1 className="text-3xl font-bold">This shop isn't here yet</h1>
-      <p className="text-muted-foreground">Grab this username for your own izzy page.</p>
-      <Link to="/auth" className="rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">Create your page</Link>
+      <p className="text-base text-muted-foreground">Grab this username for your own izzy page.</p>
+      <Link to="/auth" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your page</Link>
     </div>
   ),
   component: ShopPage,
@@ -51,22 +51,22 @@ function ShopPage() {
   useEffect(() => setOrigin(window.location.origin), []);
   const name = profile.display_name || profile.username || "";
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
-  const btn = "flex w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-4 text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
+  const btn = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
 
   return (
     <div className={`theme-${theme} min-h-screen bg-page-bg text-page-fg`}>
-      <div className="mx-auto flex max-w-md flex-col items-center px-5 py-12">
+      <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-10">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={name} className="h-24 w-24 rounded-full border-4 border-page-border object-cover" />
+          <img src={profile.avatar_url} alt={name} className="h-28 w-28 rounded-full border-4 border-page-border object-cover" />
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-page-btn text-3xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
         )}
-        <h1 className="mt-4 text-2xl font-bold">{name}</h1>
-        {profile.username && <p className="text-sm text-page-muted">@{profile.username}</p>}
-        {profile.bio && <p className="mt-3 text-center text-[15px] leading-relaxed text-page-muted">{profile.bio}</p>}
+        <h1 className="mt-4 text-center text-3xl font-bold leading-tight">{name}</h1>
+        {profile.username && <p className="text-base text-page-muted">@{profile.username}</p>}
+        {profile.bio && <p className="mt-3 text-center text-base leading-relaxed text-page-muted">{profile.bio}</p>}
 
         <div className="mt-7 flex w-full flex-col gap-3">
           <a href={`/${profile.username}`} className={btn}>
@@ -79,15 +79,15 @@ function ShopPage() {
           )}
         </div>
 
-        <h2 className="mt-10 w-full text-lg font-bold">Shop</h2>
-        <p className="mt-1 w-full text-sm text-page-muted">Tap a product, then order on WhatsApp. No payment is taken here.</p>
+        <h2 className="mt-10 w-full text-2xl font-bold">Shop</h2>
+        <p className="mt-1 w-full text-base text-page-muted">Tap a product, then order on WhatsApp. No payment is taken here.</p>
 
         {products.length === 0 ? (
-          <p className="mt-8 w-full rounded-2xl border border-page-border bg-page-btn p-6 text-center text-page-btn-fg">
+          <p className="mt-8 w-full rounded-3xl border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg">
             No products yet. Check back soon — or message the seller on WhatsApp.
           </p>
         ) : (
-          <div className="mt-6 flex w-full flex-col gap-4">
+          <div className="mt-6 flex w-full flex-col gap-5">
             {products.map((p) => (
               <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />
             ))}
@@ -95,7 +95,7 @@ function ShopPage() {
         )}
 
         {!pro && (
-          <a href="/" className="mt-12 text-sm font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+          <a href="/" className="mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
         )}
       </div>
     </div>

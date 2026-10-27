@@ -120,10 +120,10 @@ function LinksPage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {TESTING_FREE && (
-          <p className="rounded-3xl border bg-primary-soft p-4 text-sm font-medium text-accent-foreground">{TESTING_BANNER}</p>
+          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{TESTING_BANNER}</p>
         )}
         {/* Share */}
-        <section className="flex flex-col gap-4 rounded-3xl border bg-card p-5 sm:flex-row sm:items-center">
+        <section className="flex flex-col gap-4 rounded-3xl border bg-card p-5 sm:p-6 lg:flex-row lg:items-center">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your page</p>
             <a href={`/${p.username}`} target="_blank" rel="noreferrer" className="block truncate font-display text-lg font-bold text-primary">{pageUrl.replace(/^https?:\/\//, "")}</a>
@@ -161,8 +161,8 @@ function LinksPage() {
         </section>
 
         {/* Profile */}
-        <section className="rounded-3xl border bg-card p-5">
-          <h2 className="text-lg font-bold">Profile</h2>
+        <section className="rounded-3xl border bg-card p-5 sm:p-6">
+          <h2 className="text-xl font-bold">Profile</h2>
           <div className="mt-4 flex items-start gap-4">
             <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload photo">
               {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
@@ -178,20 +178,20 @@ function LinksPage() {
         </section>
 
         {/* Links */}
-        <section className="rounded-3xl border bg-card p-5">
+        <section className="rounded-3xl border bg-card p-5 sm:p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold">Links</h2>
+            <h2 className="text-xl font-bold">Links</h2>
             {!acc.isPro && <span className="text-xs text-muted-foreground">{links.length}/{FREE_LINK_LIMIT} on Free</span>}
           </div>
-          <Button onClick={() => addLink()} className="mt-4 h-12 w-full rounded-xl text-base"><Plus className="h-5 w-5" /> Add link</Button>
+          <Button onClick={() => addLink()} className="mt-4 min-h-[52px] w-full rounded-xl text-lg"><Plus className="h-5 w-5" /> Add link</Button>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => addLink("product")} className="rounded-xl"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
-            <Button variant="outline" onClick={() => addLink("service")} className="rounded-xl"><Briefcase className="h-4 w-4" /> Service</Button>
+            <Button variant="outline" onClick={() => addLink("product")} className="min-h-[48px] rounded-xl text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
+            <Button variant="outline" onClick={() => addLink("service")} className="min-h-[48px] rounded-xl text-base"><Briefcase className="h-4 w-4" /> Service</Button>
           </div>
           <div className="mt-3 rounded-xl border p-3">
-            <p className="text-sm font-semibold">Shop products</p>
-            <p className="mt-1 text-sm text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
-            <p className="mt-2 truncate text-sm font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
+            <p className="text-base font-semibold">Shop products</p>
+            <p className="mt-1 text-base text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
+            <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
             <div className="mt-2 flex gap-2">
               <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
               <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
@@ -214,7 +214,7 @@ function LinksPage() {
               </ul>
             </SortableContext>
           </DndContext>
-          {links.length === 0 && <p className="mt-6 text-center text-sm text-muted-foreground">Add your first link — your shop, YouTube video, menu, anything.</p>}
+          {links.length === 0 && <p className="mt-6 text-center text-base text-muted-foreground">Add your first link — your shop, YouTube video, menu, anything.</p>}
         </section>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
@@ -246,7 +246,7 @@ function LinkItem({ link, onUpdate, onDelete }: { link: LinkRow; onUpdate: (id: 
 
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-start gap-2 rounded-2xl border bg-background p-3 ${isDragging ? "z-10 shadow-soft" : ""}`}>
+      className={`flex items-start gap-2 rounded-2xl border bg-background p-4 ${isDragging ? "z-10 shadow-soft" : ""}`}>
       <button {...attributes} {...listeners} className="mt-2 cursor-grab touch-none text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
       <div className="min-w-0 flex-1">
         {editing ? (

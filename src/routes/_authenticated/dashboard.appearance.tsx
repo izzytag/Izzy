@@ -46,9 +46,9 @@ function AppearancePage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
-        <section className="rounded-3xl border bg-card p-5">
-          <h2 className="text-lg font-bold">Theme</h2>
-          <div className="mt-4 grid grid-cols-4 gap-3">
+        <section className="rounded-3xl border bg-card p-5 sm:p-6">
+          <h2 className="text-xl font-bold">Theme</h2>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {THEMES.map((t) => {
               const locked = !t.free && !pro;
               return (
@@ -59,7 +59,7 @@ function AppearancePage() {
                     <span className="h-1.5 w-3/4 rounded-full bg-page-btn" />
                     <span className="h-1.5 w-3/4 rounded-full bg-page-btn" />
                   </span>
-                  <span className="flex items-center gap-1 text-xs font-medium">
+                  <span className="flex min-h-[44px] items-center gap-1 text-sm font-medium">
                     {locked && <Lock className="h-3 w-3" />}{theme === t.id && <Check className="h-3 w-3 text-primary" />}{t.name}
                   </span>
                 </button>
@@ -71,8 +71,8 @@ function AppearancePage() {
             : !pro && <p className="mt-3 text-sm text-muted-foreground">Light and Dark are free. <Link to="/dashboard/upgrade" className="font-semibold text-primary">Unlock 6 more with Pro</Link>.</p>}
         </section>
 
-        <section className="space-y-4 rounded-3xl border bg-card p-5">
-          <h2 className="text-lg font-bold">WhatsApp & UPI</h2>
+        <section className="space-y-4 rounded-3xl border bg-card p-5 sm:p-6">
+          <h2 className="text-xl font-bold">WhatsApp & UPI</h2>
           <div className="space-y-1.5"><Label>WhatsApp number</Label><Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="98765 43210" inputMode="tel" /></div>
           <div className="space-y-1.5">
             <Label>UPI ID</Label>
@@ -81,8 +81,8 @@ function AppearancePage() {
           </div>
         </section>
 
-        <section className="space-y-4 rounded-3xl border bg-card p-5">
-          <h2 className="text-lg font-bold">Social links</h2>
+        <section className="space-y-4 rounded-3xl border bg-card p-5 sm:p-6">
+          <h2 className="text-xl font-bold">Social links</h2>
           {SOCIALS.filter((s) => s.key !== "whatsapp").map((s) => (
             <div key={s.key} className="space-y-1.5">
               <Label>{s.label}</Label>
@@ -91,7 +91,7 @@ function AppearancePage() {
             </div>
           ))}
         </section>
-        <Button onClick={save} className="h-12 w-full rounded-xl text-base">Save changes</Button>
+        <Button onClick={save} className="min-h-[52px] w-full rounded-xl text-lg">Save changes</Button>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
         <PhonePreview data={preview} theme={theme} showBranding={!pro} />

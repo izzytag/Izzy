@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon } from "lucide-react";
+import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, waCardLink, waLink, type ThemeId } from "@/lib/themes";
 
@@ -26,26 +26,26 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
-  const btn = "flex w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-4 text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
+  const btn = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
-      <div className={`mx-auto flex max-w-md flex-col items-center px-5 ${compact ? "py-8" : "py-12"}`}>
+      <div className={`mx-auto flex w-full max-w-md flex-col items-center px-5 ${compact ? "py-8" : "py-10"}`}>
         {data.avatar_url ? (
-          <img src={data.avatar_url} alt={name} className="h-24 w-24 rounded-full border-4 border-page-border object-cover" />
+          <img src={data.avatar_url} alt={name} className="h-28 w-28 rounded-full border-4 border-page-border object-cover" />
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-page-btn text-3xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
         )}
-        <h1 className="mt-4 text-2xl font-bold">{name}</h1>
-        {data.username && <p className="text-sm text-page-muted">@{data.username}</p>}
-        {data.bio && <p className="mt-3 text-center text-[15px] leading-relaxed text-page-muted">{data.bio}</p>}
+        <h1 className="mt-4 text-center text-3xl font-bold leading-tight">{name}</h1>
+        {data.username && <p className="text-base text-page-muted">@{data.username}</p>}
+        {data.bio && <p className="mt-3 text-center text-base leading-relaxed text-page-muted">{data.bio}</p>}
 
         {socials.length > 0 && (
           <div className="mt-5 flex gap-3">
             {socials.map(([k, v]) => {
               const Icon = ICONS[k] ?? LinkIcon;
               return (
-                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="rounded-full p-2 text-page-fg transition hover:scale-110">
+                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="flex h-11 w-11 items-center justify-center rounded-full border border-page-border text-page-fg transition hover:scale-110">
                   <Icon className="h-6 w-6" />
                 </a>
               );
@@ -53,7 +53,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
           </div>
         )}
 
-        <div className="mt-7 flex w-full flex-col gap-3">
+        <div className="mt-8 flex w-full flex-col gap-3">
           {data.whatsapp && (
             <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={btn}>
               <MessageCircle className="h-5 w-5" /> WhatsApp me
@@ -61,7 +61,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
           )}
           {shopHref && (
             <a href={shopHref} className={btn}>
-              Visit my Shop →
+              <ShoppingBag className="h-5 w-5" /> Visit my Shop →
             </a>
           )}
           {data.links.map((l) => {
@@ -76,18 +76,18 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
             const pageUrl = `${origin}/${data.username ?? ""}`;
             const href = data.whatsapp ? waCardLink(data.whatsapp, kind, l.title, pageUrl) : null;
             return (
-              <div key={l.id} className="rounded-2xl border border-page-border bg-page-btn p-4 text-page-btn-fg">
+              <div key={l.id} className="rounded-3xl border border-page-border bg-page-btn p-5 text-page-btn-fg">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-page-muted">{kind === "service" ? "Service" : "Product"}</p>
-                    <p className="font-semibold leading-snug">{l.title}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-page-muted">{kind === "service" ? "Service" : "Product"}</p>
+                    <p className="text-lg font-semibold leading-snug">{l.title}</p>
                   </div>
-                  {l.price && <p className="shrink-0 font-bold">{l.price}</p>}
+                  {l.price && <p className="shrink-0 text-lg font-bold">{l.price}</p>}
                 </div>
-                {l.description && <p className="mt-2 text-sm leading-relaxed text-page-muted">{l.description}</p>}
+                {l.description && <p className="mt-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
                 {href && (
                   <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)}
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-page-fg px-4 py-3 text-sm font-semibold text-page-bg">
+                    className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">
                     <MessageCircle className="h-4 w-4" /> {kind === "service" ? "Book on WhatsApp" : "Order on WhatsApp"}
                   </a>
                 )}
@@ -110,12 +110,12 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
             </>
           )}
           {data.links.length === 0 && !data.whatsapp && !data.upi_id && (
-            <p className="text-center text-sm text-page-muted">No links yet.</p>
+            <p className="text-center text-base text-page-muted">Nothing here yet.</p>
           )}
         </div>
 
         {showBranding && (
-          <a href="/" className="mt-12 text-sm font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+          <a href="/" className="mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
         )}
       </div>
     </div>

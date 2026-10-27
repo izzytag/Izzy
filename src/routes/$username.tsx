@@ -37,7 +37,7 @@ export const Route = createFileRoute("/$username")({
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
       <h1 className="text-3xl font-bold">This page isn't taken yet</h1>
       <p className="text-muted-foreground">Grab this username for your own izzy page.</p>
-      <Link to="/auth" className="rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">Create your page</Link>
+      <Link to="/auth" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your page</Link>
     </div>
   ),
   component: PublicPage,

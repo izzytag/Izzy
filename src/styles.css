@@ -96,8 +96,13 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
+  input, textarea, select { font-size: 16px; }
+  :focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
 }
 

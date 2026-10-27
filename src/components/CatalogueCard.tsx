@@ -15,15 +15,15 @@ export function CatalogueCard({ item, whatsapp, pageUrl, onLinkClick }: {
   const Icon = service ? Briefcase : ShoppingBag;
   const href = whatsapp && /\d{6,}/.test(whatsapp.replace(/\D/g, "")) ? waCardLink(whatsapp, item.kind ?? "product", item.title, `${pageUrl}#item-${item.id}`) : null;
   const [open, setOpen] = useState(false);
-  const action = href ? <Button asChild className="w-full bg-page-fg text-page-bg hover:bg-page-fg/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button> : null;
-  return <article id={`item-${item.id}`} className="overflow-hidden rounded-lg border border-page-border bg-page-btn text-page-btn-fg">
+  const action = href ? <Button asChild className="min-h-[48px] w-full bg-page-fg text-base text-page-bg hover:bg-page-fg/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button> : null;
+  return <article id={`item-${item.id}`} className="overflow-hidden rounded-3xl border border-page-border bg-page-btn text-page-btn-fg">
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left hover:bg-page-btn" onClick={() => setOpen(true)} aria-label={`View ${item.title}`}>
       {photos[0] ? <img src={photos[0]} alt={item.title} loading="lazy" className="aspect-[4/3] w-full object-cover" /> : <div className="flex aspect-[4/3] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
-      <div className="space-y-2 p-4">
+      <div className="space-y-2 p-5">
         <p className="text-xs text-page-muted">{item.category || (service ? "Service" : "Product")}</p>
-        <h3 className="break-words text-base font-semibold">{item.title}</h3>
-        {item.price && <p className="break-words font-bold">{item.price}</p>}
-        {item.description && <p className="line-clamp-2 break-words text-sm font-normal text-page-muted">{item.description}</p>}
+        <h3 className="break-words text-lg font-semibold">{item.title}</h3>
+        {item.price && <p className="break-words text-lg font-bold">{item.price}</p>}
+        {item.description && <p className="line-clamp-2 break-words text-base font-normal text-page-muted">{item.description}</p>}
         <span className="block text-xs underline">View details</span>
       </div>
     </Button>
