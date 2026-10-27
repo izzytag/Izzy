@@ -44,8 +44,8 @@ const SHOWCASE = [
 
 const DEMO = {
   display_name: "Priya's Kitchen", username: "priya", bio: "Homemade tiffins in Pune 🍛 Order by 10am for lunch", avatar_url: null,
-  socials: {}, whatsapp: "9876543210", upi_id: null,
-  links: [{ id: "1", title: "This week's menu", url: "#" }, { id: "2", title: "Watch my recipes", url: "#" }, { id: "3", title: "Chocolate cake", url: "", kind: "product", price: "₹499", description: "Fresh, baked today" }],
+  socials: {}, whatsapp: null, upi_id: null,
+  links: [{ id: "1", title: "This week's menu", url: "#" }, { id: "2", title: "Order on Swiggy", url: "#" }, { id: "3", title: "Watch my recipes", url: "#" }],
 };
 
 function Landing() {
@@ -64,7 +64,7 @@ function Landing() {
           </div>
           <div className="mx-auto w-full max-w-[300px]">
             <div className="overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
-              <div className="pointer-events-none h-[520px] overflow-hidden"><PublicProfile data={DEMO} theme="marigold" showBranding={false} compact /></div>
+              <div className="pointer-events-none h-[600px] overflow-hidden"><PublicProfile data={DEMO} theme="marigold" showBranding={false} compact /></div>
             </div>
             <p className="mt-3 text-center text-xs font-medium text-muted-foreground">Example page — yours will look like this</p>
           </div>
