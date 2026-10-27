@@ -9,10 +9,10 @@ import { TESTING_BANNER } from "@/lib/billing";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "izzy — One link for your links, shop and services" },
-      { name: "description", content: "One page for your links, shop products and services. Share it, and customers message you on WhatsApp to order or book. Free during testing." },
+      { title: "izzy — One link for your links or your shop" },
+      { name: "description", content: "One page for your links, or for your shop products and services. Share it, and customers message you on WhatsApp to order or book. Free during testing." },
       { property: "og:title", content: "izzy — Link in bio for creators" },
-      { property: "og:description", content: "One page for your links, shop products and services. Customers message you on WhatsApp." },
+      { property: "og:description", content: "One page for your links, or for your shop products and services. Customers message you on WhatsApp." },
     ],
   }),
   component: Landing,
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
 
 const STEPS = [
   { n: "1", t: "Create your link", d: "Pick a username. That is your page address." },
-  { n: "2", t: "Add links, shop products or services", d: "Add a link, add products with photos and prices, or add a service. Your shop lives at yourname/shop." },
+  { n: "2", t: "Add links, or shop products and services", d: "Add links for a link page, or add products with photos and prices and services for a store page. Your shop lives at yourname/shop." },
   { n: "3", t: "Share it — customers message you on WhatsApp", d: "Put the link in your bio. Buyers tap a product and order on WhatsApp. No payment is taken here." },
 ];
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, waCardLink, waLink, type ThemeId } from "@/lib/themes";
+import { visiblePageItems } from "@/lib/page-mode";
 
 const ICONS: Record<string, typeof Instagram> = { instagram: Instagram, youtube: Youtube, x: Twitter, linkedin: Linkedin, whatsapp: MessageCircle };
 
@@ -26,6 +27,9 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
+  // Exclusive page modes: a visitor sees either links OR products/services,
+  // never a mix. Legacy links on a store/service page are hidden, not deleted.
+  const visibleLinks = visiblePageItems(data.links);
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
 
@@ -65,7 +69,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
               <ShoppingBag className="h-5 w-5" /> Visit my Shop →
             </a>
           )}
-          {data.links.map((l) => {
+          {visibleLinks.map((l) => {
             const kind = l.kind ?? "link";
             if (kind === "link") {
               return (
@@ -114,7 +118,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
               )}
             </>
           )}
-          {data.links.length === 0 && !data.whatsapp && !data.upi_id && (
+          {visibleLinks.length === 0 && !data.whatsapp && !data.upi_id && (
             <p className="text-center text-base text-page-muted">Nothing here yet.</p>
           )}
         </div>

@@ -5,6 +5,7 @@ import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
 import { effectiveTheme } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
+import { getPageMode } from "@/lib/page-mode";
 
 export const Route = createFileRoute("/$username")({
   loader: async ({ params }) => {
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/$username")({
     const p = loaderData.profile;
     const name = p.display_name || p.username;
     const title = `${name} (@${p.username}) | izzy`;
-    const desc = p.bio || `All of ${name}'s links in one place.`;
+    const desc = p.bio || (getPageMode(loaderData.links) === "shop" ? `Shop ${name}'s products and services.` : `All of ${name}'s links in one place.`);
     const meta = [
       { title },
       { name: "description", content: desc },
@@ -52,14 +53,16 @@ function PublicPage() {
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
-  const hasProducts = links.some((l) => l.kind === "product");
+  // Exclusive page modes: a store/service page shows the shop button,
+  // a link page never does — visitors land on the store/service directly.
+  const isShopPage = getPageMode(links) === "shop";
   return (
     <PublicProfile
       data={{ ...profile, socials: (profile.socials as Record<string, string>) ?? {}, links }}
       theme={effectiveTheme(profile.theme, pro)}
       showBranding={!pro}
       onLinkClick={onClick}
-      shopHref={hasProducts ? `/${profile.username}/shop` : null}
+      shopHref={isShopPage ? `/${profile.username}/shop` : null}
     />
   );
 }

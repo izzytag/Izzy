@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, effectiveTheme, FREE_LINK_LIMIT, normalizeUrl } from "@/lib/themes";
 import { TESTING_FREE, TESTING_BANNER, PRO_PRICE_DISPLAY_LINE, effectiveIsPro } from "@/lib/billing";
+import { getPageMode } from "@/lib/page-mode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -67,7 +68,14 @@ function LinksPage() {
     toast.success("Photo updated");
   }
 
+  // Exclusive page modes, derived from enabled rows: a page is either
+  // links OR shop/services, never both. Nothing is deleted to enforce this.
+  const pageMode = getPageMode(links);
+  const hiddenLinks = pageMode === "shop" ? links.filter((l) => l.enabled && l.kind === "link") : [];
+
   async function addLink(kind: "link" | "product" | "service" = "link") {
+    if (kind === "link" && pageMode === "shop") return void toast.error("Your page is a store/service page, so links are not shown here. Remove all products and services first if you want a link page instead.");
+    if (kind !== "link" && pageMode === "links") return void toast.error("Your page is a link page, so shop products and services are not shown here. Remove all links first if you want a store/service page instead.");
     // NOTE: TESTING_FREE does not lift this check — the Supabase
     // enforce_link_limit trigger still caps free accounts at 5 links.
     if (!canAddLink(links.length, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} links. Upgrade to Pro for unlimited.`);
@@ -183,20 +191,34 @@ function LinksPage() {
             <h2 className="text-xl font-bold">Links</h2>
             {!acc.isPro && <span className="text-xs text-muted-foreground">{links.length}/{FREE_LINK_LIMIT} on Free</span>}
           </div>
-          <Button onClick={() => addLink()} className="mt-4 min-h-[52px] w-full rounded-full text-lg"><Plus className="h-5 w-5" /> Add link</Button>
+          {pageMode === "empty" && (
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">A page is either links OR shop and services, not both. The first item you add sets the mode.</p>
+          )}
+          {pageMode === "shop" && (
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a store/service page, so links are not shown here. Remove all products and services first if you want a link page instead.</p>
+          )}
+          {pageMode === "links" && (
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a link page, so shop products and services are not shown here. Remove all links first if you want a store/service page instead.</p>
+          )}
+          {hiddenLinks.length > 0 && (
+            <p className="mt-3 rounded-xl bg-primary-soft p-3 text-base text-accent-foreground">Your {hiddenLinks.length === 1 ? "link is" : "links are"} saved but hidden from visitors while your page is a store/service page. {hiddenLinks.length === 1 ? "It" : "They"} will show again if you remove all products and services, or you can delete {hiddenLinks.length === 1 ? "it" : "them"} below.</p>
+          )}
+          <Button onClick={() => addLink()} disabled={pageMode === "shop"} className="mt-4 min-h-[52px] w-full rounded-full text-lg"><Plus className="h-5 w-5" /> Add link</Button>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => addLink("product")} className="min-h-[48px] rounded-full text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
-            <Button variant="outline" onClick={() => addLink("service")} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
+            <Button variant="outline" onClick={() => addLink("product")} disabled={pageMode === "links"} className="min-h-[48px] rounded-full text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
+            <Button variant="outline" onClick={() => addLink("service")} disabled={pageMode === "links"} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
           </div>
-          <div className="mt-3 rounded-xl border p-3">
-            <p className="text-base font-semibold">Shop products</p>
-            <p className="mt-1 text-base text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
-            <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
-            <div className="mt-2 flex gap-2">
-              <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
-              <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
+          {pageMode !== "links" && (
+            <div className="mt-3 rounded-xl border p-3">
+              <p className="text-base font-semibold">Shop products</p>
+              <p className="mt-1 text-base text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
+              <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
+              <div className="mt-2 flex gap-2">
+                <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
+                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
+              </div>
             </div>
-          </div>
+          )}
           {!p.whatsapp && links.some((l) => l.kind !== "link") && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               Add your WhatsApp number in <Link to="/dashboard/appearance" className="font-semibold underline">Appearance</Link> so visitors can order or book on WhatsApp.
@@ -214,7 +236,7 @@ function LinksPage() {
               </ul>
             </SortableContext>
           </DndContext>
-          {links.length === 0 && <p className="mt-6 text-center text-base text-muted-foreground">Add your first link — your shop, YouTube video, menu, anything.</p>}
+          {links.length === 0 && <p className="mt-6 text-center text-base text-muted-foreground">Add your first item — a link, a shop product, or a service.</p>}
         </section>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
