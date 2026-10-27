@@ -22,6 +22,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
+import { Route as AuthenticatedDashboardStoreRouteImport } from './routes/_authenticated/dashboard.store'
 import { Route as AuthenticatedDashboardUpgradeRouteImport } from './routes/_authenticated/dashboard.upgrade'
 
 const IndexRoute = IndexRouteImport.update({
@@ -91,6 +92,12 @@ const AuthenticatedDashboardAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardStoreRoute =
+  AuthenticatedDashboardStoreRouteImport.update({
+    id: '/store',
+    path: '/store',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardUpgradeRoute =
   AuthenticatedDashboardUpgradeRouteImport.update({
     id: '/upgrade',
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/$username/shop': typeof UsernameShopRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/_authenticated/dashboard/store': typeof AuthenticatedDashboardStoreRoute
   '/_authenticated/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/store'
     | '/dashboard/upgrade'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/$username/shop'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/store'
     | '/dashboard/upgrade'
     | '/dashboard'
   id:
@@ -188,6 +200,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/appearance'
+    | '/_authenticated/dashboard/store'
     | '/_authenticated/dashboard/upgrade'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAppearanceRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/store': {
+      id: '/_authenticated/dashboard/store'
+      path: '/store'
+      fullPath: '/dashboard/store'
+      preLoaderRoute: typeof AuthenticatedDashboardStoreRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/upgrade': {
       id: '/_authenticated/dashboard/upgrade'
       path: '/upgrade'
@@ -310,6 +330,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAppearanceRoute: typeof AuthenticatedDashboardAppearanceRoute
+  AuthenticatedDashboardStoreRoute: typeof AuthenticatedDashboardStoreRoute
   AuthenticatedDashboardUpgradeRoute: typeof AuthenticatedDashboardUpgradeRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -319,6 +340,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardAppearanceRoute:
       AuthenticatedDashboardAppearanceRoute,
+    AuthenticatedDashboardStoreRoute: AuthenticatedDashboardStoreRoute,
     AuthenticatedDashboardUpgradeRoute: AuthenticatedDashboardUpgradeRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
