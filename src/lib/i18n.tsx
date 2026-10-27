@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 type Lang = "en" | "hi";
 const dict = {
-  en: { create: "Create your page", login: "Log in", pricing: "Pricing", tagline: "One link for everything you sell, share and create.", sub: "Your Instagram bio link, WhatsApp, UPI payments and all your links — on one beautiful page. $1/month." },
-  hi: { create: "अपना पेज बनाएं", login: "लॉग इन", pricing: "कीमत", tagline: "जो भी आप बेचते, शेयर करते और बनाते हैं — सब एक लिंक में।", sub: "Instagram बायो लिंक, WhatsApp, UPI पेमेंट और आपके सारे लिंक — एक सुंदर पेज पर। सिर्फ़ $1/महीना।" },
+  en: { create: "Create your page", login: "Log in", pricing: "Pricing", tagline: "One link for everything you sell, share and create.", sub: "One page for your links, shop products and services. Share it, and customers message you on WhatsApp to order or book." },
+  hi: { create: "अपना पेज बनाएं", login: "लॉग इन", pricing: "कीमत", tagline: "जो भी आप बेचते, शेयर करते और बनाते हैं — सब एक लिंक में।", sub: "आपके लिंक, दुकान के उत्पाद और सेवाओं के लिए एक पेज। ग्राहक WhatsApp पर मैसेज करके ऑर्डर या बुकिंग कर सकते हैं।" },
 };
 const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (typeof dict)["en"] }>({ lang: "en", setLang: () => {}, t: dict.en });
 

@@ -27,7 +27,7 @@ function TermsPage() {
           </section>
           <section>
             <h2 className="text-lg font-bold text-foreground">Plans</h2>
-            <p className="mt-2">The Free plan includes up to 5 links, Light and Dark themes, 7-day analytics and a "Made with Izzy" footer. Pro is $1/month and includes unlimited links, all themes, 30-day analytics and no branding. Pro subscriptions renew monthly and can be cancelled anytime; access continues until the end of the paid period.</p>
+            <p className="mt-2">The Free plan includes up to 5 links, Light and Dark themes, 7-day analytics and a "Made with Izzy" footer. Pro is ₹99/month in India and $1/month elsewhere and includes unlimited links, all themes, 30-day analytics and no branding. Pro subscriptions renew monthly and can be cancelled anytime; access continues until the end of the paid period.</p>
           </section>
           <section>
             <h2 className="text-lg font-bold text-foreground">Payments you receive</h2>

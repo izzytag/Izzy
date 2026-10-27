@@ -6,6 +6,7 @@ import { Lock, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { SOCIALS, THEMES, type ThemeId } from "@/lib/themes";
+import { TESTING_FREE, TESTING_BANNER, effectiveIsPro } from "@/lib/billing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,7 @@ function AppearancePage() {
   }
 
   const preview = { ...p, socials, whatsapp: whatsapp || null, upi_id: upi || null, links: links.filter((l) => l.enabled) };
+  const pro = effectiveIsPro(acc.isPro);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -48,7 +50,7 @@ function AppearancePage() {
           <h2 className="text-lg font-bold">Theme</h2>
           <div className="mt-4 grid grid-cols-4 gap-3">
             {THEMES.map((t) => {
-              const locked = !t.free && !acc.isPro;
+              const locked = !t.free && !pro;
               return (
                 <button key={t.id} onClick={() => locked ? toast("Pro theme", { description: "Upgrade to Pro to use all themes." }) : setTheme(t.id)}
                   className={`group relative flex flex-col items-center gap-1.5 ${locked ? "opacity-60" : ""}`}>
@@ -64,7 +66,9 @@ function AppearancePage() {
               );
             })}
           </div>
-          {!acc.isPro && <p className="mt-3 text-sm text-muted-foreground">Light and Dark are free. <Link to="/dashboard/upgrade" className="font-semibold text-primary">Unlock 6 more with Pro</Link>.</p>}
+          {TESTING_FREE
+            ? <p className="mt-3 text-sm text-muted-foreground">{TESTING_BANNER}</p>
+            : !pro && <p className="mt-3 text-sm text-muted-foreground">Light and Dark are free. <Link to="/dashboard/upgrade" className="font-semibold text-primary">Unlock 6 more with Pro</Link>.</p>}
         </section>
 
         <section className="space-y-4 rounded-3xl border bg-card p-5">
@@ -90,7 +94,7 @@ function AppearancePage() {
         <Button onClick={save} className="h-12 w-full rounded-xl text-base">Save changes</Button>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
-        <PhonePreview data={preview} theme={theme} showBranding={!acc.isPro} />
+        <PhonePreview data={preview} theme={theme} showBranding={!pro} />
       </aside>
     </div>
   );

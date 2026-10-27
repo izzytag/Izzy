@@ -11,6 +11,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, effectiveTheme, FREE_LINK_LIMIT, normalizeUrl } from "@/lib/themes";
+import { TESTING_FREE, TESTING_BANNER, PRO_PRICE_DISPLAY_LINE, effectiveIsPro } from "@/lib/billing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +41,8 @@ function LinksPage() {
   const qrRef = useRef<HTMLDivElement>(null);
   const [pageUrl, setPageUrl] = useState(`/${p.username}`);
   useEffect(() => setPageUrl(`${window.location.origin}/${p.username}`), [p.username]);
+  const pro = effectiveIsPro(acc.isPro);
+  const shopUrl = `${pageUrl}/shop`;
 
   const setLinks = (fn: (l: LinkRow[]) => LinkRow[]) => qc.setQueryData(linksQuery(acc.user.id).queryKey, (old) => fn(old ?? []));
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
@@ -65,6 +68,8 @@ function LinksPage() {
   }
 
   async function addLink(kind: "link" | "product" | "service" = "link") {
+    // NOTE: TESTING_FREE does not lift this check — the Supabase
+    // enforce_link_limit trigger still caps free accounts at 5 links.
     if (!canAddLink(links.length, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} links. Upgrade to Pro for unlimited.`);
     const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind, title: kind === "link" ? "New link" : kind === "product" ? "New product" : "New service", url: kind === "link" ? "https://" : "", position: links.length }).select().single();
     if (error) return void toast.error(error.message);
@@ -114,6 +119,9 @@ function LinksPage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
+        {TESTING_FREE && (
+          <p className="rounded-3xl border bg-primary-soft p-4 text-sm font-medium text-accent-foreground">{TESTING_BANNER}</p>
+        )}
         {/* Share */}
         <section className="flex flex-col gap-4 rounded-3xl border bg-card p-5 sm:flex-row sm:items-center">
           <div className="min-w-0 flex-1">
@@ -139,11 +147,11 @@ function LinksPage() {
                   <Button variant="outline" className="w-full" onClick={() => { navigator.clipboard.writeText(pageUrl); toast.success("Link copied"); }}>
                     <Copy className="h-4 w-4" /> Copy link
                   </Button>
-                  {acc.isPro ? (
+                  {pro ? (
                     <Button className="w-full" onClick={downloadQR}><Download className="h-4 w-4" /> Download PNG</Button>
                   ) : (
                     <div className="w-full rounded-xl bg-primary-soft p-3 text-center text-sm text-accent-foreground">
-                      Download is a Pro feature — <Link to="/dashboard/upgrade" className="font-semibold underline">Upgrade for $1/month</Link>
+                      Download is a Pro feature — <Link to="/dashboard/upgrade" className="font-semibold underline">Upgrade ({PRO_PRICE_DISPLAY_LINE})</Link>
                     </div>
                   )}
                 </div>
@@ -177,8 +185,17 @@ function LinksPage() {
           </div>
           <Button onClick={() => addLink()} className="mt-4 h-12 w-full rounded-xl text-base"><Plus className="h-5 w-5" /> Add link</Button>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => addLink("product")} className="rounded-xl"><ShoppingBag className="h-4 w-4" /> Product</Button>
+            <Button variant="outline" onClick={() => addLink("product")} className="rounded-xl"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
             <Button variant="outline" onClick={() => addLink("service")} className="rounded-xl"><Briefcase className="h-4 w-4" /> Service</Button>
+          </div>
+          <div className="mt-3 rounded-xl border p-3">
+            <p className="text-sm font-semibold">Shop products</p>
+            <p className="mt-1 text-sm text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
+            <p className="mt-2 truncate text-sm font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
+            <div className="mt-2 flex gap-2">
+              <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
+              <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
+            </div>
           </div>
           {!p.whatsapp && links.some((l) => l.kind !== "link") && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
@@ -187,7 +204,7 @@ function LinksPage() {
           )}
           {!canAddLink(links.length, acc.isPro) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro for $1/month</Link> for unlimited links.
+              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({PRO_PRICE_DISPLAY_LINE})</Link> for unlimited links.
             </p>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -201,7 +218,7 @@ function LinksPage() {
         </section>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
-        <PhonePreview data={preview} theme={effectiveTheme(p.theme, acc.isPro)} showBranding={!acc.isPro} />
+        <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
       </aside>
     </div>
   );

@@ -14,4 +14,12 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("matches a shop page for /<username>/shop, not the profile page", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    const matches = router.matchRoutes("/priya/shop");
+
+    expect(matches.at(-1)?.routeId).toBe("/$username_/shop");
+  });
 });

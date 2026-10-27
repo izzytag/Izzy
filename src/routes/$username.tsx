@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
 import { effectiveTheme } from "@/lib/themes";
+import { effectiveIsPro } from "@/lib/billing";
 
 export const Route = createFileRoute("/$username")({
   loader: async ({ params }) => {
@@ -44,18 +45,21 @@ export const Route = createFileRoute("/$username")({
 
 function PublicPage() {
   const { profile, links, isPro } = Route.useLoaderData();
+  const pro = effectiveIsPro(isPro);
   useEffect(() => {
     supabase.from("page_views").insert({ profile_id: profile.id }).then(() => {});
   }, [profile.id]);
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
+  const hasProducts = links.some((l) => l.kind === "product");
   return (
     <PublicProfile
       data={{ ...profile, socials: (profile.socials as Record<string, string>) ?? {}, links }}
-      theme={effectiveTheme(profile.theme, isPro)}
-      showBranding={!isPro}
+      theme={effectiveTheme(profile.theme, pro)}
+      showBranding={!pro}
       onLinkClick={onClick}
+      shopHref={hasProducts ? `/${profile.username}/shop` : null}
     />
   );
 }

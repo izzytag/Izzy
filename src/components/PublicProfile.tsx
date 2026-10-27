@@ -16,8 +16,10 @@ export type PublicData = {
   links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null }[];
 };
 
-export function PublicProfile({ data, theme, showBranding, onLinkClick, compact }: {
+export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref }: {
   data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; compact?: boolean;
+  /** Set only when the seller has enabled products — shows one clear "Visit my Shop" button. */
+  shopHref?: string | null;
 }) {
   const [showUpi, setShowUpi] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -55,6 +57,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
           {data.whatsapp && (
             <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={btn}>
               <MessageCircle className="h-5 w-5" /> WhatsApp me
+            </a>
+          )}
+          {shopHref && (
+            <a href={shopHref} className={btn}>
+              Visit my Shop →
             </a>
           )}
           {data.links.map((l) => {

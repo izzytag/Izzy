@@ -1,9 +1,11 @@
 # Izzy
 
-One link for your shop, WhatsApp and payments. Free to start, Pro $1/month.
+One link for your shop, WhatsApp and payments. Free to start, free during testing, Pro ₹99/month in India / $1/month elsewhere.
 
 Izzy is a link-in-bio site for small business creators: a public page per username,
-a dashboard to add links, themes, analytics and a QR code.
+a dashboard to add links, themes, analytics and a QR code. Products added in the
+dashboard also appear on a separate shop page at `/{username}/shop`, where
+visitors order on WhatsApp — no payment is taken inside Izzy.
 
 ## No Lovable needed
 
@@ -46,5 +48,5 @@ bun run dev
 
 ## Pro
 
-Pro is $1/month in the UI. Checkout itself is still a placeholder — no
+Pro is ₹99/month in India / $1/month elsewhere in the UI (Izzy only, shown as-is, no geo-detection). Checkout itself is still a placeholder — no
 Stripe/Razorpay checkout is built yet.
