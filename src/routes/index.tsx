@@ -36,10 +36,10 @@ const FEATURES = [
 const SHOWCASE = [
   { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", grad: "from-amber-100 via-orange-100 to-rose-100", h: "h-56", initial: "C", img: "/examples/chocolate-cake.webp" },
   { title: "Handmade candle", shop: "Glow Studio", price: "₹299", grad: "from-yellow-100 via-amber-100 to-orange-100", h: "h-40", initial: "G", img: "/examples/handmade-candle.webp" },
-  { title: "Sourdough loaf", shop: "Bake House", price: "₹199", grad: "from-stone-100 via-amber-50 to-yellow-100", h: "h-48", initial: "S" },
+  { title: "Sourdough loaf", shop: "Bake House", price: "₹199", grad: "from-stone-100 via-amber-50 to-yellow-100", h: "h-48", initial: "S", img: "/examples/sourdough-loaf.webp" },
   { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", grad: "from-sky-100 via-teal-50 to-emerald-100", h: "h-64", initial: "M", img: "/examples/ceramic-mug.webp" },
   { title: "Face serum", shop: "Glow Lab", price: "₹599", grad: "from-rose-100 via-pink-50 to-orange-100", h: "h-44", initial: "F", img: "/examples/face-serum.webp" },
-  { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T" },
+  { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T", img: "/examples/tote-bag.webp" },
 ];
 
 const DEMO = {
