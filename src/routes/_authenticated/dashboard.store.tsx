@@ -37,7 +37,6 @@ function StorePage() {
   const p = acc.profile;
   const [name, setName] = useState(p.display_name ?? "");
   const [bio, setBio] = useState(p.bio ?? "");
-  const [shopLayout, setShopLayout] = useState<string>((p as { shop_layout?: string | null }).shop_layout ?? "grid");
   const [avatar, setAvatar] = useState(p.avatar_url);
   const fileRef = useRef<HTMLInputElement>(null);
   const [pageUrl, setPageUrl] = useState(`/${p.username}`);
@@ -49,20 +48,10 @@ function StorePage() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
 
   async function saveProfile() {
-    const { error } = await supabase.from("profiles").update({ display_name: name.slice(0, 60), bio: bio.slice(0, 160), shop_layout: shopLayout }).eq("id", acc.user.id);
+    const { error } = await supabase.from("profiles").update({ display_name: name.slice(0, 60), bio: bio.slice(0, 160) }).eq("id", acc.user.id);
     if (error) return void toast.error(error.message);
     toast.success("Store saved");
     qc.invalidateQueries({ queryKey: ["account"] });
-  }
-
-  // Product layout choice, saved straight away so the owner can open
-  // their shop right after picking it and see the change.
-  async function saveLayout(layout: "grid" | "scroll") {
-    setShopLayout(layout);
-    const { error } = await supabase.from("profiles").update({ shop_layout: layout }).eq("id", acc.user.id);
-    if (error) return void toast.error(error.message);
-    qc.invalidateQueries({ queryKey: ["account"] });
-    toast.success("Product layout saved");
   }
 
   async function uploadAvatar(f: File) {
@@ -113,7 +102,7 @@ function StorePage() {
   }
 
   const preview = {
-    ...p, display_name: name, bio, avatar_url: avatar, shop_layout: shopLayout,
+    ...p, display_name: name, bio, avatar_url: avatar,
     socials: (p.socials as Record<string, string>) ?? {},
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };
@@ -164,21 +153,6 @@ function StorePage() {
                 <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
               </div>
             </>
-          )}
-          {pageMode !== "links" && (
-            <div className="mt-6">
-              <h3 className="text-lg font-bold">Product layout</h3>
-              <p className="mt-1 text-base text-muted-foreground">Choose how your products show on your store page.</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button variant={shopLayout === "grid" ? "default" : "outline"} onClick={() => saveLayout("grid")} className="min-h-[52px] rounded-full text-base">Side by side</Button>
-                <Button variant={shopLayout === "scroll" ? "default" : "outline"} onClick={() => saveLayout("scroll")} className="min-h-[52px] rounded-full text-base">Scrollable</Button>
-              </div>
-              <p className="mt-2 text-base text-muted-foreground">
-                {shopLayout === "scroll"
-                  ? "Scrollable: products in one vertical list, one after another, that visitors scroll down."
-                  : "Side by side: products in a grid, next to each other."}
-              </p>
-            </div>
           )}
           {pageMode !== "links" && (
             <div className="mt-4 grid grid-cols-2 gap-2">

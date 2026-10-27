@@ -24,7 +24,7 @@ export const getPublicPage = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id, shop_layout")
+      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id")
       .eq("username", data.username)
       .maybeSingle();
     if (!profile) return null;
@@ -42,7 +42,7 @@ export const getPublicShop = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id, shop_layout")
+      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id")
       .eq("username", data.username)
       .maybeSingle();
     if (!profile) return null;

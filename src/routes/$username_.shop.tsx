@@ -4,7 +4,6 @@ import { MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getPublicShop } from "@/lib/public-page.functions";
 import { CatalogueCard } from "@/components/CatalogueCard";
-import { normalizeShopLayout } from "@/lib/shop-layout";
 import { effectiveTheme, waLink } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
 
@@ -51,7 +50,6 @@ function ShopPage() {
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
   const name = profile.display_name || profile.username || "";
-  const shopLayout = normalizeShopLayout((profile as { shop_layout?: string | null }).shop_layout);
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-base text-center font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
@@ -88,19 +86,16 @@ function ShopPage() {
         </div>
 
         <h2 className="mt-12 w-full text-center text-2xl font-bold">Shop</h2>
-        <p className="mt-1 w-full text-center text-base text-page-muted">Tap a product to see it, then order on WhatsApp. No payment is taken here.</p>
+        <p className="mt-1 w-full text-center text-base text-page-muted">Tap a product to see its details, then order on WhatsApp. No payment is taken here.</p>
 
         {products.length === 0 ? (
           <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
             No products yet. Check back soon — or message the seller on WhatsApp.
           </p>
-        ) : shopLayout === "scroll" ? (
-          <div className="mx-auto mt-6 flex w-full max-w-[720px] flex-col">
-            {products.map((p) => (
-              <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />
-            ))}
-          </div>
         ) : (
+          // Pinterest-style pins, always: masonry, image-first. Tapping
+          // a pin opens its details — there is no order button on the
+          // pin itself.
           <div className="mt-6 w-full columns-2 gap-4 sm:columns-3 lg:columns-4">
             {products.map((p) => (
               <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />

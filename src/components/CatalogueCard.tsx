@@ -25,9 +25,11 @@ export function CatalogueCard({ item, whatsapp, pageUrl, onLinkClick }: {
         <h3 className="break-words text-base font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-base font-bold">{item.price}</p>}
         {item.description && <p className="line-clamp-2 break-words text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
+        <p className="pt-1 text-sm font-medium text-page-muted">See details →</p>
       </div>
     </Button>
-    {href && <div className="px-4 pb-4">{action}</div>}
+    {/* No order button on the pin itself: tapping the pin opens the
+        details below, and ordering happens from there only. */}
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader><DialogTitle className="break-words pr-5">{item.title}</DialogTitle></DialogHeader>
@@ -38,7 +40,10 @@ export function CatalogueCard({ item, whatsapp, pageUrl, onLinkClick }: {
         {item.category && <p className="text-sm text-muted-foreground">{item.category}</p>}
         {item.price && <p className="break-words text-xl font-bold">{item.price}</p>}
         {item.description && <p className="whitespace-pre-wrap break-words text-base leading-relaxed">{item.description}</p>}
-        {href && <Button asChild><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button>}
+        <div className="flex flex-col gap-2">
+          {action}
+          <Button variant="outline" className="min-h-[48px] w-full rounded-full text-base" onClick={() => setOpen(false)}>Close</Button>
+        </div>
       </DialogContent>
     </Dialog>
   </article>;
