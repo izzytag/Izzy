@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
+import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, waLink, type ThemeId } from "@/lib/themes";
 import { getPageMode, visiblePageItems } from "@/lib/page-mode";
@@ -18,14 +18,11 @@ export type PublicData = {
   links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null }[];
 };
 
-export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref, onShopClick }: {
+export function PublicProfile({ data, theme, showBranding, onLinkClick, compact }: {
   data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; compact?: boolean;
-  /** Set only when the seller has enabled products — shows one clear "Visit my Shop" button. */
-  shopHref?: string | null;
-  /** When set (dashboard live preview), "Visit my Shop" is a button that
-      calls this instead of a real link, so the preview never navigates
-      away from the dashboard. The live page never passes this. */
-  onShopClick?: (() => void) | null;
+  // No shop navigation button here: the live main page never links to
+  // /shop (products already show inline in shop mode), and the dashboard
+  // preview switches views from its own chrome toggle above the frame.
 }) {
   const [showUpi, setShowUpi] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -90,15 +87,6 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
               <MessageCircle className="h-5 w-5" /> WhatsApp me
             </a>
           )}
-          {onShopClick ? (
-            <button type="button" onClick={onShopClick} className={btn}>
-              <ShoppingBag className="h-5 w-5" /> Visit my Shop →
-            </button>
-          ) : shopHref ? (
-            <a href={shopHref} className={btn}>
-              <ShoppingBag className="h-5 w-5" /> Visit my Shop →
-            </a>
-          ) : null}
           {linkItems.map((l) => (
             <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)} className={btn}>
               {l.title}

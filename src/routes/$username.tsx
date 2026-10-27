@@ -53,16 +53,14 @@ function PublicPage() {
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
-  // Exclusive page modes: a store/service page shows the shop button,
-  // a link page never does — visitors land on the store/service directly.
-  const isShopPage = getPageMode(links) === "shop";
+  // No shop navigation button on the live main page: in shop mode the
+  // products already show inline here, and /shop still exists by URL.
   return (
     <PublicProfile
       data={{ ...profile, socials: (profile.socials as Record<string, string>) ?? {}, links }}
       theme={effectiveTheme(profile.theme, pro)}
       showBranding={!pro}
       onLinkClick={onClick}
-      shopHref={isShopPage ? `/${profile.username}/shop` : null}
     />
   );
 }

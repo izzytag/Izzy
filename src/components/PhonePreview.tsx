@@ -5,13 +5,14 @@ import { CatalogueCard } from "./CatalogueCard";
 import { waLink, type ThemeId } from "@/lib/themes";
 
 /**
- * Live preview: a phone frame around the seller's real page, with
- * working in-preview navigation. The preview never navigates away
- * from the dashboard: "Visit my Shop" switches this frame to the
- * shop view, and "← Back to main page" switches it back.
- * Tapping a product opens the existing details dialog; closing it
- * returns to whichever preview view was open, because the view
- * state lives here and is untouched by the dialog.
+ * Live preview: a phone frame around the seller's real page. The live
+ * pages have no shop navigation buttons, so view switching lives in
+ * this preview's chrome, above the frame: "Main page" / "Shop" toggle
+ * buttons (Shop only when the seller has enabled products/services).
+ * The page content inside the frame never shows those buttons, exactly
+ * like the live site. Tapping a product opens the existing details
+ * dialog; closing it returns to whichever preview view was open,
+ * because the view state lives here and is untouched by the dialog.
  */
 export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBranding: boolean }) {
   const { data, theme, showBranding } = props;
@@ -28,14 +29,30 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
   // shop view no longer exists — fall back to the main view.
   const effectiveView = view === "shop" && hasShop ? "shop" : "main";
   const name = data.display_name || data.username || "";
-  const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
+  const toggleBtn = (active: boolean) =>
+    `flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 text-sm font-semibold transition ${
+      active ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"
+    }`;
 
   return (
     <div className="mx-auto w-full max-w-[300px]">
       <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Live preview{effectiveView === "shop" ? " — Shop" : " — Main page"}
       </p>
+      {/* Preview chrome toggle (not part of the page itself): switches
+          the frame between the main view and the shop view. The Shop
+          toggle only appears when the seller has products/services. */}
+      {hasShop && (
+        <div className="mb-3 flex gap-2" role="group" aria-label="Preview view">
+          <button type="button" aria-pressed={effectiveView === "main"} onClick={() => setView("main")} className={toggleBtn(effectiveView === "main")}>
+            Main page
+          </button>
+          <button type="button" aria-pressed={effectiveView === "shop"} onClick={() => setView("shop")} className={toggleBtn(effectiveView === "shop")}>
+            Shop
+          </button>
+        </div>
+      )}
       <div className="h-[560px] overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
         <div className="h-full overflow-y-auto">
           {effectiveView === "main" ? (
@@ -44,8 +61,6 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
               theme={theme}
               showBranding={showBranding}
               compact
-              shopHref={hasShop ? `/${data.username ?? ""}/shop` : null}
-              onShopClick={hasShop ? () => setView("shop") : null}
             />
           ) : (
             <div className={`theme-${theme} min-h-full bg-page-bg text-page-fg`}>
@@ -65,19 +80,16 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
                   </div>
                 </div>
 
-                <div className="mt-5 flex w-full flex-col gap-3">
-                  <button type="button" onClick={() => setView("main")} className={btn}>
-                    ← Back to main page
-                  </button>
-                  {data.whatsapp && (
+                {/* No back button, no Shop heading, no intro here either:
+                    the header is followed directly by the WhatsApp pill
+                    (when set) and the product grid, like the live shop. */}
+                {data.whatsapp && (
+                  <div className="mt-5 flex w-full flex-col gap-3">
                     <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
                       <MessageCircle className="h-5 w-5" /> WhatsApp me
                     </a>
-                  )}
-                </div>
-
-                <h2 className="mt-8 w-full text-center text-2xl font-bold">Shop</h2>
-                <p className="mt-1 w-full text-center text-base text-page-muted">Tap a product to see its details, then order on WhatsApp. No payment is taken here.</p>
+                  </div>
+                )}
 
                 {products.length === 0 ? (
                   <p className="mx-auto mt-6 w-full rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
