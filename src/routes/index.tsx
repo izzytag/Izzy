@@ -34,11 +34,11 @@ const FEATURES = [
 ];
 
 const SHOWCASE = [
-  { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", grad: "from-amber-100 via-orange-100 to-rose-100", h: "h-56", initial: "C" },
-  { title: "Handmade candle", shop: "Glow Studio", price: "₹299", grad: "from-yellow-100 via-amber-100 to-orange-100", h: "h-40", initial: "G" },
+  { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", grad: "from-amber-100 via-orange-100 to-rose-100", h: "h-56", initial: "C", img: "/examples/chocolate-cake.webp" },
+  { title: "Handmade candle", shop: "Glow Studio", price: "₹299", grad: "from-yellow-100 via-amber-100 to-orange-100", h: "h-40", initial: "G", img: "/examples/handmade-candle.webp" },
   { title: "Sourdough loaf", shop: "Bake House", price: "₹199", grad: "from-stone-100 via-amber-50 to-yellow-100", h: "h-48", initial: "S" },
-  { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", grad: "from-sky-100 via-teal-50 to-emerald-100", h: "h-64", initial: "M" },
-  { title: "Face serum", shop: "Glow Lab", price: "₹599", grad: "from-rose-100 via-pink-50 to-orange-100", h: "h-44", initial: "F" },
+  { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", grad: "from-sky-100 via-teal-50 to-emerald-100", h: "h-64", initial: "M", img: "/examples/ceramic-mug.webp" },
+  { title: "Face serum", shop: "Glow Lab", price: "₹599", grad: "from-rose-100 via-pink-50 to-orange-100", h: "h-44", initial: "F", img: "/examples/face-serum.webp" },
   { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T" },
 ];
 
@@ -90,9 +90,13 @@ function Landing() {
         <div className="mt-10 columns-2 gap-4 sm:columns-3">
           {SHOWCASE.map((s) => (
             <div key={s.title} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border bg-card shadow-pin">
-              <div className={`flex ${s.h} items-center justify-center bg-gradient-to-br ${s.grad}`}>
-                <span className="text-5xl font-extrabold text-foreground/30">{s.initial}</span>
-              </div>
+              {s.img ? (
+                <img src={s.img} alt={s.title} loading="lazy" className={`${s.h} w-full object-cover`} />
+              ) : (
+                <div className={`flex ${s.h} items-center justify-center bg-gradient-to-br ${s.grad}`}>
+                  <span className="text-5xl font-extrabold text-foreground/30">{s.initial}</span>
+                </div>
+              )}
               <div className="p-4">
                 <p className="text-base font-semibold leading-snug">{s.title}</p>
                 <p className="mt-0.5 text-sm text-muted-foreground">{s.shop}</p>
