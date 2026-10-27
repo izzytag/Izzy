@@ -21,9 +21,9 @@ describe("izzy pricing (test phase)", () => {
     expect(testingBanner("ROW")).toContain("$1");
     expect(testingBanner("ROW")).not.toContain("₹99");
   });
-  it("testing flag gives everyone Pro display behaviour", () => {
-    expect(TESTING_FREE).toBe(true);
-    expect(effectiveIsPro(false)).toBe(true);
+  it("live paywall: only real Pro subscribers get Pro display behaviour", () => {
+    expect(TESTING_FREE).toBe(false);
+    expect(effectiveIsPro(false)).toBe(false);
     expect(effectiveIsPro(true)).toBe(true);
   });
 });

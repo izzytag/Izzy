@@ -16,24 +16,27 @@ export function proPriceLine(region: Region | "loading"): string {
 
 /**
  * Free-for-testing switch (Izzy test phase only).
- * Flip to false when the Pro paywall returns. While true, Pro-only
- * *display* behaviour is on for everyone: all themes are available and
- * the "Made with Izzy" footer is hidden, and the testing banner is shown.
+ * Set to false for live payments: Pro-only *display* behaviour is then
+ * only on for real Pro subscribers (all themes available, the
+ * "Made with Izzy" footer hidden), and the banner shows live pricing.
  * It does NOT override the database: the shared Supabase trigger
  * `enforce_link_limit` still caps free accounts at 5 links, and the
- * 30-day analytics range is still gated. Do not delete the Pro
- * code — it is only gated behind this flag.
+ * 30-day analytics range is still gated.
  *
- * Paid Pro activation (Razorpay, India) is built but only becomes
- * visible when this flag is flipped off after live keys are verified.
+ * Live payments (Razorpay, India) are enabled while this flag is off,
+ * with live keys and the live plan configured in Vercel.
  */
-export const TESTING_FREE = true;
+export const TESTING_FREE = false;
 
 export function testingBanner(region: Region | "loading"): string {
-  if (region === "loading") return "Free during testing — Pro pricing depends on your region.";
-  return region === "IN"
-    ? "Free during testing — Pro will be ₹99/month."
-    : "Free during testing — Pro will be $1/month.";
+  if (TESTING_FREE) {
+    if (region === "loading") return "Free during testing — Pro pricing depends on your region.";
+    return region === "IN"
+      ? "Free during testing — Pro will be ₹99/month."
+      : "Free during testing — Pro will be $1/month.";
+  }
+  if (region === "loading") return "Pro — monthly";
+  return region === "IN" ? "Pro is ₹99/month." : "Pro is $1/month.";
 }
 
 export function effectiveIsPro(isPro: boolean): boolean {
