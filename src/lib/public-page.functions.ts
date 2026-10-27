@@ -29,7 +29,7 @@ export const getPublicPage = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!profile) return null;
     const [{ data: links }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls").eq("user_id", profile.id).eq("enabled", true).order("position"),
+      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).order("position"),
       sb.rpc("is_pro", { _uid: profile.id }),
     ]);
     return { profile, links: links ?? [], isPro: !!isPro };
@@ -47,7 +47,7 @@ export const getPublicShop = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!profile) return null;
     const [{ data: products }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls").eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position"),
+      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position"),
       sb.rpc("is_pro", { _uid: profile.id }),
     ]);
     return { profile, products: products ?? [], isPro: !!isPro };

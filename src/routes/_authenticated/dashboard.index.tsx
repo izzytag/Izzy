@@ -169,7 +169,7 @@ function LinksPage() {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={linkRows.map((l) => l.id)} strategy={verticalListSortingStrategy}>
               <ul className="mt-4 space-y-3">
-                {linkRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} />)}
+                {linkRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} />)}
               </ul>
             </SortableContext>
           </DndContext>

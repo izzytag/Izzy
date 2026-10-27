@@ -173,7 +173,7 @@ function StorePage() {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={storeRows.map((l) => l.id)} strategy={verticalListSortingStrategy}>
               <ul className="mt-4 space-y-3">
-                {storeRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} />)}
+                {storeRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} />)}
               </ul>
             </SortableContext>
           </DndContext>

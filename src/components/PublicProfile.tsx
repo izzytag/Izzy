@@ -15,7 +15,7 @@ export type PublicData = {
   socials: Record<string, string>;
   whatsapp: string | null;
   upi_id: string | null;
-  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[] }[];
+  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null }[];
 };
 
 export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref }: {
@@ -117,10 +117,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
         </div>
 
         {productItems.length > 0 && (
-          // Pinterest-style pins: masonry, image-first. Tapping a pin
-          // opens its details (all photos, full description, WhatsApp
-          // order) — there is no order button on the pin itself.
-          <div className="mt-8 w-full columns-2 gap-4 sm:columns-3 lg:columns-4">
+          // Simple ecom grid: uniform cards, 2 columns on phone,
+          // 3 on tablet, 4 on desktop. Tapping a card opens its details
+          // (all photos, full description, WhatsApp order) — there is no
+          // order button on the card itself.
+          <div className="mt-8 grid w-full grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {productItems.map((l) => (
               <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} />
             ))}
