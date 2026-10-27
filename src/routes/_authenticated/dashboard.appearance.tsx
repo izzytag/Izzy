@@ -6,7 +6,8 @@ import { Lock, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { SOCIALS, THEMES, type ThemeId } from "@/lib/themes";
-import { TESTING_FREE, TESTING_BANNER, effectiveIsPro } from "@/lib/billing";
+import { TESTING_FREE, testingBanner, effectiveIsPro } from "@/lib/billing";
+import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/appearance")({
 });
 
 function AppearancePage() {
+  const region = useRegion();
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const qc = useQueryClient();
@@ -67,7 +69,7 @@ function AppearancePage() {
             })}
           </div>
           {TESTING_FREE
-            ? <p className="mt-3 text-sm text-muted-foreground">{TESTING_BANNER}</p>
+            ? <p className="mt-3 text-sm text-muted-foreground">{testingBanner(region)}</p>
             : !pro && <p className="mt-3 text-sm text-muted-foreground">Light and Dark are free. <Link to="/dashboard/upgrade" className="font-semibold text-primary">Unlock 6 more with Pro</Link>.</p>}
         </section>
 

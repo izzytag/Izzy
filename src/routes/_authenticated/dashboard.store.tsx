@@ -8,7 +8,8 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, effectiveTheme, FREE_LINK_LIMIT } from "@/lib/themes";
-import { TESTING_FREE, TESTING_BANNER, PRO_PRICE_DISPLAY_LINE, effectiveIsPro } from "@/lib/billing";
+import { TESTING_FREE, testingBanner, proPriceLine, effectiveIsPro } from "@/lib/billing";
+import { useRegion } from "@/lib/useRegion";
 import { getPageMode } from "@/lib/page-mode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/store")({
  * cannot be added until all links are removed. Nothing is deleted here.
  */
 function StorePage() {
+  const region = useRegion();
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const qc = useQueryClient();
@@ -113,7 +115,7 @@ function StorePage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {TESTING_FREE && (
-          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{TESTING_BANNER}</p>
+          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
         )}
         {/* Your store — store name, logo and bio, shown at the top of
             your store page. This is the only place these are edited. */}
@@ -174,7 +176,7 @@ function StorePage() {
           )}
           {pageMode !== "links" && !canAddLink(links.length, acc.isPro) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({PRO_PRICE_DISPLAY_LINE})</Link> for unlimited links.
+              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited links.
             </p>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>

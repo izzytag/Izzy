@@ -4,7 +4,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { PricingCards } from "@/components/PricingCards";
 import { PublicProfile } from "@/components/PublicProfile";
 import { useLang } from "@/lib/i18n";
-import { TESTING_BANNER } from "@/lib/billing";
+import { testingBanner } from "@/lib/billing";
+import { useRegion } from "@/lib/useRegion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,6 +51,7 @@ const DEMO = {
 
 function Landing() {
   const { t } = useLang();
+  const region = useRegion();
   return (
     <div className="min-h-screen">
       <div className="bg-hero">
@@ -122,9 +124,10 @@ function Landing() {
 
       <section className="mx-auto max-w-3xl px-5 pb-20">
         <h2 className="text-left text-3xl font-extrabold sm:text-center">Free vs Pro</h2>
-        <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{TESTING_BANNER}</p>
+        <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
         <div className="mt-8">
           <PricingCards
+            region={region}
             freeCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl border text-base font-semibold">Start free</Link>}
             proCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground">Go Pro</Link>}
           />

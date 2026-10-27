@@ -10,7 +10,8 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, effectiveTheme, FREE_LINK_LIMIT } from "@/lib/themes";
-import { TESTING_FREE, TESTING_BANNER, PRO_PRICE_DISPLAY_LINE, effectiveIsPro } from "@/lib/billing";
+import { TESTING_FREE, testingBanner, proPriceLine, effectiveIsPro } from "@/lib/billing";
+import { useRegion } from "@/lib/useRegion";
 import { getPageMode } from "@/lib/page-mode";
 import { Button } from "@/components/ui/button";
 import { PhonePreview } from "@/components/PhonePreview";
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
  * disabled and any saved links are shown as hidden, never deleted.
  */
 function LinksPage() {
+  const region = useRegion();
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const qc = useQueryClient();
@@ -106,7 +108,7 @@ function LinksPage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {TESTING_FREE && (
-          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{TESTING_BANNER}</p>
+          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
         )}
         {/* Share */}
         <section className="flex flex-col gap-4 rounded-[28px] border bg-card p-5 shadow-sm sm:p-6 lg:flex-row lg:items-center">
@@ -137,7 +139,7 @@ function LinksPage() {
                     <Button className="w-full" onClick={downloadQR}><Download className="h-4 w-4" /> Download PNG</Button>
                   ) : (
                     <div className="w-full rounded-xl bg-primary-soft p-3 text-center text-sm text-accent-foreground">
-                      Download is a Pro feature — <Link to="/dashboard/upgrade" className="font-semibold underline">Upgrade ({PRO_PRICE_DISPLAY_LINE})</Link>
+                      Download is a Pro feature — <Link to="/dashboard/upgrade" className="font-semibold underline">Upgrade ({proPriceLine(region)})</Link>
                     </div>
                   )}
                 </div>
@@ -167,7 +169,7 @@ function LinksPage() {
           <Button onClick={() => addLink()} disabled={pageMode === "shop"} className="mt-4 min-h-[52px] w-full rounded-full text-lg"><Plus className="h-5 w-5" /> Add link</Button>
           {!canAddLink(links.length, acc.isPro) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({PRO_PRICE_DISPLAY_LINE})</Link> for unlimited links.
+              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited links.
             </p>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
