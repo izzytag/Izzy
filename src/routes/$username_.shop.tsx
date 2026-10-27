@@ -52,6 +52,7 @@ function ShopPage() {
   const name = profile.display_name || profile.username || "";
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
+  const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-base text-center font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
@@ -74,7 +75,7 @@ function ShopPage() {
             ← Back to main page
           </a>
           {profile.whatsapp && (
-            <a href={waLink(profile.whatsapp)} target="_blank" rel="noopener noreferrer" className={btn}>
+            <a href={waLink(profile.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
               <MessageCircle className="h-5 w-5" /> WhatsApp me
             </a>
           )}

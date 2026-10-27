@@ -87,12 +87,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
                 <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-page-muted">{kind === "service" ? "Service" : "Product"}</p>
                     <p className="text-lg font-semibold leading-snug">{l.title}</p>
                   </div>
                   {l.price && <p className="shrink-0 text-lg font-bold">{l.price}</p>}
                 </div>
-                {l.description && <p className="mt-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
+                {l.description && <p className="mt-2 line-clamp-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
                 {href && (
                   <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)}
                     className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">

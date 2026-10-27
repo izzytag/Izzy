@@ -22,11 +22,9 @@ export function CatalogueCard({ item, whatsapp, pageUrl, onLinkClick }: {
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left hover:bg-page-btn" onClick={() => setOpen(true)} aria-label={`View ${item.title}`}>
       {photos[0] ? <img src={photos[0]} alt={item.title} loading="lazy" className={`${aspect} w-full object-cover`} /> : <div className={`flex ${aspect} items-center justify-center bg-page-bg`}><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1.5 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-page-muted">{item.category || (service ? "Service" : "Product")}</p>
         <h3 className="break-words text-base font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-base font-bold">{item.price}</p>}
-        {item.description && <p className="line-clamp-3 break-words text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
-        <span className="block pt-1 text-xs font-medium underline">View details</span>
+        {item.description && <p className="line-clamp-2 break-words text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
       </div>
     </Button>
     {href && <div className="px-4 pb-4">{action}</div>}

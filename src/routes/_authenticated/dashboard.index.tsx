@@ -168,21 +168,47 @@ function LinksPage() {
           </div>
         </section>
 
-        {/* Profile */}
+        {/* Your store — separate from Links, at the top. Store name is
+            display_name, the logo is the existing avatar upload, and the
+            bio is the short store description. Nothing here changes the
+            exclusive page modes: links and shop/services are never mixed. */}
         <section className="rounded-[28px] border bg-card p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-bold">Profile</h2>
+          <h2 className="text-xl font-bold">Your store</h2>
+          <p className="mt-1 text-base text-muted-foreground">Your store name and logo, shown at the top of your store page.</p>
           <div className="mt-4 flex items-start gap-4">
-            <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload photo">
+            <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload store logo">
               {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
               <span className="absolute inset-x-0 bottom-0 flex justify-center bg-foreground/60 py-1 text-background"><Camera className="h-4 w-4" /></span>
             </button>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
             <div className="flex-1 space-y-3">
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name or business" maxLength={60} />
-              <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Short bio (160 characters)" maxLength={160} rows={2} />
-              <Button size="sm" onClick={saveProfile}>Save profile</Button>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Store name" maxLength={60} />
+              <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Short store description (160 characters)" maxLength={160} rows={2} />
+              <Button size="sm" onClick={saveProfile}>Save store</Button>
             </div>
           </div>
+          <p className="mt-3 text-base text-muted-foreground">Logo is optional — if you skip it, we show your store initial instead.</p>
+          {pageMode === "shop" && (
+            <div className="mt-4 rounded-xl border p-3">
+              <p className="text-base font-semibold">Shop products</p>
+              <p className="mt-1 text-base text-muted-foreground">Products you add here appear on your store page. Services appear on your main page.</p>
+              <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
+                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
+                <Button variant="outline" size="sm" onClick={() => addLink("product")}><ShoppingBag className="h-4 w-4" /> Add shop product</Button>
+              </div>
+            </div>
+          )}
+          {pageMode === "links" && (
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is currently a link page, so products cannot be added until all links are removed.</p>
+          )}
+          {pageMode === "empty" && (
+            <div className="mt-4 rounded-xl border p-3">
+              <p className="text-base text-muted-foreground">Adding a first product makes this a store page.</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => addLink("product")}><ShoppingBag className="h-4 w-4" /> Add shop product</Button>
+            </div>
+          )}
         </section>
 
         {/* Links */}
@@ -208,17 +234,6 @@ function LinksPage() {
             <Button variant="outline" onClick={() => addLink("product")} disabled={pageMode === "links"} className="min-h-[48px] rounded-full text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
             <Button variant="outline" onClick={() => addLink("service")} disabled={pageMode === "links"} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
           </div>
-          {pageMode !== "links" && (
-            <div className="mt-3 rounded-xl border p-3">
-              <p className="text-base font-semibold">Shop products</p>
-              <p className="mt-1 text-base text-muted-foreground">Products you add here also appear on your shop page. Services appear on your main page.</p>
-              <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
-              <div className="mt-2 flex gap-2">
-                <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
-                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
-              </div>
-            </div>
-          )}
           {!p.whatsapp && links.some((l) => l.kind !== "link") && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               Add your WhatsApp number in <Link to="/dashboard/appearance" className="font-semibold underline">Appearance</Link> so visitors can order or book on WhatsApp.
