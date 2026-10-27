@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { isCompleteSocial, socialUrl, upiLink, waLink, type ThemeId } from "@/lib/themes";
+import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
 import { getPageMode, visiblePageItems } from "@/lib/page-mode";
 import { CatalogueCard } from "@/components/CatalogueCard";
+import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
 
 const ICONS: Record<string, typeof Instagram> = { instagram: Instagram, youtube: Youtube, x: Twitter, linkedin: Linkedin, whatsapp: MessageCircle };
 
@@ -36,7 +37,6 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
   const linkItems = visibleLinks.filter((l) => (l.kind ?? "link") === "link");
   const productItems = visibleLinks.filter((l) => l.kind === "product" || l.kind === "service");
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
-  const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
@@ -82,11 +82,6 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
         )}
 
         <div className={`mt-8 flex w-full flex-col gap-3.5 ${shopMode ? "sm:max-w-[420px] sm:self-start" : ""}`}>
-          {data.whatsapp && (
-            <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
-              <MessageCircle className="h-5 w-5" /> WhatsApp me
-            </a>
-          )}
           {linkItems.map((l) => (
             <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)} className={btn}>
               {l.title}
@@ -107,7 +102,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
               )}
             </>
           )}
-          {visibleLinks.length === 0 && !data.whatsapp && !data.upi_id && (
+          {visibleLinks.length === 0 && !data.upi_id && (
             <p className="text-center text-base text-page-muted">Nothing here yet.</p>
           )}
         </div>
@@ -130,6 +125,14 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
           <a href="/" className="mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
         )}
       </div>
+      {/* Floating WhatsApp button, live pages only, store pages only:
+          shop mode + a WhatsApp number set. In the dashboard preview
+          (compact) PhonePreview renders its own absolute version inside
+          the phone frame, so this fixed one is skipped there. Links-mode
+          pages get no floating button — a link page is not a store page. */}
+      {shopMode && !compact && (
+        <FloatingWhatsAppButton whatsapp={data.whatsapp} floating="fixed" />
+      )}
     </div>
   );
 }

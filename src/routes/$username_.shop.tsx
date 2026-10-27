@@ -1,10 +1,10 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getPublicShop } from "@/lib/public-page.functions";
 import { CatalogueCard } from "@/components/CatalogueCard";
-import { effectiveTheme, waLink } from "@/lib/themes";
+import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
+import { effectiveTheme } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
 
 /**
@@ -51,7 +51,6 @@ function ShopPage() {
   useEffect(() => setOrigin(window.location.origin), []);
   const name = profile.display_name || profile.username || "";
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
-  const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-base text-center font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
@@ -73,16 +72,10 @@ function ShopPage() {
           </div>
         </div>
 
-        {/* No back button, no Shop heading, no intro: the header is
-            followed directly by the WhatsApp pill (when set) and the
-            product grid. */}
-        {profile.whatsapp && (
-          <div className="mt-5 flex w-full flex-col gap-3 sm:max-w-[420px]">
-            <a href={waLink(profile.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
-              <MessageCircle className="h-5 w-5" /> WhatsApp me
-            </a>
-          </div>
-        )}
+        {/* No back button, no Shop heading, no intro, and no "WhatsApp
+            me" pill in the page flow: the header is followed directly
+            by the product grid, and WhatsApp lives in the floating
+            button at the bottom-right (when a number is set). */}
 
         {products.length === 0 ? (
           <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
@@ -102,6 +95,9 @@ function ShopPage() {
           <a href="/" className="mx-auto mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
         )}
       </div>
+      {/* Floating WhatsApp button, fixed bottom-right, only when the
+          seller set a number (the component returns null otherwise). */}
+      <FloatingWhatsAppButton whatsapp={profile.whatsapp} floating="fixed" />
     </div>
   );
 }

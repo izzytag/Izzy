@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { MessageCircle } from "lucide-react";
 import { PublicProfile, type PublicData } from "./PublicProfile";
 import { CatalogueCard } from "./CatalogueCard";
-import { waLink, type ThemeId } from "@/lib/themes";
+import { FloatingWhatsAppButton } from "./FloatingWhatsAppButton";
+import { type ThemeId } from "@/lib/themes";
 
 /**
  * Live preview: a phone frame around the seller's real page. The live
@@ -29,7 +29,6 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
   // shop view no longer exists — fall back to the main view.
   const effectiveView = view === "shop" && hasShop ? "shop" : "main";
   const name = data.display_name || data.username || "";
-  const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const toggleBtn = (active: boolean) =>
     `flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 text-sm font-semibold transition ${
       active ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"
@@ -53,7 +52,7 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
           </button>
         </div>
       )}
-      <div className="h-[560px] overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
+      <div className="relative h-[560px] overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
         <div className="h-full overflow-y-auto">
           {effectiveView === "main" ? (
             <PublicProfile
@@ -80,16 +79,11 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
                   </div>
                 </div>
 
-                {/* No back button, no Shop heading, no intro here either:
-                    the header is followed directly by the WhatsApp pill
-                    (when set) and the product grid, like the live shop. */}
-                {data.whatsapp && (
-                  <div className="mt-5 flex w-full flex-col gap-3">
-                    <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
-                      <MessageCircle className="h-5 w-5" /> WhatsApp me
-                    </a>
-                  </div>
-                )}
+                {/* No back button, no Shop heading, no intro, and no
+                    pill button in the page flow here either: the header
+                    is followed directly by the product grid, like the
+                    live shop. WhatsApp lives in the floating button
+                    pinned inside this frame (below). */}
 
                 {products.length === 0 ? (
                   <p className="mx-auto mt-6 w-full rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
@@ -110,6 +104,16 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
             </div>
           )}
         </div>
+        {/* Floating WhatsApp button, pinned INSIDE this phone frame
+            (absolute, relative frame above) — never fixed to the
+            dashboard viewport. Shown on store views only: the seller
+            has products/services and a WhatsApp number set. In links
+            mode there is no floating button, exactly like the live
+            pages. The main view's PublicProfile (compact) skips its
+            own fixed button, so this is the only one in preview. */}
+        {hasShop && (
+          <FloatingWhatsAppButton whatsapp={data.whatsapp} floating="absolute" />
+        )}
       </div>
     </div>
   );
