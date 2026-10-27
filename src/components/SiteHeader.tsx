@@ -5,7 +5,7 @@ import { useLang } from "@/lib/i18n";
 export function SiteHeader() {
   const { lang, setLang, t } = useLang();
   return (
-    <header className="sticky top-0 z-20 mx-auto flex w-full max-w-6xl items-center justify-between bg-background/90 px-4 py-3 backdrop-blur sm:px-5">
+    <header className="sticky top-0 z-20 mx-auto flex w-full max-w-6xl items-center justify-between border-b border-border/60 bg-background/95 px-4 py-3 backdrop-blur sm:px-5">
       <Logo />
       <nav className="flex items-center gap-3 text-sm font-medium">
         <Link to="/pricing" className="flex h-11 items-center px-2 text-base font-medium text-muted-foreground hover:text-foreground">{t.pricing}</Link>

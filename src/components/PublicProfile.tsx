@@ -13,7 +13,7 @@ export type PublicData = {
   socials: Record<string, string>;
   whatsapp: string | null;
   upi_id: string | null;
-  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null }[];
+  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[] }[];
 };
 
 export function PublicProfile({ data, theme, showBranding, onLinkClick, compact, shopHref }: {
@@ -26,26 +26,27 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
-  const btn = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
+  const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
+  const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
-      <div className={`mx-auto flex w-full max-w-md flex-col items-center px-5 ${compact ? "py-8" : "py-10"}`}>
+      <div className={`mx-auto flex w-full max-w-[420px] flex-col items-center px-4 ${compact ? "py-8" : "py-12"}`}>
         {data.avatar_url ? (
-          <img src={data.avatar_url} alt={name} className="h-28 w-28 rounded-full border-4 border-page-border object-cover" />
+          <img src={data.avatar_url} alt={name} className="h-[120px] w-[120px] rounded-full object-cover shadow-pin ring-4 ring-white/70" />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
+          <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
         )}
-        <h1 className="mt-4 text-center text-3xl font-bold leading-tight">{name}</h1>
+        <h1 className="mt-5 text-center text-[32px] font-bold leading-tight">{name}</h1>
         {data.username && <p className="text-base text-page-muted">@{data.username}</p>}
-        {data.bio && <p className="mt-3 text-center text-base leading-relaxed text-page-muted">{data.bio}</p>}
+        {data.bio && <p className="mt-2 text-center text-[17px] leading-relaxed text-page-muted">{data.bio}</p>}
 
         {socials.length > 0 && (
           <div className="mt-5 flex gap-3">
             {socials.map(([k, v]) => {
               const Icon = ICONS[k] ?? LinkIcon;
               return (
-                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="flex h-11 w-11 items-center justify-center rounded-full border border-page-border text-page-fg transition hover:scale-110">
+                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="flex h-11 w-11 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-110">
                   <Icon className="h-6 w-6" />
                 </a>
               );
@@ -53,9 +54,9 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
           </div>
         )}
 
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <div className="mt-8 flex w-full flex-col gap-3.5">
           {data.whatsapp && (
-            <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={btn}>
+            <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
               <MessageCircle className="h-5 w-5" /> WhatsApp me
             </a>
           )}
@@ -75,8 +76,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
             }
             const pageUrl = `${origin}/${data.username ?? ""}`;
             const href = data.whatsapp ? waCardLink(data.whatsapp, kind, l.title, pageUrl) : null;
+            const photos = (l as { image_urls?: string[] }).image_urls ?? [];
             return (
-              <div key={l.id} className="rounded-3xl border border-page-border bg-page-btn p-5 text-page-btn-fg">
+              <div key={l.id} className="overflow-hidden rounded-[28px] border border-page-border bg-page-btn text-page-btn-fg shadow-sm">
+                {photos[0] && <img src={photos[0]} alt={l.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
+                <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-wider text-page-muted">{kind === "service" ? "Service" : "Product"}</p>
@@ -87,10 +91,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
                 {l.description && <p className="mt-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
                 {href && (
                   <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)}
-                    className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">
+                    className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">
                     <MessageCircle className="h-4 w-4" /> {kind === "service" ? "Book on WhatsApp" : "Order on WhatsApp"}
                   </a>
                 )}
+                </div>
               </div>
             );
           })}

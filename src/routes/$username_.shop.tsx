@@ -51,22 +51,23 @@ function ShopPage() {
   useEffect(() => setOrigin(window.location.origin), []);
   const name = profile.display_name || profile.username || "";
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
-  const btn = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]";
+  const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
 
   return (
     <div className={`theme-${theme} min-h-screen bg-page-bg text-page-fg`}>
-      <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-10">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 py-10 sm:px-5">
+        <div className="flex w-full max-w-[420px] flex-col items-center">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={name} className="h-28 w-28 rounded-full border-4 border-page-border object-cover" />
+          <img src={profile.avatar_url} alt={name} className="h-[120px] w-[120px] rounded-full object-cover shadow-pin ring-4 ring-white/70" />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg">{name.charAt(0).toUpperCase() || "?"}</div>
+          <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
         )}
-        <h1 className="mt-4 text-center text-3xl font-bold leading-tight">{name}</h1>
+        <h1 className="mt-5 text-center text-[32px] font-bold leading-tight">{name}</h1>
         {profile.username && <p className="text-base text-page-muted">@{profile.username}</p>}
-        {profile.bio && <p className="mt-3 text-center text-base leading-relaxed text-page-muted">{profile.bio}</p>}
+        {profile.bio && <p className="mt-2 text-center text-[17px] leading-relaxed text-page-muted">{profile.bio}</p>}
 
         <div className="mt-7 flex w-full flex-col gap-3">
           <a href={`/${profile.username}`} className={btn}>
@@ -79,15 +80,17 @@ function ShopPage() {
           )}
         </div>
 
-        <h2 className="mt-10 w-full text-2xl font-bold">Shop</h2>
-        <p className="mt-1 w-full text-base text-page-muted">Tap a product, then order on WhatsApp. No payment is taken here.</p>
+        </div>
+
+        <h2 className="mt-12 w-full text-center text-2xl font-bold">Shop</h2>
+        <p className="mt-1 w-full text-center text-base text-page-muted">Tap a product to see it, then order on WhatsApp. No payment is taken here.</p>
 
         {products.length === 0 ? (
-          <p className="mt-8 w-full rounded-3xl border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg">
+          <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
             No products yet. Check back soon — or message the seller on WhatsApp.
           </p>
         ) : (
-          <div className="mt-6 flex w-full flex-col gap-5">
+          <div className="mt-6 w-full columns-2 gap-4 sm:columns-3 lg:columns-4">
             {products.map((p) => (
               <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />
             ))}

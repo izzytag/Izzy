@@ -82,9 +82,9 @@ function AuthPage() {
   // project and allow the Vercel redirect URL, then restore a signInWithOAuth button here.
 
   return (
-    <div className="flex min-h-dvh flex-col bg-hero px-4 py-6">
+    <div className="flex min-h-dvh flex-col bg-background px-4 py-6">
       <Logo />
-      <div className="mx-auto mt-8 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-soft sm:mt-12 sm:p-8">
+      <div className="mx-auto mt-8 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-pin sm:mt-12 sm:p-8">
         {sent ? (
           <div className="text-center">
             <h1 className="text-3xl font-bold">Check your email</h1>
@@ -111,7 +111,7 @@ function AuthPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pw" className="text-base font-medium">Password</Label>
                   {mode === "signin" && (
-                    <button type="button" onClick={forgotPassword} className="text-xs font-semibold text-primary">Forgot password?</button>
+                    <button type="button" onClick={forgotPassword} className="text-sm font-semibold text-primary">Forgot password?</button>
                   )}
                 </div>
                 <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
@@ -119,10 +119,10 @@ function AuthPage() {
                   <p className="text-sm text-muted-foreground">Use a strong, unique password. Common or leaked passwords are rejected.</p>
                 )}
               </div>
-              <Button type="submit" disabled={busy} className="min-h-[52px] w-full rounded-xl text-lg">{mode === "signup" ? "Sign up" : "Log in"}</Button>
+              <Button type="submit" disabled={busy} className="min-h-[52px] w-full rounded-full text-lg">{mode === "signup" ? "Sign up" : "Log in"}</Button>
             <p className="text-center text-sm text-muted-foreground">Google sign-in is not set up yet for this version — please use email for now.</p>
             </form>
-            <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
+            <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-full border text-base text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
               {mode === "signup" ? "Already have an account? Log in" : "New here? Sign up"}
             </button>
           </>
