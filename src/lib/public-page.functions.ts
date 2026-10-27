@@ -24,7 +24,7 @@ export const getPublicPage = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id")
+      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id, shop_layout")
       .eq("username", data.username)
       .maybeSingle();
     if (!profile) return null;
@@ -35,14 +35,14 @@ export const getPublicPage = createServerFn({ method: "GET" })
     return { profile, links: links ?? [], isPro: !!isPro };
   });
 
-/** Shop view: same profile, products only (kind='product', enabled). No new column needed — image_urls already exists. */
+/** Shop view: same profile, products only (kind='product', enabled). */
 export const getPublicShop = createServerFn({ method: "GET" })
   .inputValidator((d: { username: string }) => ({ username: String(d.username).toLowerCase().slice(0, 30) }))
   .handler(async ({ data }) => {
     const sb = publicClient();
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id")
+      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id, shop_layout")
       .eq("username", data.username)
       .maybeSingle();
     if (!profile) return null;

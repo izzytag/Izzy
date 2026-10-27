@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, waCardLink, waLink, type ThemeId } from "@/lib/themes";
-import { visiblePageItems } from "@/lib/page-mode";
+import { getPageMode, visiblePageItems } from "@/lib/page-mode";
+import { normalizeShopLayout } from "@/lib/shop-layout";
 
 const ICONS: Record<string, typeof Instagram> = { instagram: Instagram, youtube: Youtube, x: Twitter, linkedin: Linkedin, whatsapp: MessageCircle };
 
@@ -14,6 +15,7 @@ export type PublicData = {
   socials: Record<string, string>;
   whatsapp: string | null;
   upi_id: string | null;
+  shop_layout?: string | null;
   links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[] }[];
 };
 
@@ -30,23 +32,72 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
   // Exclusive page modes: a visitor sees either links OR products/services,
   // never a mix. Legacy links on a store/service page are hidden, not deleted.
   const visibleLinks = visiblePageItems(data.links);
+  const shopMode = getPageMode(data.links) === "shop";
+  const shopLayout = normalizeShopLayout(data.shop_layout);
+  const linkItems = visibleLinks.filter((l) => (l.kind ?? "link") === "link");
+  const productItems = visibleLinks.filter((l) => l.kind === "product" || l.kind === "service");
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-center text-base font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
 
+  const productCard = (l: (typeof visibleLinks)[number]) => {
+    const kind = l.kind ?? "product";
+    const pageUrl = `${origin}/${data.username ?? ""}`;
+    const href = data.whatsapp ? waCardLink(data.whatsapp, kind, l.title, pageUrl) : null;
+    const photos = (l as { image_urls?: string[] }).image_urls ?? [];
+    return (
+      <div key={l.id} className="overflow-hidden rounded-[28px] border border-page-border bg-page-btn text-page-btn-fg shadow-sm">
+        {photos[0] && <img src={photos[0]} alt={l.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-lg font-semibold leading-snug">{l.title}</p>
+            </div>
+            {l.price && <p className="shrink-0 text-lg font-bold">{l.price}</p>}
+          </div>
+          {l.description && <p className="mt-2 line-clamp-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
+          {href && (
+            <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)}
+              className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">
+              <MessageCircle className="h-4 w-4" /> {kind === "service" ? "Book on WhatsApp" : "Order on WhatsApp"}
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
-      <div className={`mx-auto flex w-full max-w-[420px] flex-col items-center px-4 ${compact ? "py-8" : "py-12"}`}>
-        {data.avatar_url ? (
-          <img src={data.avatar_url} alt={name} className="h-[120px] w-[120px] rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+      <div className={`mx-auto flex w-full ${shopMode ? "max-w-5xl" : "max-w-[420px]"} flex-col items-center px-4 ${compact ? "py-8" : "py-12"}`}>
+        {shopMode ? (
+          // Store header: logo beside the store name, at the top.
+          // No @username here — the username stays in the URL only.
+          <div className="flex w-full items-start gap-4">
+            {data.avatar_url ? (
+              <img src={data.avatar_url} alt={name} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h1 className="text-[28px] font-bold leading-tight sm:text-[32px]">{name}</h1>
+              {data.bio && <p className="mt-1 text-base leading-relaxed text-page-muted sm:text-[17px]">{data.bio}</p>}
+            </div>
+          </div>
         ) : (
-          <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
+          <>
+            {data.avatar_url ? (
+              <img src={data.avatar_url} alt={name} className="h-[120px] w-[120px] rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+            ) : (
+              <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
+            )}
+            <h1 className="mt-5 text-center text-[32px] font-bold leading-tight">{name}</h1>
+            {data.username && <p className="text-base text-page-muted">@{data.username}</p>}
+            {data.bio && <p className="mt-2 text-center text-[17px] leading-relaxed text-page-muted">{data.bio}</p>}
+          </>
         )}
-        <h1 className="mt-5 text-center text-[32px] font-bold leading-tight">{name}</h1>
-        {data.username && <p className="text-base text-page-muted">@{data.username}</p>}
-        {data.bio && <p className="mt-2 text-center text-[17px] leading-relaxed text-page-muted">{data.bio}</p>}
 
         {socials.length > 0 && (
-          <div className="mt-5 flex gap-3">
+          <div className={`mt-5 flex gap-3 ${shopMode ? "self-start" : ""}`}>
             {socials.map(([k, v]) => {
               const Icon = ICONS[k] ?? LinkIcon;
               return (
@@ -58,7 +109,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
           </div>
         )}
 
-        <div className="mt-8 flex w-full flex-col gap-3.5">
+        <div className={`mt-8 flex w-full flex-col gap-3.5 ${shopMode ? "sm:max-w-[420px] sm:self-start" : ""}`}>
           {data.whatsapp && (
             <a href={waLink(data.whatsapp)} target="_blank" rel="noopener noreferrer" className={waBtn}>
               <MessageCircle className="h-5 w-5" /> WhatsApp me
@@ -69,39 +120,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
               <ShoppingBag className="h-5 w-5" /> Visit my Shop →
             </a>
           )}
-          {visibleLinks.map((l) => {
-            const kind = l.kind ?? "link";
-            if (kind === "link") {
-              return (
-                <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)} className={btn}>
-                  {l.title}
-                </a>
-              );
-            }
-            const pageUrl = `${origin}/${data.username ?? ""}`;
-            const href = data.whatsapp ? waCardLink(data.whatsapp, kind, l.title, pageUrl) : null;
-            const photos = (l as { image_urls?: string[] }).image_urls ?? [];
-            return (
-              <div key={l.id} className="overflow-hidden rounded-[28px] border border-page-border bg-page-btn text-page-btn-fg shadow-sm">
-                {photos[0] && <img src={photos[0]} alt={l.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
-                <div className="p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-lg font-semibold leading-snug">{l.title}</p>
-                  </div>
-                  {l.price && <p className="shrink-0 text-lg font-bold">{l.price}</p>}
-                </div>
-                {l.description && <p className="mt-2 line-clamp-2 text-base leading-relaxed text-page-muted">{l.description}</p>}
-                {href && (
-                  <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)}
-                    className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-4 py-3 text-base font-semibold text-page-bg">
-                    <MessageCircle className="h-4 w-4" /> {kind === "service" ? "Book on WhatsApp" : "Order on WhatsApp"}
-                  </a>
-                )}
-                </div>
-              </div>
-            );
-          })}
+          {linkItems.map((l) => (
+            <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(l.id)} className={btn}>
+              {l.title}
+            </a>
+          ))}
           {data.upi_id && (
             <>
               <button type="button" onClick={() => setShowUpi((s) => !s)} className={btn}>
@@ -121,6 +144,12 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact,
             <p className="text-center text-base text-page-muted">Nothing here yet.</p>
           )}
         </div>
+
+        {productItems.length > 0 && (
+          <div className={`mt-8 w-full ${shopLayout === "scroll" ? "flex flex-col gap-4" : "grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"}`}>
+            {productItems.map(productCard)}
+          </div>
+        )}
 
         {showBranding && (
           <a href="/" className="mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>

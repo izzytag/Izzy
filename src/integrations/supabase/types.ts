@@ -157,6 +157,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          shop_layout: string
           socials: Json
           theme: string
           upi_id: string | null
@@ -169,6 +170,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          shop_layout?: string
           socials?: Json
           theme?: string
           upi_id?: string | null
@@ -181,6 +183,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          shop_layout?: string
           socials?: Json
           theme?: string
           upi_id?: string | null

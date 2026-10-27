@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getPublicShop } from "@/lib/public-page.functions";
 import { CatalogueCard } from "@/components/CatalogueCard";
+import { normalizeShopLayout } from "@/lib/shop-layout";
 import { effectiveTheme, waLink } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
 
@@ -50,6 +51,7 @@ function ShopPage() {
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
   const name = profile.display_name || profile.username || "";
+  const shopLayout = normalizeShopLayout((profile as { shop_layout?: string | null }).shop_layout);
   const pageUrl = origin ? `${origin}/${profile.username}/shop` : "";
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-base text-center font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
   const waBtn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-page-fg px-5 py-3.5 text-base text-center font-semibold text-page-bg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
@@ -59,18 +61,22 @@ function ShopPage() {
 
   return (
     <div className={`theme-${theme} min-h-screen bg-page-bg text-page-fg`}>
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 py-10 sm:px-5">
-        <div className="flex w-full max-w-[420px] flex-col items-center">
-        {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={name} className="h-[120px] w-[120px] rounded-full object-cover shadow-pin ring-4 ring-white/70" />
-        ) : (
-          <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full bg-page-btn text-4xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
-        )}
-        <h1 className="mt-5 text-center text-[32px] font-bold leading-tight">{name}</h1>
-        {profile.username && <p className="text-base text-page-muted">@{profile.username}</p>}
-        {profile.bio && <p className="mt-2 text-center text-[17px] leading-relaxed text-page-muted">{profile.bio}</p>}
+      <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-10 sm:px-5">
+        {/* Store header: logo beside the store name, at the top.
+            No @username here — the username stays in the URL only. */}
+        <div className="flex w-full items-start gap-4">
+          {profile.avatar_url ? (
+            <img src={profile.avatar_url} alt={name} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+          ) : (
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[28px] font-bold leading-tight sm:text-[32px]">{name}</h1>
+            {profile.bio && <p className="mt-1 text-base leading-relaxed text-page-muted sm:text-[17px]">{profile.bio}</p>}
+          </div>
+        </div>
 
-        <div className="mt-7 flex w-full flex-col gap-3">
+        <div className="mt-5 flex w-full flex-col gap-3 sm:max-w-[420px]">
           <a href={`/${profile.username}`} className={btn}>
             ← Back to main page
           </a>
@@ -81,8 +87,6 @@ function ShopPage() {
           )}
         </div>
 
-        </div>
-
         <h2 className="mt-12 w-full text-center text-2xl font-bold">Shop</h2>
         <p className="mt-1 w-full text-center text-base text-page-muted">Tap a product to see it, then order on WhatsApp. No payment is taken here.</p>
 
@@ -90,6 +94,12 @@ function ShopPage() {
           <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
             No products yet. Check back soon — or message the seller on WhatsApp.
           </p>
+        ) : shopLayout === "scroll" ? (
+          <div className="mx-auto mt-6 flex w-full max-w-[720px] flex-col">
+            {products.map((p) => (
+              <CatalogueCard key={p.id} item={p} whatsapp={profile.whatsapp} pageUrl={pageUrl} onLinkClick={onClick} />
+            ))}
+          </div>
         ) : (
           <div className="mt-6 w-full columns-2 gap-4 sm:columns-3 lg:columns-4">
             {products.map((p) => (
@@ -99,7 +109,7 @@ function ShopPage() {
         )}
 
         {!pro && (
-          <a href="/" className="mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+          <a href="/" className="mx-auto mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
         )}
       </div>
     </div>
