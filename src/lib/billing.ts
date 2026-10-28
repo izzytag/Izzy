@@ -29,12 +29,7 @@ export function proPriceLine(region: Region | "loading"): string {
 export const TESTING_FREE = false;
 
 export function testingBanner(region: Region | "loading"): string {
-  if (TESTING_FREE) {
-    if (region === "loading") return "Free during testing — Pro pricing depends on your region.";
-    return region === "IN"
-      ? "Free during testing — Pro will be ₹99/month."
-      : "Free during testing — Pro will be $1/month.";
-  }
+  // Live site: no testing wording anywhere, even if TESTING_FREE is ever flipped.
   if (region === "loading") return "Pro — monthly";
   return region === "IN" ? "Pro is ₹99/month." : "Pro is $1/month.";
 }

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "izzy — One link for your links or your shop" },
-      { name: "description", content: "One page for your links, or for your shop products and services. Share it, and customers message you on WhatsApp to order or book. Free during testing." },
+      { name: "description", content: "One page for your links, or for your shop products and services. Share it, and customers message you on WhatsApp to order or book." },
       { property: "og:title", content: "izzy — Link in bio for creators" },
       { property: "og:description", content: "One page for your links, or for your shop products and services. Customers message you on WhatsApp." },
     ],
@@ -58,7 +58,6 @@ function Landing() {
         <SiteHeader />
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-8 lg:grid-cols-2">
           <div className="text-center lg:text-left">
-            <span className="inline-block rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-accent-foreground">Free during testing</span>
             <h1 className="mx-auto mt-4 max-w-xl text-4xl font-extrabold leading-[1.05] sm:text-6xl lg:mx-0">{t.tagline}</h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground lg:mx-0">{t.sub}</p>
             <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 sm:inline-flex sm:w-auto">{t.create} →</Link>
