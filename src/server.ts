@@ -1,5 +1,6 @@
 import "./lib/error-capture";
 
+import { handleRazorpayWebhookRequest } from "./lib/razorpay-webhook-route.server";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -47,6 +48,17 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // Razorpay webhook: this TanStack Start version has no API file
+      // routes, and a server function cannot see the raw body the
+      // signature is computed over — so the webhook is intercepted
+      // here, in the real server entry, before the Start handler runs.
+      // Nothing else is intercepted: every other request delegates.
+      if (new URL(request.url).pathname === "/api/razorpay-webhook") {
+        if (request.method !== "POST") {
+          return new Response(null, { status: 405, headers: { Allow: "POST" } });
+        }
+        return await handleRazorpayWebhookRequest(request);
+      }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

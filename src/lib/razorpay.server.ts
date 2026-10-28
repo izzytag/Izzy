@@ -12,6 +12,8 @@ export type RazorpaySubscription = {
   id: string;
   status: string;
   notes?: Record<string, unknown> | null;
+  /** Current billing period end, Unix seconds (webhook use only). */
+  current_end?: number | null;
 };
 
 /** Razorpay signature: HMAC-SHA256(secret, payment_id + "|" + subscription_id). */
