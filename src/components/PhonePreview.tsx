@@ -5,7 +5,7 @@ import { FloatingWhatsAppButton } from "./FloatingWhatsAppButton";
 import { type ThemeId } from "@/lib/themes";
 
 /**
- * Live preview: a phone frame around the seller's real page. The live
+ * Preview: a phone frame around the seller's real page. The live
  * pages have no shop navigation buttons, so view switching lives in
  * this preview's chrome, above the frame: "Main page" / "Shop" toggle
  * buttons (Shop only when the seller has enabled products/services).
@@ -37,7 +37,7 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
   return (
     <div className="mx-auto w-full max-w-[300px]">
       <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        Live preview{effectiveView === "shop" ? " — Shop" : " — Main page"}
+        Preview{effectiveView === "shop" ? " — Shop" : " — Main page"}
       </p>
       {/* Preview chrome toggle (not part of the page itself): switches
           the frame between the main view and the shop view. The Shop

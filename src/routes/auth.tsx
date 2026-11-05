@@ -116,11 +116,11 @@ function AuthPage() {
                 </div>
                 <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
                 {mode === "signup" && (
-                  <p className="text-sm text-muted-foreground">Use a strong, unique password. Common or leaked passwords are rejected.</p>
+                  <p className="text-sm text-muted-foreground">Pick a strong, unique password before you sign up — common or leaked passwords are rejected, so use one you don't use anywhere else.</p>
                 )}
               </div>
               <Button type="submit" disabled={busy} className="min-h-[52px] w-full rounded-full text-lg">{mode === "signup" ? "Sign up" : "Log in"}</Button>
-            <p className="text-center text-sm text-muted-foreground">Google sign-in is not set up yet for this version — please use email for now.</p>
+            <p className="text-center text-sm text-muted-foreground">Please use email for now — Google sign-in is coming soon.</p>
             </form>
             <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-full border text-base text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
               {mode === "signup" ? "Already have an account? Log in" : "New here? Sign up"}

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { GripVertical, Trash2, Pencil, Check } from "lucide-react";
+import { GripVertical, Trash2, Pencil, Check, X } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { normalizeUrl } from "@/lib/themes";
@@ -41,17 +41,34 @@ export function reorderSubset<T extends { id: string; position: number }>(
  *  For products/services, the edit view includes the product photo editor
  *  (CatalogueEditor): photos upload to the "catalogue" bucket when picked,
  *  and Save persists the resulting URLs plus the category to the row.
- *  Plain link rows never show the photo editor. */
-export function DashboardLinkItem({ link, onUpdate, onDelete, userId }: { link: LinkRow; onUpdate: (id: string, p: Partial<LinkRow>) => void; onDelete: (id: string) => void; userId: string }) {
+ *  Plain link rows never show the photo editor.
+ *  Rows open in edit mode only when they were just created (justCreated);
+ *  hasWhatsApp / hasEnabledLinks only steer the helper copy below. */
+export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreated = false, hasWhatsApp = false, hasEnabledLinks = false }: {
+  link: LinkRow;
+  onUpdate: (id: string, p: Partial<LinkRow>) => void;
+  onDelete: (id: string) => void;
+  userId: string;
+  justCreated?: boolean;
+  hasWhatsApp?: boolean;
+  hasEnabledLinks?: boolean;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const isCard = link.kind !== "link";
-  const [editing, setEditing] = useState(isCard ? link.title.startsWith("New ") : link.url === "https://");
+  const kindLabel = link.kind === "service" ? "Service" : link.kind === "product" ? "Product" : "Link";
+  const [editing, setEditing] = useState(justCreated);
   const [title, setTitle] = useState(link.title);
   const [url, setUrl] = useState(link.url);
   const [price, setPrice] = useState(link.price ?? "");
   const [desc, setDesc] = useState(link.description ?? "");
   const [images, setImages] = useState<string[]>(link.image_urls ?? []);
   const [category, setCategory] = useState(link.category ?? "");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const deleteTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (deleteTimer.current) window.clearTimeout(deleteTimer.current);
+  }, []);
 
   // Re-sync local edit state from the saved row whenever editing starts,
   // so a photo saved earlier (or removed) shows correctly on re-edit
@@ -66,6 +83,18 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId }: { link: 
     setEditing(true);
   }
 
+  // Cancel throws the local edits away and closes the form; the saved
+  // row (and its position in the list) is left exactly as it was.
+  function cancel() {
+    setTitle(link.title);
+    setUrl(link.url);
+    setPrice(link.price ?? "");
+    setDesc(link.description ?? "");
+    setImages(link.image_urls ?? []);
+    setCategory(link.category ?? "");
+    setEditing(false);
+  }
+
   function save() {
     if (isCard) {
       if (!title.trim()) return void toast.error("Add a title");
@@ -76,6 +105,24 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId }: { link: 
     onUpdate(link.id, { title: title.trim().slice(0, 80), url: normalizeUrl(url) });
     setEditing(false);
   }
+
+  // Delete is two-step: the first tap arms a "Confirm delete?" state
+  // (which disarms itself after a few seconds); only the second tap
+  // actually deletes, so a stray tap next to the switch is harmless.
+  function handleDelete() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      if (deleteTimer.current) window.clearTimeout(deleteTimer.current);
+      deleteTimer.current = window.setTimeout(() => setConfirmingDelete(false), 4000);
+      return;
+    }
+    if (deleteTimer.current) window.clearTimeout(deleteTimer.current);
+    onDelete(link.id);
+  }
+
+  const summary = isCard
+    ? `${kindLabel}${link.price ? ` · ${link.price}` : " · No price yet"}${link.image_urls?.length ? ` · ${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}` : " · No photo yet"}${hasWhatsApp ? " · WhatsApp button" : ""}`
+    : link.url;
 
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
@@ -88,25 +135,38 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId }: { link: 
             {isCard ? (
               <>
                 <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder={link.kind === "service" ? "Fee, e.g. ₹500 / session" : "Price, e.g. ₹499"} maxLength={30} />
+                {!price.trim() && (
+                  <p className="text-sm text-muted-foreground">{link.kind === "service" ? "Add a fee — services without a price get fewer bookings." : "Add a price — products without a price get fewer orders."}</p>
+                )}
+                {hasEnabledLinks && !link.enabled && (
+                  <p className="rounded-lg bg-primary-soft p-2.5 text-sm text-accent-foreground">Turning this on makes your page a shop — your links will stop showing.</p>
+                )}
                 <p className="pt-1 text-sm font-medium">Product photos</p>
-                <p className="text-sm text-muted-foreground">Add up to 4 photos (JPG, PNG or WebP, 2MB each). The first photo is the one shown on the product card in your store.</p>
+                <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
                 <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} description={desc} onDescription={setDesc} />
               </>
             ) : (
               <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." inputMode="url" />
             )}
-            <Button size="sm" onClick={save}><Check className="h-4 w-4" /> Save</Button>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={save}><Check className="h-4 w-4" /> Save</Button>
+              <Button size="sm" variant="outline" onClick={cancel}><X className="h-4 w-4" /> Cancel</Button>
+            </div>
           </div>
         ) : (
           <button className="block w-full text-left" onClick={startEditing}>
             <p className="flex items-center gap-1.5 truncate font-semibold">{link.title} <Pencil className="h-3.5 w-3.5 text-muted-foreground" /></p>
-            <p className="truncate text-sm text-muted-foreground">{isCard ? `${link.kind === "service" ? "Service" : "Product"}${link.price ? ` · ${link.price}` : ""}${link.image_urls?.length ? ` · ${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}` : " · No photo yet"} · WhatsApp button` : link.url}</p>
+            <p className="truncate text-sm text-muted-foreground">{summary}</p>
           </button>
         )}
       </div>
       <div className="flex flex-col items-center gap-3">
-        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show link" />
-        <button onClick={() => onDelete(link.id)} className="text-muted-foreground hover:text-destructive" aria-label="Delete link"><Trash2 className="h-4 w-4" /></button>
+        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label={`Show ${kindLabel.toLowerCase()}`} />
+        {confirmingDelete ? (
+          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="whitespace-nowrap rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold text-destructive-foreground" aria-label={`Confirm delete ${kindLabel.toLowerCase()}`}>Confirm delete?</button>
+        ) : (
+          <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive" aria-label={`Delete ${kindLabel.toLowerCase()}`}><Trash2 className="h-4 w-4" /></button>
+        )}
       </div>
     </li>
   );

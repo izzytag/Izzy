@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Download, Copy, QrCode } from "lucide-react";
+import { Plus, Download, Copy, QrCode, Eye, Link2, Store } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
@@ -39,6 +39,8 @@ function LinksPage() {
   const p = acc.profile;
   const qrRef = useRef<HTMLDivElement>(null);
   const [pageUrl, setPageUrl] = useState(`/${p.username}`);
+  const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   useEffect(() => setPageUrl(`${window.location.origin}/${p.username}`), [p.username]);
   const pro = effectiveIsPro(acc.isPro);
 
@@ -55,9 +57,12 @@ function LinksPage() {
     if (pageMode === "shop") return void toast.error("Your page is a store/service page, so links are not shown here. Remove all products and services first if you want a link page instead.");
     // NOTE: TESTING_FREE does not lift this check — the Supabase
     // enforce_link_limit trigger still caps free accounts at 5 links.
-    if (!canAddLink(links.length, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} links. Upgrade to Pro for unlimited.`);
-    const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind: "link", title: "New link", url: "https://", position: links.length }).select().single();
+    if (!canAddLink(links.length, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
+    // New rows start as drafts (switched off): nothing goes live
+    // half-made, and a draft never flips the page mode on its own.
+    const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind: "link", title: "New link", url: "https://", position: links.length, enabled: false }).select().single();
     if (error) return void toast.error(error.message);
+    setJustCreatedId(data.id);
     setLinks((l) => [...l, data]);
   }
 
@@ -105,6 +110,20 @@ function LinksPage() {
   };
 
   return (
+    <div>
+      {/* Mobile preview access: on phones the preview aside is hidden,
+          so a toggle near the top expands the preview right here. On
+          large screens the aside below is always visible instead. */}
+      <div className="mb-6 lg:hidden">
+        <Button variant="outline" size="sm" onClick={() => setShowPreview((v) => !v)} aria-expanded={showPreview}>
+          <Eye className="h-4 w-4" /> {showPreview ? "Hide preview" : "Preview"}
+        </Button>
+        {showPreview && (
+          <div className="mt-4">
+            <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
+          </div>
+        )}
+      </div>
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {TESTING_FREE && (
@@ -148,20 +167,39 @@ function LinksPage() {
           </div>
         </section>
 
+        {/* First-run chooser: a brand-new seller picks what they are
+            building before they meet any forms. */}
+        {links.length === 0 && (
+          <section className="rounded-[28px] border bg-card p-5 shadow-sm sm:p-6">
+            <h2 className="text-xl font-bold">What do you want to create?</h2>
+            <p className="mt-1 text-base text-muted-foreground">Pick one to get started.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => addLink()} className="rounded-2xl border p-4 text-left transition hover:border-primary">
+                <span className="flex items-center gap-2 text-lg font-bold"><Link2 className="h-5 w-5 text-primary" /> A links page</span>
+                <span className="mt-1 block text-base text-muted-foreground">One page with buttons to your socials, videos, menu — anything you link to.</span>
+              </button>
+              <Link to="/dashboard/store" className="rounded-2xl border p-4 text-left transition hover:border-primary">
+                <span className="flex items-center gap-2 text-lg font-bold"><Store className="h-5 w-5 text-primary" /> A shop</span>
+                <span className="mt-1 block text-base text-muted-foreground">Sell products or services — customers order on WhatsApp.</span>
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* Links */}
         <section className="rounded-[28px] border bg-card p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Links</h2>
-            {!acc.isPro && <span className="text-xs text-muted-foreground">{linkRows.length}/{FREE_LINK_LIMIT} on Free</span>}
+            {!acc.isPro && <span className="text-xs text-muted-foreground">{links.length}/{FREE_LINK_LIMIT} items on Free</span>}
           </div>
           {pageMode === "empty" && (
-            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">A page is either links OR shop and services, not both. The first item you add sets the mode. Your store lives on the Store tab.</p>
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page can be a links page OR a shop — not both. Adding a product makes your page a shop, and your links stop showing to visitors. Your store lives on the Store tab.</p>
           )}
           {pageMode === "shop" && (
-            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a store/service page, so links are not shown here. Remove all products and services first if you want a link page instead.</p>
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a shop right now, so links don't show to visitors. Remove all products and services first if you want a links page instead.</p>
           )}
           {pageMode === "links" && (
-            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a link page, so shop products and services are not shown here. Remove all links first if you want a store/service page instead. Your store lives on the Store tab.</p>
+            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a links page right now. You can add products and services on the Store tab — turning one on makes your page a shop, and your links stop showing to visitors.</p>
           )}
           {hiddenLinks.length > 0 && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-base text-accent-foreground">Your {hiddenLinks.length === 1 ? "link is" : "links are"} saved but hidden from visitors while your page is a store/service page. {hiddenLinks.length === 1 ? "It" : "They"} will show again if you remove all products and services, or you can delete {hiddenLinks.length === 1 ? "it" : "them"} below.</p>
@@ -169,22 +207,23 @@ function LinksPage() {
           <Button onClick={() => addLink()} disabled={pageMode === "shop"} className="mt-4 min-h-[52px] w-full rounded-full text-lg"><Plus className="h-5 w-5" /> Add link</Button>
           {!canAddLink(links.length, acc.isPro) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-              You've used all {FREE_LINK_LIMIT} free links. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited links.
+              You've used all {FREE_LINK_LIMIT} free items. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited items.
             </p>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={linkRows.map((l) => l.id)} strategy={verticalListSortingStrategy}>
               <ul className="mt-4 space-y-3">
-                {linkRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} />)}
+                {linkRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} justCreated={l.id === justCreatedId} hasWhatsApp={Boolean(p.whatsapp)} />)}
               </ul>
             </SortableContext>
           </DndContext>
           {linkRows.length === 0 && <p className="mt-6 text-center text-base text-muted-foreground">No links yet. Add your first link above — or head to the Store tab to build a store instead.</p>}
         </section>
       </div>
-      <aside className="lg:sticky lg:top-32 lg:self-start">
+      <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
         <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
       </aside>
+    </div>
     </div>
   );
 }
