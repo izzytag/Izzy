@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -45,39 +45,47 @@
   --color-page-btn: var(--page-btn);
   --color-page-btn-fg: var(--page-btn-fg);
   --color-page-border: var(--page-border);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
 }
 
 :root {
-  --radius: 0.875rem;
-  --background: oklch(0.99 0.004 95);
-  --foreground: oklch(0.2 0.04 275);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.04 275);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.04 275);
-  --primary: oklch(0.51 0.23 277);
-  --primary-foreground: oklch(0.99 0.005 270);
-  --primary-soft: oklch(0.94 0.04 277);
-  --secondary: oklch(0.955 0.012 270);
-  --secondary-foreground: oklch(0.25 0.05 275);
-  --muted: oklch(0.96 0.008 95);
-  --muted-foreground: oklch(0.5 0.03 270);
-  --accent: oklch(0.94 0.04 277);
-  --accent-foreground: oklch(0.35 0.15 277);
-  --highlight: oklch(0.85 0.17 85);
+  /* Izzytag V1 design tokens: warm off-white surfaces, near-black text,
+     one violet accent used sparingly, WhatsApp green only for WhatsApp.
+     Radius scale: --radius 12px → cards (rounded-xl) 16px, inputs and
+     buttons (rounded-lg) 12px, small elements (rounded-md) 10px. */
+  --radius: 0.75rem;
+  --background: #FAF9F6;
+  --foreground: #171717;
+  --card: #FFFFFF;
+  --card-foreground: #171717;
+  --popover: #FFFFFF;
+  --popover-foreground: #171717;
+  --primary: #7457E8;
+  --primary-foreground: #FFFFFF;
+  --primary-soft: #EFEAFB;
+  --secondary: #F2F0EC;
+  --secondary-foreground: #171717;
+  --muted: #F2F0EC;
+  --muted-foreground: #737373;
+  --accent: #F2F0EC;
+  --accent-foreground: #171717;
+  --highlight: #EFEAFB;
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.91 0.015 270);
-  --input: oklch(0.91 0.015 270);
-  --ring: oklch(0.51 0.23 277);
-  --chart-1: oklch(0.51 0.23 277);
+  --border: #EAE8E3;
+  --input: #E7E4DC;
+  --ring: #7457E8;
+  --whatsapp: #25D366;
+  --whatsapp-foreground: #FFFFFF;
+  --chart-1: #7457E8;
   --chart-2: oklch(0.72 0.16 160);
   --chart-3: oklch(0.8 0.15 80);
   --chart-4: oklch(0.65 0.2 20);
   --chart-5: oklch(0.6 0.15 230);
-  --shadow-soft: 0 10px 30px -12px color-mix(in oklab, var(--primary) 30%, transparent);
-  --gradient-hero: radial-gradient(60% 50% at 80% 10%, color-mix(in oklab, var(--primary) 7%, transparent), transparent),
-    radial-gradient(50% 40% at 0% 30%, color-mix(in oklab, var(--highlight) 10%, transparent), transparent);
+  --shadow-soft: 0 12px 32px -16px rgb(23 23 23 / 0.16);
+  --gradient-hero: radial-gradient(60% 50% at 80% 10%, color-mix(in oklab, var(--primary) 4%, transparent), transparent),
+    radial-gradient(50% 40% at 0% 30%, color-mix(in oklab, var(--primary) 3%, transparent), transparent);
 }
 
 /* ---------- Public page themes ---------- */
