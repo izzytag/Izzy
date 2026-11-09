@@ -112,7 +112,7 @@ function MyShopPage() {
   }
 
   const preview = {
-    ...p, display_name: name, bio, avatar_url: avatar, whatsapp: whatsapp || null,
+    ...p, display_name: name, bio, category: category || null, avatar_url: avatar, whatsapp: whatsapp || null,
     socials: (p.socials as Record<string, string>) ?? {},
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };

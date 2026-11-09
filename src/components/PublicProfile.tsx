@@ -11,6 +11,7 @@ export type PublicData = {
   display_name: string | null;
   username: string | null;
   bio: string | null;
+  category?: string | null;
   avatar_url: string | null;
   socials: Record<string, string>;
   whatsapp: string | null;
@@ -30,6 +31,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
   data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; compact?: boolean;
 }) {
   const [showUpi, setShowUpi] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
@@ -43,13 +45,14 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
         {/* Store header: logo beside the store name, at the top.
             No @username here — the username stays in the URL only. */}
         <div className="flex w-full items-start gap-4">
-          {data.avatar_url ? (
-            <img src={data.avatar_url} alt={name} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+          {data.avatar_url && !avatarFailed ? (
+            <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
           ) : (
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
           )}
           <div className="min-w-0 flex-1">
             <h1 className="text-[28px] font-bold leading-tight sm:text-[32px]">{name}</h1>
+            {data.category && <p className="mt-1 text-sm font-semibold uppercase tracking-wide text-page-muted">{data.category}</p>}
             {data.bio && <p className="mt-1 text-base leading-relaxed text-page-muted sm:text-[17px]">{data.bio}</p>}
           </div>
         </div>
@@ -85,7 +88,9 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
 
         {items.length === 0 ? (
           <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
-            No products yet. Check back soon — or message the seller on WhatsApp.
+            {data.whatsapp
+              ? "No products yet. Check back soon — or message the seller on WhatsApp."
+              : "No products yet. Check back soon."}
           </p>
         ) : (
           // Pinterest-style pins: masonry, image-first. Tapping a pin
@@ -96,7 +101,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
           // the live page widens to 3/4 columns on bigger screens.
           <div className={`mt-8 w-full columns-2 gap-4 ${compact ? "" : "sm:columns-3 lg:columns-4"}`}>
             {items.map((l) => (
-              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} />
+              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} />
             ))}
           </div>
         )}
