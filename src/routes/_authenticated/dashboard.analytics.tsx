@@ -70,7 +70,7 @@ function AnalyticsPage() {
         <Stat label={`Clicks · ${days}d`} value={clicks.length} />
         <Stat label="Click rate" value={`${ctr}%`} />
       </div>
-      <section className="rounded-3xl border bg-card p-5 sm:p-6">
+      <section className="rounded-[20px] border bg-card p-5 sm:p-6">
         <h2 className="text-lg font-bold">Views & clicks · last {days} days</h2>
         <div className="mt-4 h-56">
           <ResponsiveContainer width="100%" height="100%">
@@ -85,7 +85,7 @@ function AnalyticsPage() {
           </ResponsiveContainer>
         </div>
       </section>
-      <section className="rounded-3xl border bg-card p-5 sm:p-6">
+      <section className="rounded-[20px] border bg-card p-5 sm:p-6">
         <h2 className="text-lg font-bold">Clicks per link</h2>
         <ul className="mt-4 space-y-3">
           {perLink.map((l) => (
@@ -98,7 +98,7 @@ function AnalyticsPage() {
         </ul>
       </section>
       {!acc.isPro && (
-        <p className="rounded-2xl bg-primary-soft p-4 text-sm text-accent-foreground">
+        <p className="rounded-[18px] bg-primary-soft p-4 text-sm text-accent-foreground">
           Free shows the last 7 days. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro</Link> for 30-day analytics.
         </p>
       )}
@@ -108,7 +108,7 @@ function AnalyticsPage() {
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border bg-card p-5">
+    <div className="rounded-[18px] border bg-card p-5">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 font-display text-2xl font-bold">{value}</p>
     </div>

@@ -113,7 +113,7 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
 
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-start gap-2 rounded-2xl border bg-background p-4 ${isDragging ? "z-10 shadow-soft" : ""}`}>
+      className={`flex items-start gap-2 rounded-[18px] border bg-background p-4 ${isDragging ? "z-10 shadow-soft" : ""}`}>
       <button {...attributes} {...listeners} className="mt-2 cursor-grab touch-none text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
       <div className="min-w-0 flex-1">
         {editing ? (

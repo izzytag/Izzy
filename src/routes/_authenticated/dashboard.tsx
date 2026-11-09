@@ -38,7 +38,7 @@ function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-black/[0.08] bg-[rgba(251,251,253,0.8)] backdrop-blur-[20px] backdrop-saturate-[180%]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-5">
           <div className="flex items-center gap-2">
             <Logo />
@@ -50,15 +50,15 @@ function DashboardLayout() {
           <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2">
             {NAV.map((n) => (
               <Link key={n.to} to={n.to} activeOptions={{ exact: true }}
-                className="flex h-11 items-center whitespace-nowrap rounded-full px-4 text-base font-medium text-muted-foreground transition hover:bg-muted"
-                activeProps={{ className: "bg-primary-soft text-accent-foreground" }}>
+                className="flex h-11 items-center whitespace-nowrap rounded-full px-4 text-base font-medium text-muted-foreground transition-colors duration-200 hover:bg-accent"
+                activeProps={{ className: "bg-primary-soft text-primary" }}>
                 {n.label}
               </Link>
             ))}
           </nav>
         )}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-5">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-5">
         {data.profile.username ? <Outlet /> : <UsernamePicker />}
       </main>
     </div>
@@ -100,11 +100,11 @@ function UsernamePicker() {
   }
 
   return (
-    <form onSubmit={save} className="mx-auto mt-10 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-soft sm:p-8">
+    <form onSubmit={save} className="mx-auto mt-10 w-full max-w-md rounded-[20px] border bg-card p-6 sm:p-8">
       <h1 className="text-3xl font-bold">Pick your username</h1>
       <p className="mt-1 text-base text-muted-foreground">This will be your unique shop link. Share it in your bio.</p>
-      <p className="mt-3 rounded-xl bg-muted p-3 text-sm text-muted-foreground">3–30 lowercase letters, numbers or _ only. Hyphens and spaces are removed.</p>
-      <div className="mt-4 flex items-center rounded-xl border bg-background pl-3 focus-within:ring-2 focus-within:ring-ring">
+      <p className="mt-3 rounded-[12px] bg-muted p-3 text-sm text-muted-foreground">3–30 lowercase letters, numbers or _ only. Hyphens and spaces are removed.</p>
+      <div className="mt-4 flex items-center rounded-[12px] border border-input bg-card pl-3 focus-within:ring-2 focus-within:ring-ring">
         <span className="text-sm text-muted-foreground">{origin || "izzy"}/</span>
         <Input autoFocus value={raw} onChange={(e) => setRaw(e.target.value)}
           className="h-12 border-0 pl-1 shadow-none focus-visible:ring-0" placeholder="priya" maxLength={30} />
@@ -116,7 +116,7 @@ function UsernamePicker() {
       {!err && availability === "checking" && <p className="mt-2 text-sm text-muted-foreground">Checking…</p>}
       {!err && availability === "available" && <p className="mt-2 text-sm font-medium text-green-600">Available</p>}
       {!err && availability === "taken" && <p className="mt-2 text-sm text-destructive">That username is taken</p>}
-      <Button type="submit" disabled={!u || !!err || availability !== "available" || busy} className="mt-5 min-h-[52px] w-full rounded-xl text-lg">Claim my shop</Button>
+      <Button type="submit" disabled={!u || !!err || availability !== "available" || busy} className="mt-5 min-h-[52px] w-full text-lg">Claim my shop</Button>
     </form>
   );
 }
