@@ -16,9 +16,9 @@ export const Route = createFileRoute("/privacy")({
 function PrivacyPage() {
   return (
     <div className="min-h-screen">
-      <div><SiteHeader /></div>
+      <div className="bg-hero"><SiteHeader /></div>
       <main className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
+        <h1 className="text-3xl font-extrabold">Privacy Policy</h1>
         <p className="mt-2 text-sm text-muted-foreground">Last updated: October 2026</p>
         <div className="mt-8 space-y-6 text-[15px] leading-relaxed text-muted-foreground">
           <section>

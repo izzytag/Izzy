@@ -27,7 +27,7 @@ export function FloatingWhatsAppButton({ whatsapp, floating }: {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-pin transition-opacity duration-200 hover:opacity-90 ${position}`}
+      className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-pin transition hover:scale-105 ${position}`}
       style={{ backgroundColor: "#25D366" }}
     >
       <MessageCircle className="h-7 w-7" />

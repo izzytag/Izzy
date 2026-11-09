@@ -35,12 +35,12 @@ const FEATURES = [
 ];
 
 const SHOWCASE = [
-  { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", h: "h-56", img: "/examples/chocolate-cake.webp" },
-  { title: "Handmade candle", shop: "Glow Studio", price: "₹299", h: "h-40", img: "/examples/handmade-candle.webp" },
-  { title: "Sourdough loaf", shop: "Bake House", price: "₹199", h: "h-48", img: "/examples/sourdough-loaf.webp" },
-  { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", h: "h-64", img: "/examples/ceramic-mug.webp" },
-  { title: "Face serum", shop: "Glow Lab", price: "₹599", h: "h-44", img: "/examples/face-serum.webp" },
-  { title: "Tote bag", shop: "Thread Studio", price: "₹349", h: "h-52", img: "/examples/tote-bag.webp" },
+  { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", grad: "from-amber-100 via-orange-100 to-rose-100", h: "h-56", initial: "C", img: "/examples/chocolate-cake.webp" },
+  { title: "Handmade candle", shop: "Glow Studio", price: "₹299", grad: "from-yellow-100 via-amber-100 to-orange-100", h: "h-40", initial: "G", img: "/examples/handmade-candle.webp" },
+  { title: "Sourdough loaf", shop: "Bake House", price: "₹199", grad: "from-stone-100 via-amber-50 to-yellow-100", h: "h-48", initial: "S", img: "/examples/sourdough-loaf.webp" },
+  { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", grad: "from-sky-100 via-teal-50 to-emerald-100", h: "h-64", initial: "M", img: "/examples/ceramic-mug.webp" },
+  { title: "Face serum", shop: "Glow Lab", price: "₹599", grad: "from-rose-100 via-pink-50 to-orange-100", h: "h-44", initial: "F", img: "/examples/face-serum.webp" },
+  { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T", img: "/examples/tote-bag.webp" },
 ];
 
 // Hero phone demo: a static example shop (original demo content, the
@@ -62,13 +62,13 @@ function Landing() {
   const region = useRegion();
   return (
     <div className="min-h-screen">
-      <div>
+      <div className="bg-hero">
         <SiteHeader />
-        <section className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 pb-20 pt-12 sm:pt-16 lg:grid-cols-2">
+        <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-8 lg:grid-cols-2">
           <div className="text-center lg:text-left">
-            <h1 className="mx-auto mt-4 max-w-xl text-5xl font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">{t.tagline}</h1>
-            <p className="mx-auto mt-5 max-w-xl text-xl text-muted-foreground lg:mx-0">{t.sub}</p>
-            <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground transition-colors duration-200 hover:bg-primary-hover sm:inline-flex sm:w-auto">{t.create} →</Link>
+            <h1 className="mx-auto mt-4 max-w-xl text-4xl font-extrabold leading-[1.05] sm:text-6xl lg:mx-0">{t.tagline}</h1>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground lg:mx-0">{t.sub}</p>
+            <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 sm:inline-flex sm:w-auto">{t.create} →</Link>
             <p className="mt-3 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
           </div>
           <div className="mx-auto w-full max-w-[300px]">
@@ -80,57 +80,63 @@ function Landing() {
         </section>
       </div>
 
-      <section className="mx-auto max-w-[1100px] px-5 py-16 sm:py-24">
-        <h2 className="text-left text-3xl font-semibold sm:text-center sm:text-4xl">How it works</h2>
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">How it works</h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           {STEPS.map((s) => (
-            <div key={s.n} className="rounded-[20px] border bg-card p-6">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground">{s.n}</span>
-              <h3 className="mt-3 text-lg font-semibold">{s.t}</h3>
+            <div key={s.n} className="rounded-[28px] border bg-card p-6 shadow-sm">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">{s.n}</span>
+              <h3 className="mt-3 text-lg font-bold">{s.t}</h3>
               <p className="mt-1 text-base text-muted-foreground">{s.d}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1100px] px-5 py-16 sm:py-24">
-        <h2 className="text-center text-3xl font-semibold sm:text-4xl">Beautiful shops, made in minutes</h2>
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+        <h2 className="text-center text-3xl font-extrabold">Beautiful shops, made in minutes</h2>
         <p className="mt-3 text-center text-base text-muted-foreground">Example shops — browse like this, then make your own.</p>
-        <div className="mt-10 columns-2 gap-5 sm:columns-3">
+        <div className="mt-10 columns-2 gap-4 sm:columns-3">
           {SHOWCASE.map((s) => (
-            <div key={s.title} className="mb-5 break-inside-avoid overflow-hidden rounded-[20px] border bg-card">
-              <img src={s.img} alt={s.title} loading="lazy" className={`${s.h} w-full object-cover`} />
+            <div key={s.title} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border bg-card shadow-pin">
+              {s.img ? (
+                <img src={s.img} alt={s.title} loading="lazy" className={`${s.h} w-full object-cover`} />
+              ) : (
+                <div className={`flex ${s.h} items-center justify-center bg-gradient-to-br ${s.grad}`}>
+                  <span className="text-5xl font-extrabold text-foreground/30">{s.initial}</span>
+                </div>
+              )}
               <div className="p-4">
                 <p className="text-base font-semibold leading-snug">{s.title}</p>
                 <p className="mt-0.5 text-sm text-muted-foreground">{s.shop}</p>
-                <p className="mt-1 text-base font-bold tabular-nums">{s.price}</p>
+                <p className="mt-1 text-base font-bold">{s.price}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1100px] px-5 py-16 sm:py-24">
-        <h2 className="text-left text-3xl font-semibold sm:text-center sm:text-4xl">Everything a small business needs</h2>
+      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">Everything a small business needs</h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
-            <div key={f.t} className="rounded-[20px] border bg-card p-6">
+            <div key={f.t} className="rounded-[28px] border bg-card p-6 shadow-sm">
               <f.icon className="h-7 w-7 text-primary" />
-              <h3 className="mt-3 text-lg font-semibold">{f.t}</h3>
+              <h3 className="mt-3 text-lg font-bold">{f.t}</h3>
               <p className="mt-1 text-base text-muted-foreground">{f.d}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-5 pb-24">
-        <h2 className="text-left text-3xl font-semibold sm:text-center sm:text-4xl">Free vs Pro</h2>
+      <section className="mx-auto max-w-3xl px-5 pb-20">
+        <h2 className="text-left text-3xl font-extrabold sm:text-center">Free vs Pro</h2>
         <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
         <div className="mt-8">
           <PricingCards
             region={region}
-            freeCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-full border border-input bg-card text-base font-semibold transition-colors duration-200 hover:bg-accent">Start free</Link>}
-            proCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground transition-colors duration-200 hover:bg-primary-hover">Go Pro</Link>}
+            freeCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl border text-base font-semibold">Start free</Link>}
+            proCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground">Go Pro</Link>}
           />
         </div>
       </section>

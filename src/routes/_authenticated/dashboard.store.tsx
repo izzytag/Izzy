@@ -182,11 +182,11 @@ function StorePage() {
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {TESTING_FREE && (
-          <p className="rounded-[20px] border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
+          <p className="rounded-3xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
         )}
         {/* Your store — store name, logo and bio, shown at the top of
             your store page. This is the only place these are edited. */}
-        <section className="rounded-[20px] border bg-card p-5 sm:p-6">
+        <section className="rounded-[28px] border bg-card p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold">Your store</h2>
           <p className="mt-1 text-base text-muted-foreground">Your store name and logo, shown at the top of your store page.</p>
           <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row">
@@ -215,7 +215,7 @@ function StorePage() {
         </section>
 
         {/* Shop */}
-        <section className="rounded-[20px] border bg-card p-5 sm:p-6">
+        <section className="rounded-[28px] border bg-card p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Shop products &amp; services</h2>
           </div>
@@ -230,12 +230,12 @@ function StorePage() {
             <Button variant="outline" onClick={() => addItem("service")} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
           </div>
           {!whatsapp && storeRows.some((l) => l.enabled) && (
-            <p className="mt-3 rounded-[12px] bg-primary-soft p-3 text-sm text-accent-foreground">
+            <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               Add your WhatsApp number above, in Your store, so visitors can order or book on WhatsApp.
             </p>
           )}
           {!canAddLink(itemCount, acc.isPro) && (
-            <p className="mt-3 rounded-[12px] bg-primary-soft p-3 text-sm text-accent-foreground">
+            <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               You've used all {FREE_LINK_LIMIT} free items. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited items.
             </p>
           )}

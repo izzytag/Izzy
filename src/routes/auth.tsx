@@ -84,12 +84,12 @@ function AuthPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-background px-4 py-6">
       <Logo />
-      <div className="mx-auto mt-8 w-full max-w-md rounded-[20px] border bg-card p-6 sm:mt-12 sm:p-8">
+      <div className="mx-auto mt-8 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-pin sm:mt-12 sm:p-8">
         {sent ? (
           <div className="text-center">
             <h1 className="text-3xl font-bold">Check your email</h1>
             <p className="mt-2 text-base leading-relaxed text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your shop. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
-            <button className="mt-6 flex min-h-[48px] w-full items-center justify-center rounded-full border border-input text-base font-semibold transition-colors duration-200 hover:bg-accent" onClick={() => setSent(false)}>Use a different email</button>
+            <button className="mt-6 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => setSent(false)}>Use a different email</button>
           </div>
         ) : (
           <>
@@ -111,7 +111,7 @@ function AuthPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pw" className="text-base font-medium">Password</Label>
                   {mode === "signin" && (
-                    <button type="button" onClick={forgotPassword} className="text-sm font-semibold text-link">Forgot password?</button>
+                    <button type="button" onClick={forgotPassword} className="text-sm font-semibold text-primary">Forgot password?</button>
                   )}
                 </div>
                 <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
@@ -122,7 +122,7 @@ function AuthPage() {
               <Button type="submit" disabled={busy} className="min-h-[52px] w-full rounded-full text-lg">{mode === "signup" ? "Sign up" : "Log in"}</Button>
             <p className="text-center text-sm text-muted-foreground">Please use email for now — Google sign-in is coming soon.</p>
             </form>
-            <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-full border border-input text-base text-muted-foreground transition-colors duration-200 hover:bg-accent" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
+            <button className="mt-2 flex min-h-[48px] w-full items-center justify-center rounded-full border text-base text-muted-foreground" onClick={() => { setFormError(""); setMode(mode === "signup" ? "signin" : "signup"); }}>
               {mode === "signup" ? "Already have an account? Log in" : "New here? Sign up"}
             </button>
           </>
