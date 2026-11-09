@@ -1,122 +1,149 @@
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { LogOut } from "lucide-react";
+import {
+  BarChart3, ChevronUp, LayoutDashboard, LifeBuoy, LogOut, Menu, Package, Palette, Settings, Store,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery } from "@/lib/account";
-import { validateUsername } from "@/lib/themes";
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — izzy" }, { name: "robots", content: "noindex" }] }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(accountQuery),
+  loader: async ({ context }) => {
+    const acc = await context.queryClient.ensureQueryData(accountQuery);
+    // Owners who have not claimed a shop link yet go through
+    // onboarding first — every dashboard screen needs a username.
+    // Owners with one never see onboarding again.
+    if (!acc.profile.username) throw redirect({ to: "/onboarding" });
+    return acc;
+  },
   component: DashboardLayout,
 });
 
-const NAV = [
-  { to: "/dashboard/store", label: "Store" },
-  { to: "/dashboard/appearance", label: "Appearance" },
-  { to: "/dashboard/analytics", label: "Analytics" },
-  { to: "/dashboard/upgrade", label: "Plan" },
+/** Main sections — shown in the desktop sidebar and the mobile tab bar. */
+const NAV_MAIN = [
+  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/dashboard/store", label: "My Shop", icon: Store, exact: false },
+  { to: "/dashboard/products", label: "Products", icon: Package, exact: false },
+  { to: "/dashboard/appearance", label: "Store Appearance", icon: Palette, exact: false },
+  { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, exact: false },
 ] as const;
 
-function DashboardLayout() {
-  const { data } = useSuspenseQuery(accountQuery);
+/** Secondary destinations — sidebar lower section / mobile header menu. */
+const NAV_SECONDARY = [
+  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/contact", label: "Help / Support", icon: LifeBuoy },
+] as const;
+
+function useSignOut() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-
-  async function signOut() {
+  return async () => {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-5">
-          <div className="flex items-center gap-2">
-            <Logo />
-            <Badge variant={data.isPro ? "default" : "secondary"}>{data.isPro ? "Pro" : "Free"}</Badge>
-          </div>
-          <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out"><LogOut className="h-5 w-5" /></Button>
-        </div>
-        {data.profile.username && (
-          <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2">
-            {NAV.map((n) => (
-              <Link key={n.to} to={n.to} activeOptions={{ exact: true }}
-                className="flex h-11 items-center whitespace-nowrap rounded-full px-4 text-base font-medium text-muted-foreground transition hover:bg-muted"
-                activeProps={{ className: "bg-primary-soft text-accent-foreground" }}>
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-        )}
-      </header>
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-5">
-        {data.profile.username ? <Outlet /> : <UsernamePicker />}
-      </main>
-    </div>
-  );
+  };
 }
 
-function UsernamePicker() {
-  const qc = useQueryClient();
+function DashboardLayout() {
   const { data } = useSuspenseQuery(accountQuery);
-  const [raw, setRaw] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [origin, setOrigin] = useState("");
-  const [availability, setAvailability] = useState<"idle" | "checking" | "available" | "taken">("idle");
-
-  const u = raw.toLowerCase().replace(/[\s-]+/g, "").replace(/[^a-z0-9_]/g, "");
-  const err = u ? validateUsername(u) : null;
-
-  useEffect(() => setOrigin(window.location.host), []);
-
-  useEffect(() => {
-    if (!u || validateUsername(u)) { setAvailability("idle"); return; }
-    setAvailability("checking");
-    const t = setTimeout(async () => {
-      const { data: existing } = await supabase.from("profiles").select("id").eq("username", u).maybeSingle();
-      setAvailability(existing ? "taken" : "available");
-    }, 400);
-    return () => clearTimeout(t);
-  }, [u]);
-
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    if (validateUsername(u) || availability !== "available") return;
-    setBusy(true);
-    const { error } = await supabase.from("profiles").update({ username: u }).eq("id", data.user.id);
-    setBusy(false);
-    if (error) return void toast.error(error.code === "23505" ? "That username is taken" : error.message);
-    toast.success("Your shop is live!");
-    qc.invalidateQueries({ queryKey: ["account"] });
-  }
+  const signOut = useSignOut();
+  const p = data.profile;
+  const businessName = p.display_name || p.username || "Your shop";
 
   return (
-    <form onSubmit={save} className="mx-auto mt-10 w-full max-w-md rounded-[2rem] border bg-card p-6 shadow-soft sm:p-8">
-      <h1 className="text-3xl font-bold">Pick your username</h1>
-      <p className="mt-1 text-base text-muted-foreground">This will be your unique shop link. Share it in your bio.</p>
-      <p className="mt-3 rounded-xl bg-muted p-3 text-sm text-muted-foreground">3–30 lowercase letters, numbers or _ only. Hyphens and spaces are removed.</p>
-      <div className="mt-4 flex items-center rounded-xl border bg-background pl-3 focus-within:ring-2 focus-within:ring-ring">
-        <span className="text-sm text-muted-foreground">{origin || "izzy"}/</span>
-        <Input autoFocus value={raw} onChange={(e) => setRaw(e.target.value)}
-          className="h-12 border-0 pl-1 shadow-none focus-visible:ring-0" placeholder="priya" maxLength={30} />
+    <div className="min-h-dvh bg-background lg:flex">
+      {/* ---------- Desktop sidebar ---------- */}
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r bg-card lg:flex">
+        <div className="flex items-center gap-2 px-5 pb-2 pt-5">
+          <Logo />
+          <Badge variant={data.isPro ? "default" : "secondary"}>{data.isPro ? "Pro" : "Free"}</Badge>
+        </div>
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Dashboard">
+          {NAV_MAIN.map((n) => (
+            <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }}
+              className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              activeProps={{ className: "bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary" }}>
+              <n.icon className="h-5 w-5 shrink-0" /> {n.label}
+            </Link>
+          ))}
+          <div className="my-3 border-t" />
+          {NAV_SECONDARY.map((n) => (
+            <Link key={n.to} to={n.to}
+              className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              activeProps={{ className: "bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary" }}>
+              <n.icon className="h-5 w-5 shrink-0" /> {n.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="border-t p-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex min-h-[52px] w-full items-center gap-3 rounded-lg px-2 text-left transition hover:bg-muted">
+              {p.avatar_url
+                ? <img src={p.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
+                : <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary">{businessName[0]?.toUpperCase()}</span>}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold leading-tight">{businessName}</span>
+                <span className="block truncate text-sm text-muted-foreground">@{p.username}</span>
+              </span>
+              <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuItem asChild><Link to="/dashboard/settings"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/contact"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => void signOut()}><LogOut className="h-4 w-4" /> Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* ---------- Mobile header ---------- */}
+        <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur lg:hidden">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Logo />
+              <Badge variant={data.isPro ? "default" : "secondary"}>{data.isPro ? "Pro" : "Free"}</Badge>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger aria-label="Account menu" className="flex h-11 w-11 items-center justify-center rounded-lg transition hover:bg-muted">
+                <Menu className="h-6 w-6" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild><Link to="/dashboard/settings"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/contact"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => void signOut()}><LogOut className="h-4 w-4" /> Log out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-24 sm:px-5 lg:pb-6">
+          <Outlet />
+        </main>
       </div>
-      {raw && u !== raw && (
-        <p className="mt-2 text-sm text-muted-foreground">Your username will be: <span className="font-semibold text-foreground">{u || "…"}</span></p>
-      )}
-      {err && u && <p className="mt-2 text-sm text-destructive">{err}</p>}
-      {!err && availability === "checking" && <p className="mt-2 text-sm text-muted-foreground">Checking…</p>}
-      {!err && availability === "available" && <p className="mt-2 text-sm font-medium text-green-600">Available</p>}
-      {!err && availability === "taken" && <p className="mt-2 text-sm text-destructive">That username is taken</p>}
-      <Button type="submit" disabled={!u || !!err || availability !== "available" || busy} className="mt-5 min-h-[52px] w-full rounded-xl text-lg">Claim my shop</Button>
-    </form>
+
+      {/* ---------- Mobile bottom navigation ---------- */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-card lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} aria-label="Dashboard">
+        <div className="grid grid-cols-5">
+          {NAV_MAIN.map((n) => (
+            <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }}
+              className={cn("flex min-h-[60px] flex-col items-center justify-center gap-1 px-1 text-[11px] font-medium text-muted-foreground transition")}
+              activeProps={{ className: "text-primary" }}>
+              <n.icon className="h-6 w-6" />
+              <span className="max-w-full truncate">{n.label === "Store Appearance" ? "Appearance" : n.label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
+    </div>
   );
 }
