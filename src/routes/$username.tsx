@@ -1,6 +1,6 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { trackProductView, trackShopView, trackWhatsappClick } from "@/lib/track";
 import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
 import { effectiveTheme } from "@/lib/themes";
@@ -46,12 +46,15 @@ export const Route = createFileRoute("/$username")({
 function PublicPage() {
   const { profile, links, isPro } = Route.useLoaderData();
   const pro = effectiveIsPro(isPro);
+  // Analytics (Step 04, lib/track.ts): one shop view per visitor
+  // session, a product view when a customer opens a product's
+  // details, a WhatsApp click when they tap Order/Book. The shop
+  // owner is never counted, and tracking never blocks the page.
   useEffect(() => {
-    supabase.from("page_views").insert({ profile_id: profile.id }).then(() => {});
+    trackShopView(profile.id);
   }, [profile.id]);
-  const onClick = (id: string) => {
-    supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
-  };
+  const onClick = (id: string) => trackWhatsappClick(profile.id, id);
+  const onProductView = (id: string) => trackProductView(profile.id, id);
   // The main page IS the storefront: the loader returns the enabled
   // products and services, and PublicProfile renders them as the
   // catalogue under the store header.
@@ -61,6 +64,7 @@ function PublicPage() {
       theme={effectiveTheme(profile.theme, pro)}
       showBranding={!pro}
       onLinkClick={onClick}
+      onProductView={onProductView}
     />
   );
 }

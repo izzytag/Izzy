@@ -2,11 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, Camera, Eye } from "lucide-react";
+import { Copy, Camera, Eye, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
-import { effectiveTheme } from "@/lib/themes";
+import { effectiveTheme, waCardLink } from "@/lib/themes";
 import { TESTING_FREE, testingBanner, effectiveIsPro } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
@@ -117,6 +117,22 @@ function MyShopPage() {
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };
 
+  // Example customer enquiry (Step 04): the exact message the
+  // storefront's WhatsApp button prepares, built with the same
+  // waCardLink the live shop uses — a sample product against the
+  // number in the field above. Shown only when the number looks
+  // dialable; it is an example, not a real message.
+  let enquiryText: string | null = null;
+  if (whatsapp.replace(/\D/g, "").length >= 6) {
+    try {
+      enquiryText = new URL(
+        waCardLink(whatsapp, "product", "Sample product", pageUrl, { price: "₹499", shopName: name || "Your shop" }),
+      ).searchParams.get("text");
+    } catch {
+      enquiryText = null;
+    }
+  }
+
   return (
     <div>
       <div className="mb-6 lg:hidden">
@@ -153,6 +169,9 @@ function MyShopPage() {
               {liveCount > 0
                 ? `${liveCount} ${liveCount === 1 ? "product or service is" : "products and services are"} live on your shop.`
                 : <>No products live yet — visitors will see your shop with nothing to order. <Link to="/dashboard/products" className="font-semibold text-primary underline">Add your first product</Link>.</>}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your shop link is permanent — it never changes, so links you've already shared keep working.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button variant="outline" asChild className="min-h-[44px]"><a href={pageUrl} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> View my shop</a></Button>
@@ -195,6 +214,19 @@ function MyShopPage() {
                   <p className="text-sm text-muted-foreground">Visitors use this number to order on WhatsApp. Include the country code — for India, start with 91.</p>
                   {whatsappError && <p className="text-sm font-medium text-destructive">{whatsappError}</p>}
                 </div>
+                {enquiryText && (
+                  <div className="rounded-xl bg-muted p-4">
+                    <p className="flex items-center gap-2 text-sm font-semibold">
+                      <MessageCircle className="h-4 w-4 text-primary" /> Example — what a customer sends you
+                    </p>
+                    <p className="mt-2 rounded-lg rounded-tl-none bg-card p-3 text-sm leading-relaxed shadow-sm">{enquiryText}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      This is the message WhatsApp opens with when a customer taps Order on a product (shown
+                      here for a “Sample product” at ₹499), addressed to the number above. The customer can
+                      edit it before sending. Changing the number changes where future enquiries go.
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center gap-3">
                   <Button size="sm" onClick={async () => { if (await saveProfile()) toast.success("Shop saved"); }}>Save shop</Button>
                   {saveStatus === "saving" && <span className="text-sm text-muted-foreground">Saving…</span>}

@@ -1,32 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  ArrowRight, BarChart3, Check, Copy, Eye, Package, Palette, Share2, Store, TrendingUp,
+  ArrowRight, BarChart3, Check, Copy, Eye, Package, Palette, QrCode, Share2, Store, TrendingUp,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
+import { statsQuery } from "@/lib/stats";
 import { Button } from "@/components/ui/button";
 
 /**
- * Same data the Analytics tab reads (page_views / link_clicks), so
+ * Same shared stats query the Analytics tab reads (lib/stats.ts), so
  * Overview numbers always agree with Analytics. Plan gating matches
  * Analytics too: Free sees the last 7 days, Pro the last 30.
  */
-const statsQuery = (uid: string) =>
-  queryOptions({
-    queryKey: ["stats", uid],
-    queryFn: async () => {
-      const since = new Date(Date.now() - 30 * 864e5).toISOString();
-      const [v, c, tv] = await Promise.all([
-        supabase.from("page_views").select("created_at").eq("profile_id", uid).gte("created_at", since).limit(10000),
-        supabase.from("link_clicks").select("created_at, link_id").eq("profile_id", uid).gte("created_at", since).limit(10000),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).eq("profile_id", uid),
-      ]);
-      return { views: v.data ?? [], clicks: c.data ?? [], totalViews: tv.count ?? 0 };
-    },
-  });
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   loader: async ({ context }) => {
@@ -64,7 +51,7 @@ function OverviewPage() {
   const days = acc.isPro ? 30 : 7;
   const cutoff = Date.now() - days * 864e5;
   const viewsInWindow = stats.views.filter((x) => +new Date(x.created_at) >= cutoff).length;
-  const tapsInWindow = stats.clicks.filter((x) => +new Date(x.created_at) >= cutoff).length;
+  const tapsInWindow = [...stats.productViews, ...stats.whatsappClicks].filter((x) => +new Date(x.created_at) >= cutoff).length;
   const hasActivity = stats.totalViews > 0;
 
   async function copyLink() {
@@ -155,7 +142,7 @@ function OverviewPage() {
       {/* ---------- Quick actions ---------- */}
       <section>
         <h2 className="text-lg font-bold">Quick actions</h2>
-        <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-5">
           <Link to="/dashboard/products" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
             <Package className="h-6 w-6 text-primary" />
             <p className="mt-3 font-semibold">Add a product</p>
@@ -176,6 +163,11 @@ function OverviewPage() {
             <p className="mt-3 font-semibold">Share shop link</p>
             <p className="mt-0.5 text-sm text-muted-foreground">Put it in your bio</p>
           </button>
+          <Link to="/dashboard/qr" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
+            <QrCode className="h-6 w-6 text-primary" />
+            <p className="mt-3 font-semibold">Shop QR code</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">Print it for your counter</p>
+          </Link>
         </div>
       </section>
 

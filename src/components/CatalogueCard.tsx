@@ -6,8 +6,8 @@ import { waCardLink } from "@/lib/themes";
 
 export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null };
 
-export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick }: {
-  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void;
+export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView }: {
+  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined;
 }) {
   const [selected, setSelected] = useState(0);
   const [pinImgFailed, setPinImgFailed] = useState(false);
@@ -23,7 +23,7 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick }
   const aspects = ["aspect-[3/4]", "aspect-square", "aspect-[4/5]"];
   const aspect = aspects[Math.abs([...item.id].reduce((a, c) => a + c.charCodeAt(0), 0)) % aspects.length];
   return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
-    <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left hover:bg-page-btn" onClick={() => setOpen(true)} aria-label={`View ${item.title}`}>
+    <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left hover:bg-page-btn" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
       {photos[0] && !pinImgFailed ? <img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className={`${aspect} w-full object-cover`} /> : <div className={`flex ${aspect} items-center justify-center bg-page-bg`}><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1.5 p-4">
         <h3 className="break-words text-base font-semibold leading-snug">{item.title}</h3>

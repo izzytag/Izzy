@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import {
-  BarChart3, ChevronUp, LayoutDashboard, LifeBuoy, LogOut, Menu, Package, Palette, Settings, Store,
+  BarChart3, ChevronUp, LayoutDashboard, LifeBuoy, LogOut, Menu, Package, Palette, QrCode, Settings, Store,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery } from "@/lib/account";
@@ -73,6 +73,14 @@ function DashboardLayout() {
               <n.icon className="h-5 w-5 shrink-0" /> {n.label}
             </Link>
           ))}
+          {/* QR Code lives in the sidebar only: the mobile bottom bar
+              keeps its five slots, and on mobile the page is reached
+              from the header menu and the Overview quick action. */}
+          <Link to="/dashboard/qr"
+            className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            activeProps={{ className: "bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary" }}>
+            <QrCode className="h-5 w-5 shrink-0" /> QR Code
+          </Link>
           <div className="my-3 border-t" />
           {NAV_SECONDARY.map((n) => (
             <Link key={n.to} to={n.to}
@@ -117,6 +125,7 @@ function DashboardLayout() {
                 <Menu className="h-6 w-6" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild><Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> QR Code</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/dashboard/settings"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/contact"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
