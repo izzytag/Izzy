@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { proPriceLine } from "@/lib/billing";
 import type { Region } from "@/lib/geo";
 
-const FREE = ["Up to 5 links", "Shop page at yourname/shop", "Light & Dark themes", "WhatsApp & UPI buttons", "7-day analytics", "\"Made with Izzy\" footer"];
-const PRO = ["Unlimited links", "Shop page at yourname/shop", "All 8 themes", "No izzy branding", "30-day analytics", "Downloadable QR code", "Priority support"];
+const FREE = ["Up to 5 products & services", "Your shop at izzytag.shop/yourname", "Light & Dark themes", "WhatsApp & UPI buttons", "7-day analytics", "\"Made with Izzy\" footer"];
+const PRO = ["Unlimited products & services", "Your shop at izzytag.shop/yourname", "All 8 themes", "No izzy branding", "30-day analytics", "Downloadable QR code", "Priority support"];
 
 /** Region-aware pricing cards: exactly ONE Pro price per visitor. */
 export function PricingCards({ freeCta, proCta, region }: { freeCta: ReactNode; proCta: ReactNode; region: Region | "loading" }) {

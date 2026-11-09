@@ -10,7 +10,6 @@ import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, effectiveTheme, FREE_LINK_LIMIT } from "@/lib/themes";
 import { TESTING_FREE, testingBanner, proPriceLine, effectiveIsPro } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
-import { getPageMode } from "@/lib/page-mode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,11 +26,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/store")({
 });
 
 /**
- * Store tab, separate from Links. This is the only place where the store
- * identity (name, logo, bio) and shop products/services are managed.
- * Products and services can always be added here: new items start as
- * drafts (switched off), so adding one never flips the page mode or
- * hides anything — the mode still follows the ENABLED rows only.
+ * Store tab — the dashboard home. This is the only place where the
+ * store identity (name, logo, bio) and shop products/services are
+ * managed. Izzy is shop/catalog only: new items start as drafts
+ * (switched off), so nothing goes live half-made. Legacy link-kind
+ * rows are filtered out of this tab entirely — they stay in the
+ * database, just never displayed or edited.
  */
 function StorePage() {
   const region = useRegion();
@@ -53,7 +53,6 @@ function StorePage() {
   const [pageUrl, setPageUrl] = useState(`/${p.username}`);
   useEffect(() => setPageUrl(`${window.location.origin}/${p.username}`), [p.username]);
   const pro = effectiveIsPro(acc.isPro);
-  const shopUrl = `${pageUrl}/shop`;
 
   const setLinks = (fn: (l: LinkRow[]) => LinkRow[]) => qc.setQueryData(linksQuery(acc.user.id).queryKey, (old) => fn(old ?? []));
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
@@ -117,17 +116,23 @@ function StorePage() {
     toast.success("Logo updated");
   }
 
-  // Exclusive page modes, derived from enabled rows: a page is either
-  // links OR shop/services, never both. Nothing is deleted to enforce this.
-  const pageMode = getPageMode(links);
+  // Store rows are the product/service rows only. Legacy link-kind
+  // rows are not the store's items, so they don't count towards the
+  // free-plan item limit in this UI. (The database trigger still
+  // counts every row — see the note in addItem.)
   const storeRows = links.filter((l) => l.kind !== "link");
+  const itemCount = storeRows.length;
 
   async function addItem(kind: "product" | "service") {
-    // NOTE: TESTING_FREE does not lift this check — the Supabase
-    // enforce_link_limit trigger still caps free accounts at 5 items.
-    if (!canAddLink(links.length, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
+    // NOTE: TESTING_FREE does not lift this check. Also note the
+    // enforce_link_limit trigger counts ALL of the user's rows
+    // (including legacy link rows), so a free user whose old link
+    // rows fill the quota can still be refused by the database even
+    // when this UI count has room — the trigger's message is what
+    // the toast below then shows.
+    if (!canAddLink(itemCount, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
     // New items start as drafts (switched off): nothing goes live
-    // half-made, and a draft never flips the page mode on its own.
+    // half-made.
     const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind, title: kind === "product" ? "New product" : "New service", url: "", position: links.length, enabled: false }).select().single();
     if (error) return void toast.error(error.message);
     setJustCreatedId(data.id);
@@ -158,8 +163,6 @@ function StorePage() {
     socials: (p.socials as Record<string, string>) ?? {},
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };
-
-  const hasEnabledLinks = links.some((l) => l.kind === "link" && l.enabled);
 
   return (
     <div>
@@ -216,33 +219,22 @@ function StorePage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Shop products &amp; services</h2>
           </div>
-          {pageMode === "links" && (
-            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page is a links page right now. You can add products and services below — they start switched off, so nothing changes for your visitors. Turning one on makes your page a shop, and your links stop showing to visitors.</p>
-          )}
-          {pageMode === "empty" && (
-            <p className="mt-4 rounded-xl border p-3 text-base text-muted-foreground">Your page can be a links page OR a shop — not both. Adding a product makes your page a shop, and your links stop showing to visitors. New items start switched off, so you can finish them before anyone sees them.</p>
-          )}
-          {pageMode === "shop" && (
-            <>
-              <p className="mt-4 text-base text-muted-foreground">Products you add here appear on your store page. Services appear on your main page.</p>
-              <p className="mt-2 truncate text-base font-medium text-primary">{shopUrl.replace(/^https?:\/\//, "")}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" asChild><a href={shopUrl} target="_blank" rel="noreferrer">View my Shop</a></Button>
-                <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(shopUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
-              </div>
-            </>
-          )}
+          <p className="mt-4 text-base text-muted-foreground">Everything you add appears on your shop page.</p>
+          <p className="mt-2 truncate text-base font-medium text-primary">{pageUrl.replace(/^https?:\/\//, "")}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" asChild><a href={pageUrl} target="_blank" rel="noreferrer">View my shop</a></Button>
+            <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(pageUrl); toast.success("Shop link copied"); }}><Copy className="h-4 w-4" /> Copy shop link</Button>
+          </div>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={() => addItem("product")} className="min-h-[48px] rounded-full text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
             <Button variant="outline" onClick={() => addItem("service")} className="min-h-[48px] rounded-full text-base"><Briefcase className="h-4 w-4" /> Service</Button>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Products appear on your shop page ({p.username}/shop). Services appear on your main page.</p>
           {!whatsapp && storeRows.some((l) => l.enabled) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               Add your WhatsApp number above, in Your store, so visitors can order or book on WhatsApp.
             </p>
           )}
-          {!canAddLink(links.length, acc.isPro) && (
+          {!canAddLink(itemCount, acc.isPro) && (
             <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
               You've used all {FREE_LINK_LIMIT} free items. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited items.
             </p>
@@ -250,12 +242,11 @@ function StorePage() {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={storeRows.map((l) => l.id)} strategy={verticalListSortingStrategy}>
               <ul className="mt-4 space-y-3">
-                {storeRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} justCreated={l.id === justCreatedId} hasWhatsApp={Boolean(p.whatsapp)} hasEnabledLinks={hasEnabledLinks} />)}
+                {storeRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} justCreated={l.id === justCreatedId} hasWhatsApp={Boolean(p.whatsapp)} />)}
               </ul>
             </SortableContext>
           </DndContext>
-          {storeRows.length === 0 && pageMode !== "links" && <p className="mt-6 text-center text-base text-muted-foreground">No products or services yet. Add your first one above.</p>}
-          {storeRows.length === 0 && pageMode === "links" && <p className="mt-6 text-center text-base text-muted-foreground">No products or services here yet — this page is a link page for now.</p>}
+          {storeRows.length === 0 && <p className="mt-6 text-center text-base text-muted-foreground">No products or services yet. Add your first product above — it starts switched off, so you can finish it before anyone sees it.</p>}
         </section>
       </div>
       <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">

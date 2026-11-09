@@ -5,7 +5,6 @@ import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
 import { effectiveTheme } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
-import { getPageMode } from "@/lib/page-mode";
 
 export const Route = createFileRoute("/$username")({
   loader: async ({ params }) => {
@@ -18,7 +17,7 @@ export const Route = createFileRoute("/$username")({
     const p = loaderData.profile;
     const name = p.display_name || p.username;
     const title = `${name} (@${p.username}) | izzy`;
-    const desc = p.bio || (getPageMode(loaderData.links) === "shop" ? `Shop ${name}'s products and services.` : `All of ${name}'s links in one place.`);
+    const desc = p.bio || `Shop ${name}'s products and services — order on WhatsApp.`;
     const meta = [
       { title },
       { name: "description", content: desc },
@@ -36,9 +35,9 @@ export const Route = createFileRoute("/$username")({
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <h1 className="text-3xl font-bold">This page isn't taken yet</h1>
-      <p className="text-muted-foreground">Grab this username for your own izzy page.</p>
-      <Link to="/auth" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your page</Link>
+      <h1 className="text-3xl font-bold">This shop isn't here yet</h1>
+      <p className="text-muted-foreground">Grab this username for your own izzy shop.</p>
+      <Link to="/auth" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your shop</Link>
     </div>
   ),
   component: PublicPage,
@@ -53,8 +52,9 @@ function PublicPage() {
   const onClick = (id: string) => {
     supabase.from("link_clicks").insert({ link_id: id, profile_id: profile.id }).then(() => {});
   };
-  // No shop navigation button on the live main page: in shop mode the
-  // products already show inline here, and /shop still exists by URL.
+  // The main page IS the storefront: the loader returns the enabled
+  // products and services, and PublicProfile renders them as the
+  // catalogue under the store header.
   return (
     <PublicProfile
       data={{ ...profile, socials: (profile.socials as Record<string, string>) ?? {}, links }}

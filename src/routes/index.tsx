@@ -10,26 +10,26 @@ import { useRegion } from "@/lib/useRegion";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "izzy — One link for your links or your shop" },
-      { name: "description", content: "One page for your links, or for your shop products and services. Share it, and customers message you on WhatsApp to order or book." },
-      { property: "og:title", content: "izzy — Link in bio for creators" },
-      { property: "og:description", content: "One page for your links, or for your shop products and services. Customers message you on WhatsApp." },
+      { title: "izzy — Your shop in one link" },
+      { name: "description", content: "Your whole catalogue in one link — products and services with photos and prices. Share it, and customers order on WhatsApp." },
+      { property: "og:title", content: "izzy — Your shop in one link" },
+      { property: "og:description", content: "Your whole catalogue in one link — products and services with photos and prices. Customers order on WhatsApp." },
     ],
   }),
   component: Landing,
 });
 
 const STEPS = [
-  { n: "1", t: "Create your link", d: "Pick a username. That is your page address." },
-  { n: "2", t: "Add links, or shop products and services", d: "Add links for a link page, or add products with photos and prices and services for a store page. Your shop lives at yourname/shop." },
-  { n: "3", t: "Share it — customers message you on WhatsApp", d: "Put the link in your bio. Buyers tap a product and order on WhatsApp. No payment is taken here." },
+  { n: "1", t: "Create your shop", d: "Pick a username. That is your shop address." },
+  { n: "2", t: "Add your products", d: "Add products and services with photos and prices. Everything you add appears on your shop page." },
+  { n: "3", t: "Share it — customers order on WhatsApp", d: "Put the link in your bio. Buyers tap a product and order on WhatsApp. No payment is taken here." },
 ];
 
 const FEATURES = [
   { icon: IndianRupee, t: "UPI payments", d: "Show a QR and tap-to-pay link. Get paid directly." },
   { icon: MessageCircle, t: "WhatsApp me", d: "One tap to chat — perfect for orders and enquiries." },
   { icon: Palette, t: "8 themes", d: "Light, dark and 6 inspired presets." },
-  { icon: BarChart3, t: "Analytics", d: "See views and which links get clicked." },
+  { icon: BarChart3, t: "Analytics", d: "See views and which products get tapped." },
   { icon: QrCode, t: "QR code", d: "Print it on your shop counter or packaging." },
   { icon: Zap, t: "Super fast", d: "Loads instantly, even on 4G." },
 ];
@@ -43,10 +43,18 @@ const SHOWCASE = [
   { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T", img: "/examples/tote-bag.webp" },
 ];
 
+// Hero phone demo: a static example shop (original demo content, the
+// site's own example photos) rendered by the real storefront
+// component — store header plus product cards with prices.
 const DEMO = {
-  display_name: "Priya's Kitchen", username: "priya", bio: "Homemade tiffins in Pune 🍛 Order by 10am for lunch", avatar_url: null,
+  display_name: "Priya's Kitchen", username: "priya", bio: "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", avatar_url: null,
   socials: {}, whatsapp: null, upi_id: null,
-  links: [{ id: "1", title: "This week's menu", url: "#" }, { id: "2", title: "Order on Swiggy", url: "#" }, { id: "3", title: "Watch my recipes", url: "#" }],
+  links: [
+    { id: "1", title: "Chocolate cake", url: "#", kind: "product", price: "₹499", description: "Rich Belgian chocolate, baked fresh to order.", image_urls: ["/examples/chocolate-cake.webp"], category: "Cakes" },
+    { id: "2", title: "Handmade candle", url: "#", kind: "product", price: "₹299", description: "Soy wax, sandalwood scent.", image_urls: ["/examples/handmade-candle.webp"], category: "Home" },
+    { id: "3", title: "Sourdough loaf", url: "#", kind: "product", price: "₹199", description: "Slow-fermented, crusty and fresh every morning.", image_urls: ["/examples/sourdough-loaf.webp"], category: "Bakes" },
+    { id: "4", title: "Ceramic mug", url: "#", kind: "product", price: "₹449", description: "Hand-thrown stoneware, each piece unique.", image_urls: ["/examples/ceramic-mug.webp"], category: "Home" },
+  ],
 };
 
 function Landing() {
@@ -61,13 +69,13 @@ function Landing() {
             <h1 className="mx-auto mt-4 max-w-xl text-4xl font-extrabold leading-[1.05] sm:text-6xl lg:mx-0">{t.tagline}</h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground lg:mx-0">{t.sub}</p>
             <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 sm:inline-flex sm:w-auto">{t.create} →</Link>
-            <p className="mt-3 text-base text-muted-foreground">Free to start · No card needed · One link for everything</p>
+            <p className="mt-3 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
           </div>
           <div className="mx-auto w-full max-w-[300px]">
             <div className="overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
               <div className="pointer-events-none h-[600px] overflow-hidden"><PublicProfile data={DEMO} theme="marigold" showBranding={false} compact /></div>
             </div>
-            <p className="mt-3 text-center text-xs font-medium text-muted-foreground">Example page — yours will look like this</p>
+            <p className="mt-3 text-center text-xs font-medium text-muted-foreground">Example shop — yours will look like this</p>
           </div>
         </section>
       </div>
@@ -87,7 +95,7 @@ function Landing() {
 
       <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
         <h2 className="text-center text-3xl font-extrabold">Beautiful shops, made in minutes</h2>
-        <p className="mt-3 text-center text-base text-muted-foreground">Example pages — browse like this, then make your own.</p>
+        <p className="mt-3 text-center text-base text-muted-foreground">Example shops — browse like this, then make your own.</p>
         <div className="mt-10 columns-2 gap-4 sm:columns-3">
           {SHOWCASE.map((s) => (
             <div key={s.title} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border bg-card shadow-pin">

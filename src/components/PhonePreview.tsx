@@ -1,119 +1,34 @@
-import { useState } from "react";
 import { PublicProfile, type PublicData } from "./PublicProfile";
-import { CatalogueCard } from "./CatalogueCard";
 import { FloatingWhatsAppButton } from "./FloatingWhatsAppButton";
 import { type ThemeId } from "@/lib/themes";
 
 /**
- * Preview: a phone frame around the seller's real page. The live
- * pages have no shop navigation buttons, so view switching lives in
- * this preview's chrome, above the frame: "Main page" / "Shop" toggle
- * buttons (Shop only when the seller has enabled products/services).
- * The page content inside the frame never shows those buttons, exactly
- * like the live site. Tapping a product opens the existing details
- * dialog; closing it returns to whichever preview view was open,
- * because the view state lives here and is untouched by the dialog.
+ * Preview: a phone frame around the seller's real storefront — the
+ * shop page is the only public page, so there is no view switching.
+ * The frame shows exactly what visitors see: store header, catalogue,
+ * and the floating WhatsApp button pinned INSIDE the frame (absolute)
+ * when a number is set, never fixed to the dashboard viewport.
  */
 export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBranding: boolean }) {
   const { data, theme, showBranding } = props;
-  const [view, setView] = useState<"main" | "shop">("main");
-  // Dashboard preview rows come from linksQuery and carry `enabled`;
-  // public-page rows omit it and are treated as enabled, matching
-  // PublicProfile's mode logic.
-  const rows = data.links as (typeof data.links[number] & { enabled?: boolean | null })[];
-  const products = (rows ?? []).filter(
-    (l) => l.enabled !== false && (l.kind === "product" || l.kind === "service"),
-  );
-  const hasShop = products.length > 0;
-  // If the seller stops having products (e.g. removes them all), the
-  // shop view no longer exists — fall back to the main view.
-  const effectiveView = view === "shop" && hasShop ? "shop" : "main";
-  const name = data.display_name || data.username || "";
-  const toggleBtn = (active: boolean) =>
-    `flex min-h-[44px] flex-1 items-center justify-center rounded-full px-4 text-sm font-semibold transition ${
-      active ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"
-    }`;
-
   return (
     <div className="mx-auto w-full max-w-[300px]">
       <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        Preview{effectiveView === "shop" ? " — Shop" : " — Main page"}
+        Preview
       </p>
-      {/* Preview chrome toggle (not part of the page itself): switches
-          the frame between the main view and the shop view. The Shop
-          toggle only appears when the seller has products/services. */}
-      {hasShop && (
-        <div className="mb-3 flex gap-2" role="group" aria-label="Preview view">
-          <button type="button" aria-pressed={effectiveView === "main"} onClick={() => setView("main")} className={toggleBtn(effectiveView === "main")}>
-            Main page
-          </button>
-          <button type="button" aria-pressed={effectiveView === "shop"} onClick={() => setView("shop")} className={toggleBtn(effectiveView === "shop")}>
-            Shop
-          </button>
-        </div>
-      )}
       <div className="relative h-[560px] overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
         <div className="h-full overflow-y-auto">
-          {effectiveView === "main" ? (
-            <PublicProfile
-              data={data}
-              theme={theme}
-              showBranding={showBranding}
-              compact
-            />
-          ) : (
-            <div className={`theme-${theme} min-h-full bg-page-bg text-page-fg`}>
-              <div className="mx-auto flex w-full flex-col px-4 py-8">
-                {/* Shop view header: same horizontal store header as the
-                    real shop page — logo beside the store name, bio
-                    under the name, no @username line. */}
-                <div className="flex w-full items-start gap-4">
-                  {data.avatar_url ? (
-                    <img src={data.avatar_url} alt={name} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
-                  ) : (
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <h1 className="text-[28px] font-bold leading-tight">{name}</h1>
-                    {data.bio && <p className="mt-1 text-base leading-relaxed text-page-muted">{data.bio}</p>}
-                  </div>
-                </div>
-
-                {/* No back button, no Shop heading, no intro, and no
-                    pill button in the page flow here either: the header
-                    is followed directly by the product grid, like the
-                    live shop. WhatsApp lives in the floating button
-                    pinned inside this frame (below). */}
-
-                {products.length === 0 ? (
-                  <p className="mx-auto mt-6 w-full rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
-                    No products yet.
-                  </p>
-                ) : (
-                  <div className="mt-6 w-full columns-2 gap-4">
-                    {products.map((p) => (
-                      <CatalogueCard key={p.id} item={p} whatsapp={data.whatsapp} pageUrl={`/${data.username ?? ""}`} />
-                    ))}
-                  </div>
-                )}
-
-                {showBranding && (
-                  <p className="mt-8 text-center text-base font-semibold text-page-muted">Made with Izzy</p>
-                )}
-              </div>
-            </div>
-          )}
+          <PublicProfile
+            data={data}
+            theme={theme}
+            showBranding={showBranding}
+            compact
+          />
         </div>
-        {/* Floating WhatsApp button, pinned INSIDE this phone frame
-            (absolute, relative frame above) — never fixed to the
-            dashboard viewport. Shown on store views only: the seller
-            has products/services and a WhatsApp number set. In links
-            mode there is no floating button, exactly like the live
-            pages. The main view's PublicProfile (compact) skips its
-            own fixed button, so this is the only one in preview. */}
-        {hasShop && (
-          <FloatingWhatsAppButton whatsapp={data.whatsapp} floating="absolute" />
-        )}
+        {/* The compact PublicProfile skips its own fixed button, so
+            this absolute one is the only WhatsApp button in preview.
+            It renders nothing when no number is set. */}
+        <FloatingWhatsAppButton whatsapp={data.whatsapp} floating="absolute" />
       </div>
     </div>
   );

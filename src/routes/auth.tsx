@@ -11,9 +11,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Log in or sign up — izzy" },
-      { name: "description", content: "Create your free izzy page in under a minute." },
+      { name: "description", content: "Create your free izzy shop in under a minute." },
       { property: "og:title", content: "Log in or sign up — izzy" },
-      { property: "og:description", content: "Create your free izzy page in under a minute." },
+      { property: "og:description", content: "Create your free izzy shop in under a minute." },
     ],
   }),
   component: AuthPage,
@@ -88,7 +88,7 @@ function AuthPage() {
         {sent ? (
           <div className="text-center">
             <h1 className="text-3xl font-bold">Check your email</h1>
-            <p className="mt-2 text-base leading-relaxed text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your page. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
+            <p className="mt-2 text-base leading-relaxed text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your shop. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
             <button className="mt-6 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => setSent(false)}>Use a different email</button>
           </div>
         ) : (
@@ -97,7 +97,7 @@ function AuthPage() {
               <button type="button" onClick={() => { setFormError(""); setMode("signup"); }} className={`min-h-[44px] flex-1 rounded-full text-base font-semibold ${mode === "signup" ? "bg-card shadow-sm" : "text-muted-foreground"}`}>Sign up</button>
               <button type="button" onClick={() => { setFormError(""); setMode("signin"); }} className={`min-h-[44px] flex-1 rounded-full text-base font-semibold ${mode === "signin" ? "bg-card shadow-sm" : "text-muted-foreground"}`}>Log in</button>
             </div>
-            <h1 className="mt-6 text-3xl font-bold">{mode === "signup" ? "Create your page" : "Welcome back"}</h1>
+            <h1 className="mt-6 text-3xl font-bold">{mode === "signup" ? "Create your shop" : "Welcome back"}</h1>
             <p className="mt-1 text-base text-muted-foreground">{mode === "signup" ? "Free forever. No card needed." : "Log in to your izzy dashboard."}</p>
             {mode === "signin" && (
               <p className="mt-3 rounded-xl bg-muted p-3 text-sm text-muted-foreground">Signed up with Google before? Enter that Google email above, tap Forgot password, set a password, then log in here.</p>

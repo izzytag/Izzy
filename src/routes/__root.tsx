@@ -55,8 +55,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "izzy — link in bio for creators" },
-      { name: "description", content: "One link for your links or your shop, WhatsApp and UPI payments. Pro ₹99/month in India / $1/month elsewhere." },
+      { title: "izzy — your shop in one link" },
+      { name: "description", content: "Your shop in one link — catalogue, prices and WhatsApp orders. Pro ₹99/month in India / $1/month elsewhere." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

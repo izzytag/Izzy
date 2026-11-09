@@ -18,6 +18,12 @@ function publicClient() {
   });
 }
 
+/**
+ * Public storefront data: the profile plus its ENABLED products and
+ * services, in position order. Izzy is shop/catalog only — link-kind
+ * rows (legacy data, kept in the DB) are never returned here, so they
+ * never appear on the public page.
+ */
 export const getPublicPage = createServerFn({ method: "GET" })
   .inputValidator((d: { username: string }) => ({ username: String(d.username).toLowerCase().slice(0, 30) }))
   .handler(async ({ data }) => {
@@ -29,26 +35,8 @@ export const getPublicPage = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!profile) return null;
     const [{ data: links }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).order("position"),
+      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).in("kind", ["product", "service"]).order("position"),
       sb.rpc("is_pro", { _uid: profile.id }),
     ]);
     return { profile, links: links ?? [], isPro: !!isPro };
-  });
-
-/** Shop view: same profile, products only (kind='product', enabled). */
-export const getPublicShop = createServerFn({ method: "GET" })
-  .inputValidator((d: { username: string }) => ({ username: String(d.username).toLowerCase().slice(0, 30) }))
-  .handler(async ({ data }) => {
-    const sb = publicClient();
-    const { data: profile } = await sb
-      .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme, socials, whatsapp, upi_id")
-      .eq("username", data.username)
-      .maybeSingle();
-    if (!profile) return null;
-    const [{ data: products }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position"),
-      sb.rpc("is_pro", { _uid: profile.id }),
-    ]);
-    return { profile, products: products ?? [], isPro: !!isPro };
   });

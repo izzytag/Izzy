@@ -8,9 +8,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — izzy | Free or Pro" },
-      { name: "description", content: "Start free with 5 links. Go Pro (monthly): unlimited links, all themes, no branding, full analytics." },
+      { name: "description", content: "Start free with 5 products and services. Go Pro (monthly): unlimited products and services, all themes, no branding, full analytics." },
       { property: "og:title", content: "izzy pricing — Free or Pro" },
-      { property: "og:description", content: "Unlimited links, all themes and no branding (Pro, monthly)." },
+      { property: "og:description", content: "Unlimited products and services, all themes and no branding (Pro, monthly)." },
     ],
   }),
   component: Pricing,
