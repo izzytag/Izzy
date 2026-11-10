@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PricingCards } from "@/components/PricingCards";
-import { proPriceLine, testingBanner } from "@/lib/billing";
+import { proPriceLine } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -56,7 +56,6 @@ function Pricing() {
       <main className="mx-auto max-w-3xl px-5 py-10">
         <h1 className="text-4xl font-extrabold sm:text-center">Simple pricing</h1>
         <p className="mt-3 text-base text-muted-foreground sm:text-center">{proPriceLine(region)} for Pro. No surprises.</p>
-        <p className="mt-2 text-center text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
         <div className="mt-10"><PricingCards region={region} freeCta={cta("Start free")} proCta={cta("Go Pro", true)} /></div>
         <section className="mt-14">
           <h2 className="text-2xl font-bold sm:text-center">Billing questions</h2>

@@ -60,6 +60,42 @@ function SupportPage() {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
+  // Beta feedback (Step 07 §3): four short questions, landed in the
+  // same support inbox as a ticket (category "Other", subject "Beta
+  // feedback") so nothing new had to be built to read it — the izzy
+  // team reads it there alongside support messages.
+  const [fbConfusing, setFbConfusing] = useState("");
+  const [fbUseful, setFbUseful] = useState("");
+  const [fbContinue, setFbContinue] = useState("Yes");
+  const [fbPay, setFbPay] = useState("Not sure");
+  const [fbBusy, setFbBusy] = useState(false);
+  const [fbSent, setFbSent] = useState(false);
+
+  async function submitFeedback(e: React.FormEvent) {
+    e.preventDefault();
+    if (!fbConfusing.trim() && !fbUseful.trim()) {
+      toast.error("Tell us at least one thing — even a sentence helps.");
+      return;
+    }
+    const body = [
+      "What was the most confusing part of creating your shop?",
+      fbConfusing.trim() || "—",
+      "",
+      "What would make izzy more useful for your business?",
+      fbUseful.trim() || "—",
+      "",
+      `Would you continue using izzy? ${fbContinue}`,
+      `Would you consider paying for additional features? ${fbPay}`,
+    ].join("\n");
+    setFbBusy(true);
+    const res = await submitSupportTicket({ data: { category: "Other", subject: "Beta feedback", message: body } }).catch((err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Couldn't send your feedback. Please try again.");
+      return null;
+    });
+    setFbBusy(false);
+    if (res?.ok) setFbSent(true);
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -152,6 +188,79 @@ function SupportPage() {
             </div>
             <Button type="submit" disabled={busy} className="min-h-[48px] w-full text-base sm:w-auto sm:px-8">
               {busy ? "Sending…" : "Send message"}
+            </Button>
+          </form>
+        )}
+      </section>
+
+      <section className="rounded-xl border bg-card p-5 sm:p-6">
+        <h2 className="text-xl font-bold">Beta feedback</h2>
+        <p className="mt-1 max-w-2xl text-base leading-relaxed text-muted-foreground">
+          izzy is still in beta, and your answers shape what we fix and build next. They go to the izzy team
+          and are read in our support inbox — four quick questions, nothing else is collected.
+        </p>
+        {fbSent ? (
+          <div className="mt-4 flex flex-col items-center gap-2 rounded-xl bg-muted p-6 text-center">
+            <CheckCircle2 className="h-10 w-10 text-primary" />
+            <p className="text-lg font-semibold">Thank you!</p>
+            <p className="max-w-md text-base leading-relaxed text-muted-foreground">
+              Your feedback is with the izzy team. It genuinely helps us make izzy easier for shops like yours.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={submitFeedback} className="mt-4 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="fb-confusing">What was the most confusing part of creating your shop?</Label>
+              <Textarea
+                id="fb-confusing"
+                maxLength={400}
+                rows={3}
+                value={fbConfusing}
+                onChange={(e) => setFbConfusing(e.target.value)}
+                placeholder="Anything that made you pause, guess, or ask for help…"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="fb-useful">What would make izzy more useful for your business?</Label>
+              <Textarea
+                id="fb-useful"
+                maxLength={400}
+                rows={3}
+                value={fbUseful}
+                onChange={(e) => setFbUseful(e.target.value)}
+                placeholder="A feature you expected, or something that would save you time…"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="fb-continue">Would you continue using izzy?</Label>
+                <select
+                  id="fb-continue"
+                  value={fbContinue}
+                  onChange={(e) => setFbContinue(e.target.value)}
+                  className="flex min-h-[44px] w-full rounded-md border border-input bg-background px-3 py-2 text-base"
+                >
+                  {["Yes", "No", "Not sure"].map((o) => (
+                    <option key={o} value={o}>{o}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="fb-pay">Would you consider paying for additional features?</Label>
+                <select
+                  id="fb-pay"
+                  value={fbPay}
+                  onChange={(e) => setFbPay(e.target.value)}
+                  className="flex min-h-[44px] w-full rounded-md border border-input bg-background px-3 py-2 text-base"
+                >
+                  {["Yes", "No", "Not sure"].map((o) => (
+                    <option key={o} value={o}>{o}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <Button type="submit" disabled={fbBusy} className="min-h-[48px] w-full text-base sm:w-auto sm:px-8">
+              {fbBusy ? "Sending…" : "Send feedback"}
             </Button>
           </form>
         )}

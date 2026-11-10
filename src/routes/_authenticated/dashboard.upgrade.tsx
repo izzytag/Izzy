@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { accountQuery } from "@/lib/account";
 import {
   proPriceLine,
-  testingBanner,
   startProSubscription,
   planDisplayState,
   requestProCancellation,
@@ -89,7 +88,6 @@ function UpgradePage() {
         <p className="mt-1 text-muted-foreground">
           {proPriceLine(region)}, cancel anytime. {isRow ? "Stripe checkout coming soon." : "Card, UPI, or netbanking at checkout."}
         </p>
-        <p className="mt-1 text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
       </div>
 
       <section className="rounded-xl border bg-card p-5 sm:p-6">

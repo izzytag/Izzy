@@ -117,9 +117,15 @@ function OverviewPage() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="truncate text-xl font-bold">{p.display_name || p.username}</h2>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
-                <span className="h-2 w-2 rounded-full bg-primary" /> Live
-              </span>
+              {p.suspended ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-sm font-semibold text-destructive">
+                  <span className="h-2 w-2 rounded-full bg-destructive" /> Suspended
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
+                  <span className="h-2 w-2 rounded-full bg-primary" /> Live
+                </span>
+              )}
             </div>
             <p className="mt-1 break-all text-base font-medium text-primary">{shopUrlDisplay}</p>
             {liveCount === 0 && (

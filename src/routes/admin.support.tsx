@@ -103,6 +103,7 @@ function AdminSupportPage() {
                     >
                       <span className="flex items-center gap-2">
                         <span className="min-w-0 flex-1 truncate font-semibold">{t.subject || t.message.split("\n")[0]}</span>
+                        {t.senderIsPro && <Badge>Pro</Badge>}
                         <Badge variant={t.status === "open" ? "default" : "secondary"}>
                           {TICKET_STATUS_LABELS[(t.status as TicketStatus)] ?? t.status}
                         </Badge>
@@ -127,6 +128,9 @@ function AdminSupportPage() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-lg font-bold">{selected.subject || "Contact form message"}</h2>
+                  {selected.senderIsPro && (
+                    <p className="mt-1.5"><Badge>Pro</Badge> <span className="text-sm text-muted-foreground">Priority support — this shop is on an active Pro plan.</span></p>
+                  )}
                   <p className="mt-1 text-sm text-muted-foreground">
                     From {selected.email}
                     {selected.business?.username ? ` · ${selected.business.displayName || ""} (@${selected.business.username})` : " · sent from the public contact page"}

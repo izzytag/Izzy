@@ -399,10 +399,27 @@ export const adminListTickets = createServerFn({ method: "GET" })
     let q = admin.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(200);
     if (data.status) q = q.eq("status", data.status);
     const { data: tickets } = await q;
-    const businesses = await businessMap(admin, (tickets ?? []).map((t) => t.user_id));
-    return (tickets ?? []).map((t) => ({
+    const rows = tickets ?? [];
+    const businesses = await businessMap(admin, rows.map((t) => t.user_id));
+    // Priority support (Step 07): tickets sent from the dashboard carry
+    // the sender's user_id, so their CURRENT plan can be looked up for
+    // a Pro badge in the inbox. Email-only tickets (public /contact
+    // form) cannot be matched reliably — profiles store no email
+    // (addresses live in auth.users), so there is deliberately no
+    // email-based guess: they simply get no badge.
+    const senderIds = [...new Set(rows.map((t) => t.user_id).filter((x): x is string => !!x))];
+    const proByUser = new Map<string, boolean>();
+    if (senderIds.length > 0) {
+      const { data: subs } = await admin
+        .from("subscriptions")
+        .select("user_id, plan, status, current_period_end")
+        .in("user_id", senderIds);
+      for (const s of subs ?? []) proByUser.set(s.user_id, subIsActivePro(s));
+    }
+    return rows.map((t) => ({
       ...t,
       business: t.user_id ? (businesses.get(t.user_id) ?? null) : null,
+      senderIsPro: t.user_id ? (proByUser.get(t.user_id) ?? false) : false,
     }));
   });
 

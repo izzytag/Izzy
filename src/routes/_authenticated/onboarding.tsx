@@ -337,7 +337,7 @@ function OnboardingPage() {
                   </div>
                 </div>
                 <p className="mt-3 max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3 leading-relaxed">
-                  Hi! I'd like to order: <span className="font-medium">Chocolate cake — ₹499</span>
+                  Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on {name.trim() || "Your business"}&apos;s izzy shop. Could you please share more details?
                   <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
                 </p>
                 <p className="mt-3 text-center text-sm text-muted-foreground">An example — the chat opens on your number.</p>

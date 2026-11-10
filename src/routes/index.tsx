@@ -11,7 +11,6 @@ import { Section, SectionHeading } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLang } from "@/lib/i18n";
-import { testingBanner } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import type { ThemeId } from "@/lib/themes";
 
@@ -256,7 +255,7 @@ function Landing() {
           </div>
           <div className="space-y-3 pt-4">
             <p className="max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3.5 leading-relaxed shadow-none">
-              Hi! I'd like to order: <span className="font-medium">Chocolate cake — ₹499</span>
+              Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on Priya&apos;s Kitchen&apos;s izzy shop. Could you please share more details?
               <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
             </p>
             <p className="ml-auto max-w-[85%] rounded-xl rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">
@@ -271,7 +270,6 @@ function Landing() {
       <Section id="pricing">
         <div className="mx-auto max-w-3xl">
           <SectionHeading title="Simple, honest pricing." sub="Start free. Upgrade when your shop grows — cancel anytime." />
-          <p className="mt-4 text-center text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
           <div className="mt-10">
             <PricingCards
               region={region}

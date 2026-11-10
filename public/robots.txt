@@ -1,14 +1,36 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /onboarding
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /onboarding
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /onboarding
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /onboarding
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+Disallow: /onboarding
+
+Sitemap: https://izzytag.shop/sitemap.xml

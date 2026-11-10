@@ -77,7 +77,13 @@ function ProductsPage() {
 
   async function deleteLink(id: string) {
     setLinks((l) => l.filter((x) => x.id !== id));
-    await supabase.from("links").delete().eq("id", id);
+    const { error } = await supabase.from("links").delete().eq("id", id);
+    if (error) {
+      // The optimistic removal was wrong — tell the seller and pull
+      // the real list back instead of silently diverging.
+      toast.error(error.message);
+      void qc.invalidateQueries({ queryKey: linksQuery(acc.user.id).queryKey });
+    }
   }
 
   async function onDragEnd(e: DragEndEvent) {
@@ -87,7 +93,12 @@ function ProductsPage() {
     const next = reorderSubset(links, visibleRows, String(e.active.id), String(e.over.id));
     if (!next) return;
     setLinks(() => next);
-    await Promise.all(next.map((l) => supabase.from("links").update({ position: l.position }).eq("id", l.id)));
+    const results = await Promise.all(next.map((l) => supabase.from("links").update({ position: l.position }).eq("id", l.id)));
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast.error(failed.error.message);
+      void qc.invalidateQueries({ queryKey: linksQuery(acc.user.id).queryKey });
+    }
   }
 
   return (

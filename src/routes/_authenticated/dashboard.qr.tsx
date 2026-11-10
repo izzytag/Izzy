@@ -23,6 +23,17 @@ const CAMPAIGNS = [
   { label: "Custom label", value: "custom" },
 ] as const;
 
+/** Escape user-controlled text before it is interpolated into the
+ *  print window's raw HTML (the business name is free text). */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * QR Code & sharing (Step 04). The code encodes the canonical shop
  * URL with ?src=qr so scans are labelled as QR visits in Analytics.
@@ -99,8 +110,9 @@ function QrPage() {
       return;
     }
     const img = canvas.toDataURL("image/png");
+    const safeName = escapeHtml(businessName);
     win.document.write(`<!doctype html>
-<html><head><title>${businessName} — shop QR code</title>
+<html><head><title>${safeName} — shop QR code</title>
 <style>
   body { font-family: system-ui, sans-serif; text-align: center; padding: 48px 24px; color: #171717; }
   img { width: 320px; height: 320px; }
@@ -110,7 +122,7 @@ function QrPage() {
 </style></head>
 <body>
   <img src="${img}" alt="QR code for ${shopUrl}" />
-  <h1>${businessName}</h1>
+  <h1>${safeName}</h1>
   <p>Scan to explore our shop.</p>
   <p class="url">${shopUrl.replace("https://", "")}</p>
   <script>window.onload = () => window.print();</script>
