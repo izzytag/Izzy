@@ -221,9 +221,74 @@ function AnalyticsPage() {
           Free shows the last 7 days. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro</Link> for 30-day analytics.
         </p>
       )}
+
+      <section className="rounded-3xl border bg-card p-5 sm:p-6">
+        <h2 className="text-lg font-bold">What these numbers mean</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          How a visit becomes an enquiry — and where izzy's counting stops.
+        </p>
+        <ol className="mt-5 space-y-5">
+          {MEANINGS.map((m, i) => (
+            <li key={m.title} className="flex gap-3">
+              <span
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                  m.tracked ? "bg-primary text-primary-foreground" : "border-2 border-border text-muted-foreground"
+                }`}
+              >
+                {i + 1}
+              </span>
+              <div className="min-w-0">
+                <p className="flex flex-wrap items-center gap-2 font-semibold">
+                  {m.title}
+                  {!m.tracked && (
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Not tracked by izzy
+                    </span>
+                  )}
+                </p>
+                <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }
+
+/**
+ * The enquiry chain, in plain words. The first three steps are the
+ * events izzy actually records; the last two happen inside WhatsApp
+ * and between people, so they are named here precisely so nobody
+ * mistakes a click for a message sent or a sale made.
+ */
+const MEANINGS = [
+  {
+    title: "Shop view",
+    tracked: true,
+    text: "A customer opened your shop page. If they refresh during the same visit, it still counts once.",
+  },
+  {
+    title: "Product view",
+    tracked: true,
+    text: "A customer opened a product's details to look closer — its photos, price and description.",
+  },
+  {
+    title: "WhatsApp click",
+    tracked: true,
+    text: "A customer tapped the Order or Book button on a product. WhatsApp opens with an enquiry about that product already written for them.",
+  },
+  {
+    title: "Message sent",
+    tracked: false,
+    text: "Only the customer decides to press send in WhatsApp — izzy can't see this, so it is never counted here.",
+  },
+  {
+    title: "Sale",
+    tracked: false,
+    text: "The conversation and the sale happen between you and the customer. izzy doesn't process payments for your orders, so sales aren't tracked here either.",
+  },
+];
 
 function RankedList({ rows, empty }: { rows: { id: string; title: string; n: number }[]; empty: string }) {
   if (rows.length === 0) return <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{empty}</p>;

@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -24,10 +25,14 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
+import { Route as AdminGrowthRouteImport } from './routes/admin.growth'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesInstagramBioLinkRouteImport } from './routes/guides.instagram-bio-link'
+import { Route as GuidesSellOnWhatsappRouteImport } from './routes/guides.sell-on-whatsapp'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
@@ -66,6 +71,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -113,6 +123,11 @@ const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
   path: '/businesses',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGrowthRoute = AdminGrowthRouteImport.update({
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -132,6 +147,21 @@ const AdminSupportRoute = AdminSupportRouteImport.update({
   id: '/support',
   path: '/support',
   getParentRoute: () => AdminRoute,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GuidesRoute,
+} as any)
+const GuidesInstagramBioLinkRoute = GuidesInstagramBioLinkRouteImport.update({
+  id: '/instagram-bio-link',
+  path: '/instagram-bio-link',
+  getParentRoute: () => GuidesRoute,
+} as any)
+const GuidesSellOnWhatsappRoute = GuidesSellOnWhatsappRouteImport.update({
+  id: '/sell-on-whatsapp',
+  path: '/sell-on-whatsapp',
+  getParentRoute: () => GuidesRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -199,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -207,11 +238,15 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -235,11 +270,15 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin': typeof AdminIndexRoute
+  '/guides': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -259,6 +298,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -267,11 +307,15 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
@@ -291,6 +335,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/guides'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -299,11 +344,15 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/growth'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
     | '/admin/'
+    | '/guides/'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
     | '/dashboard/products'
@@ -327,11 +376,15 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/growth'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
     | '/admin'
+    | '/guides'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
     | '/dashboard/products'
@@ -350,6 +403,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/guides'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -358,11 +412,15 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/growth'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
     | '/admin/'
+    | '/guides/'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/appearance'
     | '/_authenticated/dashboard/products'
@@ -382,6 +440,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  GuidesRoute: typeof GuidesRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -430,6 +489,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -495,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBusinessesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/growth': {
+      id: '/admin/growth'
+      path: '/growth'
+      fullPath: '/admin/growth'
+      preLoaderRoute: typeof AdminGrowthRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -522,6 +595,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/support'
       preLoaderRoute: typeof AdminSupportRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/instagram-bio-link': {
+      id: '/guides/instagram-bio-link'
+      path: '/instagram-bio-link'
+      fullPath: '/guides/instagram-bio-link'
+      preLoaderRoute: typeof GuidesInstagramBioLinkRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/sell-on-whatsapp': {
+      id: '/guides/sell-on-whatsapp'
+      path: '/sell-on-whatsapp'
+      fullPath: '/guides/sell-on-whatsapp'
+      preLoaderRoute: typeof GuidesSellOnWhatsappRouteImport
+      parentRoute: typeof GuidesRoute
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -643,6 +737,7 @@ const AuthenticatedRouteRouteWithChildren =
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminGrowthRoute: typeof AdminGrowthRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
@@ -654,6 +749,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminGrowthRoute: AdminGrowthRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
@@ -664,6 +760,21 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface GuidesRouteChildren {
+  GuidesInstagramBioLinkRoute: typeof GuidesInstagramBioLinkRoute
+  GuidesSellOnWhatsappRoute: typeof GuidesSellOnWhatsappRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
+}
+
+const GuidesRouteChildren: GuidesRouteChildren = {
+  GuidesInstagramBioLinkRoute: GuidesInstagramBioLinkRoute,
+  GuidesSellOnWhatsappRoute: GuidesSellOnWhatsappRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
+}
+
+const GuidesRouteWithChildren =
+  GuidesRoute._addFileChildren(GuidesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -671,6 +782,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  GuidesRoute: GuidesRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,

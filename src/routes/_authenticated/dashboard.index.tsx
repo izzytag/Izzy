@@ -51,6 +51,8 @@ function OverviewPage() {
   const days = acc.isPro ? 30 : 7;
   const cutoff = Date.now() - days * 864e5;
   const viewsInWindow = stats.views.filter((x) => +new Date(x.created_at) >= cutoff).length;
+  // The share nudge always uses a plain 7-day window, whatever the plan.
+  const viewsLast7 = stats.views.filter((x) => +new Date(x.created_at) >= Date.now() - 7 * 864e5).length;
   const tapsInWindow = [...stats.productViews, ...stats.whatsappClicks].filter((x) => +new Date(x.created_at) >= cutoff).length;
   const hasActivity = stats.totalViews > 0;
 
@@ -81,27 +83,40 @@ function OverviewPage() {
       label: "Complete your business profile",
       hint: "Name and a short description",
       to: "/dashboard/store" as const,
+      ctaTo: "/dashboard/store" as const,
     },
     {
       done: !!p.whatsapp,
       label: "Add your WhatsApp number",
       hint: "So customers can order from you",
       to: "/dashboard/store" as const,
+      ctaTo: "/dashboard/store" as const,
     },
     {
       done: !!p.username,
       label: "Choose your shop username",
       hint: "Your shareable shop link",
       to: "/dashboard/store" as const,
+      // Claiming a username happens in onboarding. The dashboard is
+      // only reachable after a username exists, so in practice this
+      // step is always complete here — the link is just a fallback.
+      ctaTo: "/onboarding" as const,
     },
     {
       done: storeRows.length > 0,
       label: "Add your first product",
       hint: "With a photo and a price",
       to: "/dashboard/products" as const,
+      ctaTo: "/dashboard/products" as const,
     },
   ];
   const setupDone = checklist.every((c) => c.done);
+  const nextStep = checklist.find((c) => !c.done);
+  const nextStepNumber = checklist.findIndex((c) => !c.done) + 1;
+  // Factual, from the same stats the rest of this page shows: the
+  // shop is set up with something live, but nobody has visited in a
+  // week — the one useful thing left to do is share the link.
+  const needsVisitors = setupDone && liveCount >= 1 && viewsLast7 === 0;
 
   return (
     <div className="space-y-6">
@@ -176,6 +191,52 @@ function OverviewPage() {
           </Link>
         </div>
       </section>
+
+      {/* ---------- Your next step ---------- */}
+      {nextStep ? (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+            Your next step · {nextStepNumber} of {checklist.length}
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">{nextStep.label}</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            {nextStep.hint} — finish your setup one step at a time, and your shop is ready to share.
+          </p>
+          <Button asChild className="mt-4 min-h-[44px]">
+            <Link to={nextStep.ctaTo}>{nextStep.label} <ArrowRight className="h-4 w-4" /></Link>
+          </Button>
+        </section>
+      ) : needsVisitors ? (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            You have {liveCount} {liveCount === 1 ? "product or service" : "products and services"} live, but nobody has
+            visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
+            WhatsApp status, or a printed QR code.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
+            <Button variant="outline" asChild className="min-h-[44px]">
+              <Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> Get your QR code</Link>
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            Your setup is complete. Put your link where customers already are — Instagram bio, WhatsApp status,
+            or a printed QR code on your counter.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
+          </div>
+        </section>
+      )}
 
       {/* ---------- Setup checklist ---------- */}
       {setupDone ? (

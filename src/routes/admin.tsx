@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Building2, CreditCard, Flag, LayoutDashboard, LifeBuoy, ScrollText, Settings, ShieldAlert,
+  Building2, CreditCard, Flag, LayoutDashboard, LifeBuoy, ScrollText, Settings, ShieldAlert, TrendingUp,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminCheck } from "@/lib/admin.functions";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/admin")({
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/admin/growth", label: "Growth", icon: TrendingUp, exact: false },
   { to: "/admin/businesses", label: "Businesses", icon: Building2, exact: false },
   { to: "/admin/subscriptions", label: "Subscriptions", icon: CreditCard, exact: false },
   { to: "/admin/support", label: "Support", icon: LifeBuoy, exact: false },

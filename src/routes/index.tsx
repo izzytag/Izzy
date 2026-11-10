@@ -22,6 +22,20 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "izzy — Your business. Your products. One beautiful link." },
       { property: "og:description", content: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required." },
     ],
+    // Structured data: only facts — the platform's name, URL and
+    // logo. No ratings or reviews are claimed anywhere.
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            { "@type": "Organization", name: "izzy", url: "https://izzytag.shop/", logo: "https://izzytag.shop/favicon.png" },
+            { "@type": "WebSite", name: "izzy", url: "https://izzytag.shop/" },
+          ],
+        }),
+      },
+    ],
   }),
   component: Landing,
 });
@@ -321,6 +335,7 @@ function Landing() {
                 <li><Link to="/" hash="how-it-works" className="transition-colors duration-200 hover:text-foreground">How it works</Link></li>
                 <li><Link to="/" hash="examples" className="transition-colors duration-200 hover:text-foreground">Examples</Link></li>
                 <li><Link to="/pricing" className="transition-colors duration-200 hover:text-foreground">Pricing</Link></li>
+                <li><Link to="/guides" className="transition-colors duration-200 hover:text-foreground">Guides</Link></li>
               </ul>
             </nav>
             <nav aria-label="Support and legal">

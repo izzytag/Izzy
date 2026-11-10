@@ -32,7 +32,27 @@ export const Route = createFileRoute("/$username")({
     if (p.avatar_url?.startsWith("https://")) {
       meta.push({ property: "og:image", content: p.avatar_url }, { name: "twitter:image", content: p.avatar_url });
     }
-    return { meta };
+    // Structured data for the shop itself — built only from the
+    // business's own saved fields (name, link, description, photo).
+    const store: {
+      "@context": string;
+      "@type": string;
+      name: string;
+      url: string;
+      description?: string;
+      image?: string;
+    } = {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      // A loaded shop always has a username (the loader fetches by
+      // it); the final fallback only satisfies the nullable types.
+      name: name ?? p.username ?? "",
+      url: `https://izzytag.shop/${p.username}`,
+    };
+    if (p.bio) store.description = p.bio;
+    const avatar = p.avatar_url;
+    if (avatar?.startsWith("https://")) store.image = avatar;
+    return { meta, scripts: [{ type: "application/ld+json", children: JSON.stringify(store) }] };
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">

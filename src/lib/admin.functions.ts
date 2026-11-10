@@ -151,6 +151,87 @@ export const adminOverview = createServerFn({ method: "GET" })
     };
   });
 
+/* ------------------------------- growth ------------------------------- */
+
+/**
+ * Platform growth metrics (Step 08) — derived counts only, computed
+ * from the same tables the overview reads. Every metric's definition
+ * is rendered next to its number on the Growth page; nothing here is
+ * estimated, sampled or extrapolated. Windows are fixed (7 days /
+ * 30 days / all time) — there is deliberately no range picker.
+ *
+ * Data sources: profiles (registrations, usernames), links (product /
+ * service rows — enabled = live), subscriptions (plan state),
+ * page_views (one row per shop visit session), link_clicks filtered
+ * to kind = "whatsapp_click" (Order/Book taps — NOT orders).
+ */
+export const adminGrowth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { admin } = await requireAdmin(context);
+    const since = (days: number) => new Date(Date.now() - days * 864e5).toISOString();
+    const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
+    const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 1000) / 10 : 0);
+    const [
+      totalBusinesses,
+      newReg7,
+      newReg30,
+      { data: profileRows },
+      { data: itemRows },
+      { data: viewRows },
+      whatsappClicksAll,
+      whatsappClicks30,
+      { data: subRows },
+    ] = await Promise.all([
+      count(admin.from("profiles").select("id", { count: "exact", head: true })),
+      count(admin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since(7))),
+      count(admin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since(30))),
+      admin.from("profiles").select("id, username").limit(10000),
+      admin.from("links").select("user_id, enabled").in("kind", ["product", "service"]).limit(10000),
+      admin.from("page_views").select("profile_id").gte("created_at", since(30)).limit(10000),
+      count(admin.from("link_clicks").select("id", { count: "exact", head: true }).eq("kind", "whatsapp_click")),
+      count(
+        admin
+          .from("link_clicks")
+          .select("id", { count: "exact", head: true })
+          .eq("kind", "whatsapp_click")
+          .gte("created_at", since(30)),
+      ),
+      admin.from("subscriptions").select("user_id, plan, status, current_period_end"),
+    ]);
+    const profiles = profileRows ?? [];
+    const usernameByUser = new Map(profiles.map((p) => [p.id, p.username]));
+    const completedOnboarding = profiles.filter((p) => !!p.username).length;
+    const withItems = new Set<string>();
+    const withLiveItems = new Set<string>();
+    for (const r of itemRows ?? []) {
+      withItems.add(r.user_id);
+      if (r.enabled) withLiveItems.add(r.user_id);
+    }
+    // Published = a shareable link exists AND at least one item on it
+    // is live: username claimed and at least one enabled item.
+    let publishedShops = 0;
+    for (const uid of withLiveItems) if (usernameByUser.get(uid)) publishedShops += 1;
+    const activeShops30 = new Set((viewRows ?? []).map((v) => v.profile_id)).size;
+    const activePro = (subRows ?? []).filter((s) => subIsActivePro(s)).length;
+    return {
+      totalBusinesses,
+      newReg7,
+      newReg30,
+      completedOnboarding,
+      completedOnboardingPct: pct(completedOnboarding, totalBusinesses),
+      publishedShops,
+      publishedPct: pct(publishedShops, totalBusinesses),
+      withFirstProduct: withItems.size,
+      withFirstProductPct: pct(withItems.size, totalBusinesses),
+      activeShops30,
+      whatsappClicksAll,
+      whatsappClicks30,
+      activePro,
+      proConversionPct: pct(activePro, totalBusinesses),
+    };
+  });
+
 /* ----------------------------- businesses ----------------------------- */
 
 export const adminListBusinesses = createServerFn({ method: "GET" })
