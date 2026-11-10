@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
     const acc = await context.queryClient.ensureQueryData(accountQuery);
     await Promise.all([
       context.queryClient.ensureQueryData(linksQuery(acc.user.id)),
-      context.queryClient.ensureQueryData(statsQuery(acc.user.id)),
+      context.queryClient.ensureQueryData(statsQuery(acc.user.id, acc.isPro)),
     ]);
   },
   component: OverviewPage,
@@ -36,7 +36,7 @@ function greeting(): string {
 function OverviewPage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
-  const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id));
+  const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id, acc.isPro));
   const p = acc.profile;
   const businessName = p.display_name || p.username || "there";
 

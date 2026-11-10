@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/analytics")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
     await Promise.all([
-      context.queryClient.ensureQueryData(statsQuery(acc.user.id)),
+      context.queryClient.ensureQueryData(statsQuery(acc.user.id, acc.isPro)),
       context.queryClient.ensureQueryData(linksQuery(acc.user.id)),
     ]);
   },
@@ -23,7 +23,7 @@ const SOURCE_ORDER = ["Instagram", "WhatsApp", "Facebook", "Google", "QR code", 
 
 function AnalyticsPage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
-  const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id));
+  const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id, acc.isPro));
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const [range, setRange] = useState<7 | 30>(7);
   // Plan gating, unchanged: Free always sees the last 7 days, Pro can

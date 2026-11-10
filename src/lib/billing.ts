@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import type { Region } from "./geo";
-import { createRazorpaySubscription, verifyRazorpayPayment } from "./razorpay.functions";
+import { createRazorpaySubscription, verifyRazorpayPayment, cancelProSubscription } from "./razorpay.functions";
 
 export const PRO_PRICE_USD = 1;
 export const PRO_PRICE_INR = 99;
@@ -36,6 +36,43 @@ export function testingBanner(region: Region | "loading"): string {
 
 export function effectiveIsPro(isPro: boolean): boolean {
   return isPro || TESTING_FREE;
+}
+
+/** The subscriptions-table fields the Plan page displays. */
+export type SubscriptionRowLike = {
+  plan: string;
+  status: string;
+  current_period_end: string | null;
+};
+
+/**
+ * How a subscriptions row should be described to its owner — derived
+ * only from what the row actually stores, never an invented state:
+ * - "free": no row yet, or the row is the Free plan.
+ * - "active": Pro, status active, paid period still running (or no
+ *   period end stored) — Razorpay renews it at the period end.
+ * - "expired": Pro, status active, but the paid period has passed —
+ *   the account is back on Free entitlements.
+ * - "cancelled": the row itself says cancelled (the webhook writes
+ *   this once Razorpay has actually ended the subscription).
+ * - "other": a status Izzy doesn't write itself — shown as stored.
+ */
+export type PlanDisplayState =
+  | { kind: "free" }
+  | { kind: "active"; periodEnd: string | null }
+  | { kind: "expired"; periodEnd: string | null }
+  | { kind: "cancelled"; periodEnd: string | null }
+  | { kind: "other"; status: string; periodEnd: string | null };
+
+export function planDisplayState(sub: SubscriptionRowLike | null, now: Date = new Date()): PlanDisplayState {
+  if (!sub || sub.plan !== "pro") return { kind: "free" };
+  const periodEnd = sub.current_period_end ?? null;
+  if (sub.status === "cancelled") return { kind: "cancelled", periodEnd };
+  if (sub.status === "active") {
+    if (periodEnd && new Date(periodEnd) <= now) return { kind: "expired", periodEnd };
+    return { kind: "active", periodEnd };
+  }
+  return { kind: "other", status: sub.status, periodEnd };
 }
 
 type RazorpayCheckoutInstance = { open: () => void };
@@ -128,5 +165,29 @@ export async function startProSubscription(opts: {
     checkout.open();
   } catch (e) {
     toast.error(e instanceof Error ? e.message : "Could not start checkout. Please try again.");
+  }
+}
+
+export type CancellationResult =
+  | { ok: true; alreadyEnded: boolean; periodEnd: string | null }
+  | { ok: false };
+
+/**
+ * Cancel Pro at cycle end, via the server function (the server
+ * re-checks ownership with Razorpay before cancelling — the client
+ * never marks anything cancelled itself). Pro stays active until the
+ * paid-through date the server returns.
+ */
+export async function requestProCancellation(): Promise<CancellationResult> {
+  try {
+    const result = await cancelProSubscription({});
+    if (!result.ok) {
+      toast.error(result.error);
+      return { ok: false };
+    }
+    return { ok: true, alreadyEnded: result.alreadyEnded, periodEnd: result.periodEnd };
+  } catch {
+    toast.error("Could not cancel right now. Please try again.");
+    return { ok: false };
   }
 }

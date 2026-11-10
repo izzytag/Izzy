@@ -6,8 +6,11 @@ export type EventRow = { created_at: string; link_id: string; source: string | n
 
 /**
  * Dashboard stats — one shared query for Overview and Analytics so
- * their numbers always agree. Fetches the last 30 days of events;
- * each page applies the plan window on top (Free 7 days, Pro 30).
+ * their numbers always agree. The fetch itself is limited to the
+ * plan's analytics window (Free 7 days, Pro 30) — a Free account's
+ * browser never receives the older rows; each page then applies the
+ * same window for display. (The all-time views count is separate
+ * and not windowed.)
  *
  * link_clicks rows are split by kind (Step 04): "product_view" is a
  * customer opening a product's details; everything else is a WhatsApp
@@ -19,11 +22,11 @@ export type EventRow = { created_at: string; link_id: string; source: string | n
  * columns are not in the database yet, the query retries without
  * them (sources read as null, clicks as WhatsApp clicks).
  */
-export const statsQuery = (uid: string) =>
+export const statsQuery = (uid: string, isPro: boolean) =>
   queryOptions({
-    queryKey: ["stats", uid],
+    queryKey: ["stats", uid, isPro ? 30 : 7],
     queryFn: async () => {
-      const since = new Date(Date.now() - 30 * 864e5).toISOString();
+      const since = new Date(Date.now() - (isPro ? 30 : 7) * 864e5).toISOString();
       const [views, events, tv] = await Promise.all([
         fetchViews(uid, since),
         fetchEvents(uid, since),

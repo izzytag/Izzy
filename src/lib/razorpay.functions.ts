@@ -15,8 +15,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  * (requireSupabaseAuth), never from a client-supplied user_id. A payment
  * is only activated after BOTH checks pass: the Razorpay subscription
  * fetched from Razorpay belongs to this user (notes.user_id), and the
- * HMAC signature verifies with the server secret. No webhook is built
- * in this task — renewals/cancellations via webhook are a follow-up.
+ * HMAC signature verifies with the server secret. Renewals and the
+ * final end of a cancelled subscription arrive via the Razorpay
+ * webhook (razorpay-webhook.server.ts); cancellation is below.
  */
 
 type RazorpayEnv = {
@@ -115,4 +116,114 @@ export const verifyRazorpayPayment = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Payment verified, but Pro could not be activated. Please contact support." };
     }
     return { ok: true as const };
+  });
+
+/**
+ * Cancel the caller's own Pro subscription at cycle end. The caller is
+ * identified from the validated session token; the subscription that
+ * gets cancelled is the one stored on THEIR subscriptions row, and a
+ * fresh fetch from Razorpay must confirm it belongs to them
+ * (notes.user_id) before anything is cancelled.
+ *
+ * Nothing is written to the local subscriptions row here: the row
+ * stays "active" (Pro genuinely stays on until the paid-through
+ * date), Razorpay ends the subscription at cycle end and fires
+ * subscription.cancelled, and the webhook then marks the row
+ * cancelled. Even if that webhook were delayed, is_pro() and the
+ * account query both stop Pro at current_period_end.
+ */
+export const cancelProSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(() => ({}))
+  .handler(async ({ context }) => {
+    const env = razorpayEnv();
+    if (!env) {
+      return {
+        ok: false as const,
+        configured: false as const,
+        error: "Razorpay is not connected yet — cancellation isn't available here right now. Please contact support.",
+      };
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("subscriptions")
+      .select("plan, status, razorpay_subscription_id, current_period_end")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!row || row.plan !== "pro" || !row.razorpay_subscription_id) {
+      return {
+        ok: false as const,
+        configured: true as const,
+        error: "There's no Razorpay subscription on this account to cancel.",
+      };
+    }
+    const subscriptionId = row.razorpay_subscription_id;
+    const { getRazorpaySubscription, cancelRazorpaySubscription, cancellationDecision } =
+      await import("./razorpay.server");
+    let fetched;
+    try {
+      fetched = await getRazorpaySubscription({
+        keyId: env.keyId,
+        keySecret: env.keySecret,
+        subscriptionId,
+      });
+    } catch {
+      return {
+        ok: false as const,
+        configured: true as const,
+        error: "Could not reach Razorpay to cancel. Please try again.",
+      };
+    }
+    // The subscription must belong to the authenticated caller.
+    if (fetched.notes?.["user_id"] !== context.userId) {
+      return {
+        ok: false as const,
+        configured: true as const,
+        error: "This subscription does not belong to your account.",
+      };
+    }
+    const decision = cancellationDecision(fetched.status);
+    if (decision === "already_ended") {
+      return {
+        ok: true as const,
+        configured: true as const,
+        alreadyEnded: true as const,
+        periodEnd: row.current_period_end ?? null,
+      };
+    }
+    if (decision === "unavailable") {
+      return {
+        ok: false as const,
+        configured: true as const,
+        error: "This subscription isn't in a state that can be cancelled right now. Please contact support.",
+      };
+    }
+    let cancelled;
+    try {
+      cancelled = await cancelRazorpaySubscription({
+        keyId: env.keyId,
+        keySecret: env.keySecret,
+        subscriptionId,
+      });
+    } catch {
+      return {
+        ok: false as const,
+        configured: true as const,
+        error: "Could not cancel this subscription. Please try again.",
+      };
+    }
+    // The paid-through date: prefer Razorpay's own current_end (from
+    // the cancel response, then the earlier fetch) over the stored
+    // row — never an invented date.
+    const fromRazorpay = cancelled.current_end ?? fetched.current_end;
+    const periodEnd =
+      typeof fromRazorpay === "number" && Number.isFinite(fromRazorpay)
+        ? new Date(fromRazorpay * 1000).toISOString()
+        : (row.current_period_end ?? null);
+    return {
+      ok: true as const,
+      configured: true as const,
+      alreadyEnded: false as const,
+      periodEnd,
+    };
   });

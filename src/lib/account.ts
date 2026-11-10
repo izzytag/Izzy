@@ -13,7 +13,10 @@ export const accountQuery = queryOptions({
     if (error) throw error;
     const isPro = !!sub && sub.plan === "pro" && sub.status === "active" &&
       (!sub.current_period_end || new Date(sub.current_period_end) > new Date());
-    return { user: u.user, profile, isPro };
+    // `sub` is the caller's own subscriptions row (RLS: own read only).
+    // The Plan page displays its real status/period from it; every
+    // other consumer just keeps using isPro.
+    return { user: u.user, profile, isPro, sub: sub ?? null };
   },
 });
 
