@@ -16,43 +16,138 @@ export type Database = {
     Tables: {
       contact_messages: {
         Row: {
+          admin_note: string | null
+          category: string | null
           created_at: string
           email: string
           id: string
           message: string
+          status: string
+          subject: string | null
+          user_id: string | null
         }
         Insert: {
+          admin_note?: string | null
+          category?: string | null
           created_at?: string
           email: string
           id?: string
           message: string
+          status?: string
+          subject?: string | null
+          user_id?: string | null
         }
         Update: {
+          admin_note?: string | null
+          category?: string | null
           created_at?: string
           email?: string
           id?: string
           message?: string
+          status?: string
+          subject?: string | null
+          user_id?: string | null
         }
         Relationships: []
+      }
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_email: string
+          created_at: string
+          details: Json | null
+          id: string
+          reason: string | null
+          target_user_id: string | null
+          target_username: string | null
+        }
+        Insert: {
+          action: string
+          admin_email: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          target_user_id?: string | null
+          target_username?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          target_user_id?: string | null
+          target_username?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          link_id: string | null
+          reason: string
+          reporter_email: string | null
+          status: string
+          target_username: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          link_id?: string | null
+          reason: string
+          reporter_email?: string | null
+          status?: string
+          target_username: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          link_id?: string | null
+          reason?: string
+          reporter_email?: string | null
+          status?: string
+          target_username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "links"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       link_clicks: {
         Row: {
           created_at: string
           id: number
+          kind: string
           link_id: string
           profile_id: string
+          source: string | null
         }
         Insert: {
           created_at?: string
           id?: never
+          kind?: string
           link_id: string
           profile_id: string
+          source?: string | null
         }
         Update: {
           created_at?: string
           id?: never
+          kind?: string
           link_id?: string
           profile_id?: string
+          source?: string | null
         }
         Relationships: [
           {
@@ -129,16 +224,19 @@ export type Database = {
           created_at: string
           id: number
           profile_id: string
+          source: string | null
         }
         Insert: {
           created_at?: string
           id?: never
           profile_id: string
+          source?: string | null
         }
         Update: {
           created_at?: string
           id?: never
           profile_id?: string
+          source?: string | null
         }
         Relationships: [
           {
@@ -154,10 +252,12 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          category: string | null
           created_at: string
           display_name: string | null
           id: string
           socials: Json
+          suspended: boolean
           theme: string
           upi_id: string | null
           username: string | null
@@ -166,10 +266,12 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          category?: string | null
           created_at?: string
           display_name?: string | null
           id: string
           socials?: Json
+          suspended?: boolean
           theme?: string
           upi_id?: string | null
           username?: string | null
@@ -178,10 +280,12 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          category?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           socials?: Json
+          suspended?: boolean
           theme?: string
           upi_id?: string | null
           username?: string | null

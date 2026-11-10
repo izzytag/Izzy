@@ -65,11 +65,23 @@ export function waLink(num: string) {
   return `https://wa.me/${d.length === 10 ? "91" + d : d}`;
 }
 
-/** WhatsApp deep link with a pre-filled message about a product/service card. */
-export function waCardLink(num: string, kind: string, title: string, pageUrl: string) {
+/**
+ * WhatsApp deep link with a pre-filled message about a product/service
+ * card. When the shop name is known the message names the shop and
+ * includes the price (when the item has one), so the seller sees the
+ * full context; without a shop name it falls back to the shop URL.
+ * The customer still reviews and sends the message themselves.
+ */
+export function waCardLink(num: string, kind: string, title: string, pageUrl: string, opts?: { price?: string | null | undefined; shopName?: string | null | undefined }) {
+  const price = opts?.price?.trim() ? ` (${opts.price.trim()})` : "";
+  const shop = opts?.shopName?.trim();
   const text = kind === "service"
-    ? `Hi, I'd like to book "${title}". Found you on ${pageUrl}`
-    : `Hi, I'm interested in "${title}". Found you on ${pageUrl}`;
+    ? shop
+      ? `Hi! I'd like to book "${title}"${price} listed on ${shop}'s izzy shop. Could you please share more details?`
+      : `Hi, I'd like to book "${title}". Found you on ${pageUrl}`
+    : shop
+      ? `Hi! I'm interested in "${title}"${price} listed on ${shop}'s izzy shop. Could you please share more details?`
+      : `Hi, I'm interested in "${title}". Found you on ${pageUrl}`;
   return `${waLink(num)}?text=${encodeURIComponent(text)}`;
 }
 

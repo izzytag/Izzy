@@ -3,6 +3,7 @@ import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
 import { CatalogueCard } from "@/components/CatalogueCard";
+import { ReportShopButton } from "@/components/ReportShopButton";
 import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
 
 const ICONS: Record<string, typeof Instagram> = { instagram: Instagram, youtube: Youtube, x: Twitter, linkedin: Linkedin, whatsapp: MessageCircle };
@@ -11,6 +12,7 @@ export type PublicData = {
   display_name: string | null;
   username: string | null;
   bio: string | null;
+  category?: string | null;
   avatar_url: string | null;
   socials: Record<string, string>;
   whatsapp: string | null;
@@ -26,10 +28,11 @@ export type PublicData = {
  * server already excludes them; the filter here keeps dashboard
  * previews honest too, since they pass raw rows).
  */
-export function PublicProfile({ data, theme, showBranding, onLinkClick, compact }: {
-  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; compact?: boolean;
+export function PublicProfile({ data, theme, showBranding, onLinkClick, onProductView, compact, reportable }: {
+  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; compact?: boolean; reportable?: boolean;
 }) {
   const [showUpi, setShowUpi] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
@@ -43,13 +46,14 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
         {/* Store header: logo beside the store name, at the top.
             No @username here — the username stays in the URL only. */}
         <div className="flex w-full items-start gap-4">
-          {data.avatar_url ? (
-            <img src={data.avatar_url} alt={name} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
+          {data.avatar_url && !avatarFailed ? (
+            <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70" />
           ) : (
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
           )}
           <div className="min-w-0 flex-1">
             <h1 className="text-[28px] font-bold leading-tight sm:text-[32px]">{name}</h1>
+            {data.category && <p className="mt-1 text-sm font-semibold uppercase tracking-wide text-page-muted">{data.category}</p>}
             {data.bio && <p className="mt-1 text-base leading-relaxed text-page-muted sm:text-[17px]">{data.bio}</p>}
           </div>
         </div>
@@ -85,7 +89,9 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
 
         {items.length === 0 ? (
           <p className="mx-auto mt-8 w-full max-w-[420px] rounded-[28px] border border-page-border bg-page-btn p-6 text-center text-base text-page-btn-fg shadow-sm">
-            No products yet. Check back soon — or message the seller on WhatsApp.
+            {data.whatsapp
+              ? "No products yet. Check back soon — or message the seller on WhatsApp."
+              : "No products yet. Check back soon."}
           </p>
         ) : (
           // Pinterest-style pins: masonry, image-first. Tapping a pin
@@ -96,13 +102,21 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, compact 
           // the live page widens to 3/4 columns on bigger screens.
           <div className={`mt-8 w-full columns-2 gap-4 ${compact ? "" : "sm:columns-3 lg:columns-4"}`}>
             {items.map((l) => (
-              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} />
+              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} onProductView={onProductView} />
             ))}
           </div>
         )}
 
-        {showBranding && (
-          <a href="/" className="mx-auto mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+        {(showBranding || (reportable && data.username)) && (
+          <div className="mx-auto mt-12 flex flex-col items-center gap-1">
+            {showBranding && (
+              <a href="/" className="flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+            )}
+            {/* Live pages only (the dashboard preview passes no
+                `reportable`): a discreet way for visitors to flag a
+                shop for the admin team to review. */}
+            {reportable && data.username && <ReportShopButton username={data.username} />}
+          </div>
         )}
       </div>
       {/* Floating WhatsApp button, live pages only: shown whenever the

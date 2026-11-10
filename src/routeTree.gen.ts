@@ -12,18 +12,37 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsernameRouteImport } from './routes/$username'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as UsernameShopRouteImport } from './routes/$username_.shop'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
+import { Route as AdminGrowthRouteImport } from './routes/admin.growth'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
+import { Route as AdminSupportRouteImport } from './routes/admin.support'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesInstagramBioLinkRouteImport } from './routes/guides.instagram-bio-link'
+import { Route as GuidesSellOnWhatsappRouteImport } from './routes/guides.sell-on-whatsapp'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
+import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
+import { Route as AuthenticatedDashboardQrRouteImport } from './routes/_authenticated/dashboard.qr'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardStoreRouteImport } from './routes/_authenticated/dashboard.store'
+import { Route as AuthenticatedDashboardSupportRouteImport } from './routes/_authenticated/dashboard.support'
 import { Route as AuthenticatedDashboardUpgradeRouteImport } from './routes/_authenticated/dashboard.upgrade'
+import { Route as AdminBusinessUserIdRouteImport } from './routes/admin.business.$userId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,6 +58,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -47,6 +71,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -74,6 +103,66 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGrowthRoute = AdminGrowthRouteImport.update({
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AdminRoute,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GuidesRoute,
+} as any)
+const GuidesInstagramBioLinkRoute = GuidesInstagramBioLinkRouteImport.update({
+  id: '/instagram-bio-link',
+  path: '/instagram-bio-link',
+  getParentRoute: () => GuidesRoute,
+} as any)
+const GuidesSellOnWhatsappRoute = GuidesSellOnWhatsappRouteImport.update({
+  id: '/sell-on-whatsapp',
+  path: '/sell-on-whatsapp',
+  getParentRoute: () => GuidesRoute,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
@@ -92,10 +181,34 @@ const AuthenticatedDashboardAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardProductsRoute =
+  AuthenticatedDashboardProductsRouteImport.update({
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardQrRoute =
+  AuthenticatedDashboardQrRouteImport.update({
+    id: '/qr',
+    path: '/qr',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardStoreRoute =
   AuthenticatedDashboardStoreRouteImport.update({
     id: '/store',
     path: '/store',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardSupportRoute =
+  AuthenticatedDashboardSupportRouteImport.update({
+    id: '/support',
+    path: '/support',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardUpgradeRoute =
@@ -104,21 +217,45 @@ const AuthenticatedDashboardUpgradeRoute =
     path: '/upgrade',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AdminBusinessUserIdRoute = AdminBusinessUserIdRouteImport.update({
+  id: '/business/$userId',
+  path: '/business/$userId',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$username/shop': typeof UsernameShopRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
+  '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
+  '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -130,10 +267,27 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$username/shop': typeof UsernameShopRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
+  '/admin': typeof AdminIndexRoute
+  '/guides': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
+  '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -141,17 +295,36 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$username': typeof UsernameRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$username_/shop': typeof UsernameShopRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/growth': typeof AdminGrowthRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
+  '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
+  '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
+  '/_authenticated/dashboard/qr': typeof AuthenticatedDashboardQrRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/_authenticated/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/_authenticated/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -159,17 +332,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$username'
+    | '/admin'
     | '/auth'
     | '/contact'
+    | '/guides'
     | '/pricing'
     | '/privacy'
     | '/terms'
     | '/$username/shop'
     | '/dashboard'
+    | '/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/growth'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
+    | '/admin/'
+    | '/guides/'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/products'
+    | '/dashboard/qr'
+    | '/dashboard/settings'
     | '/dashboard/store'
+    | '/dashboard/support'
     | '/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -181,27 +373,63 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/$username/shop'
+    | '/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/growth'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
+    | '/admin'
+    | '/guides'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/products'
+    | '/dashboard/qr'
+    | '/dashboard/settings'
     | '/dashboard/store'
+    | '/dashboard/support'
     | '/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/$username'
+    | '/admin'
     | '/auth'
     | '/contact'
+    | '/guides'
     | '/pricing'
     | '/privacy'
     | '/terms'
     | '/$username_/shop'
     | '/_authenticated/dashboard'
+    | '/_authenticated/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/growth'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/guides/instagram-bio-link'
+    | '/guides/sell-on-whatsapp'
+    | '/admin/'
+    | '/guides/'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/appearance'
+    | '/_authenticated/dashboard/products'
+    | '/_authenticated/dashboard/qr'
+    | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/store'
+    | '/_authenticated/dashboard/support'
     | '/_authenticated/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -209,8 +437,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   UsernameRoute: typeof UsernameRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  GuidesRoute: typeof GuidesRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -240,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -252,6 +489,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -289,6 +533,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/growth': {
+      id: '/admin/growth'
+      path: '/growth'
+      fullPath: '/admin/growth'
+      preLoaderRoute: typeof AdminGrowthRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/subscriptions': {
+      id: '/admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/admin/subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/instagram-bio-link': {
+      id: '/guides/instagram-bio-link'
+      path: '/instagram-bio-link'
+      fullPath: '/guides/instagram-bio-link'
+      preLoaderRoute: typeof GuidesInstagramBioLinkRouteImport
+      parentRoute: typeof GuidesRoute
+    }
+    '/guides/sell-on-whatsapp': {
+      id: '/guides/sell-on-whatsapp'
+      path: '/sell-on-whatsapp'
+      fullPath: '/guides/sell-on-whatsapp'
+      preLoaderRoute: typeof GuidesSellOnWhatsappRouteImport
+      parentRoute: typeof GuidesRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
@@ -310,11 +638,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAppearanceRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/products': {
+      id: '/_authenticated/dashboard/products'
+      path: '/products'
+      fullPath: '/dashboard/products'
+      preLoaderRoute: typeof AuthenticatedDashboardProductsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/qr': {
+      id: '/_authenticated/dashboard/qr'
+      path: '/qr'
+      fullPath: '/dashboard/qr'
+      preLoaderRoute: typeof AuthenticatedDashboardQrRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/store': {
       id: '/_authenticated/dashboard/store'
       path: '/store'
       fullPath: '/dashboard/store'
       preLoaderRoute: typeof AuthenticatedDashboardStoreRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/support': {
+      id: '/_authenticated/dashboard/support'
+      path: '/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof AuthenticatedDashboardSupportRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/upgrade': {
@@ -324,13 +680,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardUpgradeRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/admin/business/$userId': {
+      id: '/admin/business/$userId'
+      path: '/business/$userId'
+      fullPath: '/admin/business/$userId'
+      preLoaderRoute: typeof AdminBusinessUserIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAppearanceRoute: typeof AuthenticatedDashboardAppearanceRoute
+  AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRoute
+  AuthenticatedDashboardQrRoute: typeof AuthenticatedDashboardQrRoute
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardStoreRoute: typeof AuthenticatedDashboardStoreRoute
+  AuthenticatedDashboardSupportRoute: typeof AuthenticatedDashboardSupportRoute
   AuthenticatedDashboardUpgradeRoute: typeof AuthenticatedDashboardUpgradeRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -340,7 +707,11 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardAppearanceRoute:
       AuthenticatedDashboardAppearanceRoute,
+    AuthenticatedDashboardProductsRoute: AuthenticatedDashboardProductsRoute,
+    AuthenticatedDashboardQrRoute: AuthenticatedDashboardQrRoute,
+    AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardStoreRoute: AuthenticatedDashboardStoreRoute,
+    AuthenticatedDashboardSupportRoute: AuthenticatedDashboardSupportRoute,
     AuthenticatedDashboardUpgradeRoute: AuthenticatedDashboardUpgradeRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
@@ -352,21 +723,66 @@ const AuthenticatedDashboardRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminGrowthRoute: typeof AdminGrowthRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminBusinessUserIdRoute: typeof AdminBusinessUserIdRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminGrowthRoute: AdminGrowthRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
+  AdminSupportRoute: AdminSupportRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminBusinessUserIdRoute: AdminBusinessUserIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface GuidesRouteChildren {
+  GuidesInstagramBioLinkRoute: typeof GuidesInstagramBioLinkRoute
+  GuidesSellOnWhatsappRoute: typeof GuidesSellOnWhatsappRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
+}
+
+const GuidesRouteChildren: GuidesRouteChildren = {
+  GuidesInstagramBioLinkRoute: GuidesInstagramBioLinkRoute,
+  GuidesSellOnWhatsappRoute: GuidesSellOnWhatsappRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
+}
+
+const GuidesRouteWithChildren =
+  GuidesRoute._addFileChildren(GuidesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   UsernameRoute: UsernameRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  GuidesRoute: GuidesRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,

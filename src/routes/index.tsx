@@ -1,152 +1,357 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { IndianRupee, MessageCircle, BarChart3, Palette, QrCode, Zap } from "lucide-react";
+import {
+  BarChart3, LayoutGrid, Link2, MessageCircle, MessagesSquare, MousePointerClick,
+  PackagePlus, Palette, QrCode, Search, Store, Zap,
+} from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Logo } from "@/components/Logo";
 import { PricingCards } from "@/components/PricingCards";
-import { PublicProfile } from "@/components/PublicProfile";
+import { PublicProfile, type PublicData } from "@/components/PublicProfile";
+import { Section, SectionHeading } from "@/components/Section";
+import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLang } from "@/lib/i18n";
-import { testingBanner } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
+import type { ThemeId } from "@/lib/themes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "izzy — Your shop in one link" },
-      { name: "description", content: "Your whole catalogue in one link — products and services with photos and prices. Share it, and customers order on WhatsApp." },
-      { property: "og:title", content: "izzy — Your shop in one link" },
-      { property: "og:description", content: "Your whole catalogue in one link — products and services with photos and prices. Customers order on WhatsApp." },
+      { title: "izzy — Your business. Your products. One beautiful link." },
+      { name: "description", content: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required." },
+      { property: "og:title", content: "izzy — Your business. Your products. One beautiful link." },
+      { property: "og:description", content: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required." },
+    ],
+    // Structured data: only facts — the platform's name, URL and
+    // logo. No ratings or reviews are claimed anywhere.
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            { "@type": "Organization", name: "izzy", url: "https://izzytag.shop/", logo: "https://izzytag.shop/favicon.png" },
+            { "@type": "WebSite", name: "izzy", url: "https://izzytag.shop/" },
+          ],
+        }),
+      },
     ],
   }),
   component: Landing,
 });
 
+/* ---------- Demo shops: original demo content rendered by the real
+   storefront component, using the site's own example photos. ---------- */
+
+function demoShop(name: string, username: string, bio: string, items: [string, string, string, string][]): PublicData {
+  return {
+    display_name: name, username, bio, avatar_url: null, socials: {}, whatsapp: null, upi_id: null,
+    links: items.map(([title, price, description, img], i) => ({
+      id: `${username}-${i}`, title, url: "#", kind: "product", price, description, image_urls: [img], category: null,
+    })),
+  };
+}
+
+const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", [
+  ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
+  ["Handmade candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
+  ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
+  ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
+]);
+
+const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
+  {
+    label: "Fashion boutique", theme: "rose",
+    data: demoShop("Thread Studio", "threadstudio", "Handmade totes, gifts & everyday fashion", [
+      ["Canvas tote bag", "₹349", "Sturdy everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
+      ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
+      ["Scented candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
+    ]),
+  },
+  {
+    label: "Food & bakery", theme: "marigold",
+    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", [
+      ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
+      ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
+      ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
+    ]),
+  },
+  {
+    label: "Beauty & lifestyle", theme: "mint",
+    data: demoShop("Glow Lab", "glowlab", "Clean skincare & self-care essentials", [
+      ["Face serum", "₹599", "Vitamin C serum for a daily glow.", "/examples/face-serum.webp"],
+      ["Handmade candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
+      ["Canvas tote bag", "₹349", "Sturdy everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
+    ]),
+  },
+];
+
+/** Static phone-frame mockup of a live storefront (illustration only —
+    the whole frame is non-interactive, exactly like a product photo). */
+function PhoneMockup({ data, theme, height, whatsappButton }: { data: PublicData; theme: ThemeId; height: number; whatsappButton?: boolean }) {
+  return (
+    <div className="relative mx-auto w-full max-w-[320px]">
+      <div className="overflow-hidden rounded-[2.5rem] border-[10px] border-foreground bg-card shadow-soft">
+        <div className="pointer-events-none overflow-hidden" style={{ height }} aria-hidden>
+          <PublicProfile data={data} theme={theme} showBranding={false} compact />
+        </div>
+      </div>
+      {whatsappButton && (
+        <span aria-hidden className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-soft">
+          <MessageCircle className="h-7 w-7" />
+        </span>
+      )}
+    </div>
+  );
+}
+
+const TRUST = [
+  { icon: Zap, t: "Simple setup" },
+  { icon: Link2, t: "Your own shop link" },
+  { icon: MessageCircle, t: "Orders through WhatsApp" },
+];
+
 const STEPS = [
-  { n: "1", t: "Create your shop", d: "Pick a username. That is your shop address." },
-  { n: "2", t: "Add your products", d: "Add products and services with photos and prices. Everything you add appears on your shop page." },
-  { n: "3", t: "Share it — customers order on WhatsApp", d: "Put the link in your bio. Buyers tap a product and order on WhatsApp. No payment is taken here." },
+  { n: "01", icon: Store, t: "Create your shop", d: "Set up your business profile in minutes." },
+  { n: "02", icon: PackagePlus, t: "Add your products", d: "Upload photos, descriptions and prices." },
+  { n: "03", icon: MessageCircle, t: "Start receiving orders", d: "Share your shop link and receive enquiries directly on WhatsApp." },
 ];
 
 const FEATURES = [
-  { icon: IndianRupee, t: "UPI payments", d: "Show a QR and tap-to-pay link. Get paid directly." },
-  { icon: MessageCircle, t: "WhatsApp me", d: "One tap to chat — perfect for orders and enquiries." },
-  { icon: Palette, t: "8 themes", d: "Light, dark and 6 inspired presets." },
-  { icon: BarChart3, t: "Analytics", d: "See views and which products get tapped." },
-  { icon: QrCode, t: "QR code", d: "Print it on your shop counter or packaging." },
-  { icon: Zap, t: "Super fast", d: "Loads instantly, even on 4G." },
+  { icon: LayoutGrid, t: "Beautiful online catalog", d: "A clean catalog with photos, descriptions and prices — no website building, no code." },
+  { icon: MessageCircle, t: "Direct WhatsApp ordering", d: "Customers tap Order on a product and reach you on WhatsApp with the product already in the message." },
+  { icon: PackagePlus, t: "Easy product management", d: "Add, edit, reorder or draft products anytime from your dashboard — changes go live instantly." },
+  { icon: Link2, t: "Shareable shop link", d: "One link — izzytag.shop/yourname — for your Instagram bio, stories, status and everywhere else." },
+  { icon: QrCode, t: "QR code sharing", d: "Put your shop's QR code on your counter, packaging or posters; customers scan and land in your shop." },
+  { icon: Palette, t: "Shop customization", d: "Eight themes, your logo, your bio — a shop that looks like your business, not a template." },
+  { icon: BarChart3, t: "Basic analytics", d: "See how many people visit your shop and which products they tap." },
 ];
 
-const SHOWCASE = [
-  { title: "Chocolate cake", shop: "Priya's Kitchen", price: "₹499", grad: "from-amber-100 via-orange-100 to-rose-100", h: "h-56", initial: "C", img: "/examples/chocolate-cake.webp" },
-  { title: "Handmade candle", shop: "Glow Studio", price: "₹299", grad: "from-yellow-100 via-amber-100 to-orange-100", h: "h-40", initial: "G", img: "/examples/handmade-candle.webp" },
-  { title: "Sourdough loaf", shop: "Bake House", price: "₹199", grad: "from-stone-100 via-amber-50 to-yellow-100", h: "h-48", initial: "S", img: "/examples/sourdough-loaf.webp" },
-  { title: "Ceramic mug", shop: "Clay & Co", price: "₹449", grad: "from-sky-100 via-teal-50 to-emerald-100", h: "h-64", initial: "M", img: "/examples/ceramic-mug.webp" },
-  { title: "Face serum", shop: "Glow Lab", price: "₹599", grad: "from-rose-100 via-pink-50 to-orange-100", h: "h-44", initial: "F", img: "/examples/face-serum.webp" },
-  { title: "Tote bag", shop: "Thread Studio", price: "₹349", grad: "from-emerald-100 via-lime-50 to-yellow-100", h: "h-52", initial: "T", img: "/examples/tote-bag.webp" },
+const WA_STEPS = [
+  { icon: Search, t: "Customer discovers a product", d: "They open your link and browse your catalog." },
+  { icon: MousePointerClick, t: "They tap Order", d: "Every product carries its own WhatsApp order button." },
+  { icon: MessageCircle, t: "WhatsApp opens, message ready", d: "The product name and link are already written for them." },
+  { icon: MessagesSquare, t: "You take it from there", d: "Chat, confirm, and arrange payment and delivery directly." },
 ];
 
-// Hero phone demo: a static example shop (original demo content, the
-// site's own example photos) rendered by the real storefront
-// component — store header plus product cards with prices.
-const DEMO = {
-  display_name: "Priya's Kitchen", username: "priya", bio: "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", avatar_url: null,
-  socials: {}, whatsapp: null, upi_id: null,
-  links: [
-    { id: "1", title: "Chocolate cake", url: "#", kind: "product", price: "₹499", description: "Rich Belgian chocolate, baked fresh to order.", image_urls: ["/examples/chocolate-cake.webp"], category: "Cakes" },
-    { id: "2", title: "Handmade candle", url: "#", kind: "product", price: "₹299", description: "Soy wax, sandalwood scent.", image_urls: ["/examples/handmade-candle.webp"], category: "Home" },
-    { id: "3", title: "Sourdough loaf", url: "#", kind: "product", price: "₹199", description: "Slow-fermented, crusty and fresh every morning.", image_urls: ["/examples/sourdough-loaf.webp"], category: "Bakes" },
-    { id: "4", title: "Ceramic mug", url: "#", kind: "product", price: "₹449", description: "Hand-thrown stoneware, each piece unique.", image_urls: ["/examples/ceramic-mug.webp"], category: "Home" },
-  ],
-};
+const FAQS = [
+  { q: "What is izzy?", a: "izzy is a simple way for small businesses, creators, resellers and local shops to sell online. You create a shop page with your products and prices, share one link, and customers order through WhatsApp. No website, no technical skills needed." },
+  { q: "How do I create my online shop?", a: "Sign up free, pick your shop name (your link becomes izzytag.shop/yourname), add your business name and logo, then add products with photos and prices. Most shops are ready to share in a few minutes." },
+  { q: "Can customers order through WhatsApp?", a: "Yes — that's how ordering works on izzy. A customer taps Order on any product and WhatsApp opens with a prefilled message about that product, sent straight to your number." },
+  { q: "Do I need technical knowledge?", a: "None at all. If you can post on Instagram and chat on WhatsApp, you can run an izzy shop. Everything is forms and buttons — no code, no setup help needed." },
+  { q: "Can I share my shop on Instagram?", a: "Yes. Your shop link is made for your Instagram bio, and you can also share it in stories, posts and WhatsApp status — or print your shop's QR code for your counter and packaging." },
+  { q: "Does izzy process payments?", a: "No. izzy never touches the money for your orders: customers pay you directly — UPI, cash, bank transfer, whatever you both agree on WhatsApp. (If you choose an izzy Pro subscription, that subscription is billed separately.)" },
+  { q: "Can I edit my products later?", a: "Anytime. From your dashboard you can change prices, photos and descriptions, hide a product, or prepare new products as drafts and switch them on when you're ready. Changes appear on your shop straight away." },
+];
 
 function Landing() {
   const { t } = useLang();
   const region = useRegion();
   return (
     <div className="min-h-screen">
-      <div className="bg-hero">
-        <SiteHeader />
-        <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-8 lg:grid-cols-2">
+      <SiteHeader />
+
+      {/* ---------- Hero ---------- */}
+      <section className="overflow-hidden">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-2 lg:px-8 lg:pb-24">
           <div className="text-center lg:text-left">
-            <h1 className="mx-auto mt-4 max-w-xl text-4xl font-extrabold leading-[1.05] sm:text-6xl lg:mx-0">{t.tagline}</h1>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground lg:mx-0">{t.sub}</p>
-            <Link to="/auth" className="mt-8 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-lg font-semibold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 sm:inline-flex sm:w-auto">{t.create} →</Link>
-            <p className="mt-3 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
-          </div>
-          <div className="mx-auto w-full max-w-[300px]">
-            <div className="overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
-              <div className="pointer-events-none h-[600px] overflow-hidden"><PublicProfile data={DEMO} theme="marigold" showBranding={false} compact /></div>
+            <span className="inline-flex items-center rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
+              For small businesses, creators &amp; local shops
+            </span>
+            <h1 className="mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">{t.tagline}</h1>
+            <p className="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">{t.sub}</p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+              <Button asChild size="lg" className="min-h-[52px] text-base">
+                <Link to="/auth">{t.createFree}</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="min-h-[52px] text-base">
+                <a href="#examples">Explore demo shops</a>
+              </Button>
             </div>
-            <p className="mt-3 text-center text-xs font-medium text-muted-foreground">Example shop — yours will look like this</p>
+            <p className="mt-4 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
           </div>
-        </section>
-      </div>
+          <div>
+            <PhoneMockup data={HERO_SHOP} theme="light" height={600} whatsappButton />
+            <p className="mt-4 text-center text-sm text-muted-foreground">Example shop — yours will look like this</p>
+          </div>
+        </div>
+      </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
-        <h2 className="text-left text-3xl font-extrabold sm:text-center">How it works</h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      {/* ---------- Trust strip ---------- */}
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 py-8 sm:flex-row sm:gap-12 sm:px-6 lg:px-8">
+          {TRUST.map((item) => (
+            <span key={item.t} className="flex items-center gap-2.5 text-base font-semibold">
+              <item.icon className="h-5 w-5 text-primary" /> {item.t}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------- How it works ---------- */}
+      <Section id="how-it-works">
+        <SectionHeading title="Your online shop in three simple steps." />
+        <div className="mt-12 grid gap-5 sm:grid-cols-3">
           {STEPS.map((s) => (
-            <div key={s.n} className="rounded-[28px] border bg-card p-6 shadow-sm">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">{s.n}</span>
-              <h3 className="mt-3 text-lg font-bold">{s.t}</h3>
-              <p className="mt-1 text-base text-muted-foreground">{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
-        <h2 className="text-center text-3xl font-extrabold">Beautiful shops, made in minutes</h2>
-        <p className="mt-3 text-center text-base text-muted-foreground">Example shops — browse like this, then make your own.</p>
-        <div className="mt-10 columns-2 gap-4 sm:columns-3">
-          {SHOWCASE.map((s) => (
-            <div key={s.title} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border bg-card shadow-pin">
-              {s.img ? (
-                <img src={s.img} alt={s.title} loading="lazy" className={`${s.h} w-full object-cover`} />
-              ) : (
-                <div className={`flex ${s.h} items-center justify-center bg-gradient-to-br ${s.grad}`}>
-                  <span className="text-5xl font-extrabold text-foreground/30">{s.initial}</span>
-                </div>
-              )}
-              <div className="p-4">
-                <p className="text-base font-semibold leading-snug">{s.title}</p>
-                <p className="mt-0.5 text-sm text-muted-foreground">{s.shop}</p>
-                <p className="mt-1 text-base font-bold">{s.price}</p>
+            <div key={s.n} className="rounded-xl border border-border bg-card p-7">
+              <div className="flex items-center justify-between">
+                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                  <s.icon className="h-5 w-5" />
+                </span>
+                <span className="font-display text-lg font-bold text-muted-foreground">{s.n}</span>
               </div>
+              <h3 className="mt-5 text-xl font-semibold">{s.t}</h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{s.d}</p>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
-      <section className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
-        <h2 className="text-left text-3xl font-extrabold sm:text-center">Everything a small business needs</h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* ---------- Storefront showcase ---------- */}
+      <Section id="examples" className="bg-card">
+        <SectionHeading
+          title="A beautiful shop that represents your business."
+          sub="One product, many kinds of businesses. Each shop below is an example built with izzy."
+        />
+        <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          {SHOWCASE.map((s) => (
+            <figure key={s.label}>
+              <PhoneMockup data={s.data} theme={s.theme} height={480} />
+              <figcaption className="mt-4 text-center">
+                <span className="text-base font-semibold">{s.data.display_name}</span>
+                <span className="block text-sm text-muted-foreground">{s.label}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </Section>
+
+      {/* ---------- Features ---------- */}
+      <Section id="features">
+        <SectionHeading title="Everything you need to showcase your products." />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
-            <div key={f.t} className="rounded-[28px] border bg-card p-6 shadow-sm">
-              <f.icon className="h-7 w-7 text-primary" />
-              <h3 className="mt-3 text-lg font-bold">{f.t}</h3>
-              <p className="mt-1 text-base text-muted-foreground">{f.d}</p>
+            <div key={f.t} className="rounded-xl border border-border bg-card p-7">
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                <f.icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 text-xl font-semibold">{f.t}</h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{f.d}</p>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
-      <section className="mx-auto max-w-3xl px-5 pb-20">
-        <h2 className="text-left text-3xl font-extrabold sm:text-center">Free vs Pro</h2>
-        <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{testingBanner(region)}</p>
-        <div className="mt-8">
-          <PricingCards
-            region={region}
-            freeCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl border text-base font-semibold">Start free</Link>}
-            proCta={<Link to="/auth" className="flex min-h-[48px] items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground">Go Pro</Link>}
-          />
+      {/* ---------- WhatsApp ordering ---------- */}
+      <Section className="bg-card">
+        <SectionHeading
+          title="Your customers are already on WhatsApp. Meet them there."
+          sub="No new app for your customers to learn, and no inbox for you to check — the order lands in the WhatsApp you already use."
+        />
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {WA_STEPS.map((s, i) => (
+            <div key={s.t} className="rounded-xl border border-border bg-background p-6">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-whatsapp/10 text-whatsapp">
+                <s.icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-4 text-lg font-semibold">{i + 1}. {s.t}</h3>
+              <p className="mt-1.5 leading-relaxed text-muted-foreground">{s.d}</p>
+            </div>
+          ))}
         </div>
-      </section>
-      <footer className="border-t py-8">
-        <nav className="flex flex-wrap justify-center gap-2 text-base font-medium text-muted-foreground">
-          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
-          <Link to="/terms" className="hover:text-foreground">Terms</Link>
-          <Link to="/contact" className="hover:text-foreground">Contact</Link>
-        </nav>
-        <p className="mt-4 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} izzy</p>
+        <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="Example WhatsApp conversation">
+          <div className="flex items-center gap-3 border-b border-border pb-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">P</span>
+            <div>
+              <p className="text-base font-semibold leading-tight">Priya's Kitchen</p>
+              <p className="text-sm text-muted-foreground">WhatsApp</p>
+            </div>
+          </div>
+          <div className="space-y-3 pt-4">
+            <p className="max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3.5 leading-relaxed shadow-none">
+              Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on Priya&apos;s Kitchen&apos;s izzy shop. Could you please share more details?
+              <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
+            </p>
+            <p className="ml-auto max-w-[85%] rounded-xl rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">
+              Hi, thank you! 😊 When would you like it delivered?
+            </p>
+          </div>
+          <p className="pt-4 text-center text-sm text-muted-foreground">An example conversation — you and your customer talk directly.</p>
+        </div>
+      </Section>
+
+      {/* ---------- Pricing ---------- */}
+      <Section id="pricing">
+        <div className="mx-auto max-w-3xl">
+          <SectionHeading title="Simple, honest pricing." sub="Start free. Upgrade when your shop grows — cancel anytime." />
+          <div className="mt-10">
+            <PricingCards
+              region={region}
+              freeCta={<Button asChild variant="outline" className="min-h-[48px] w-full text-base"><Link to="/auth">Start free</Link></Button>}
+              proCta={<Button asChild className="min-h-[48px] w-full text-base"><Link to="/auth">Go Pro</Link></Button>}
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* ---------- FAQ ---------- */}
+      <Section className="bg-card">
+        <SectionHeading title="Questions, answered." />
+        <div className="mx-auto mt-10 max-w-3xl">
+          <Accordion type="single" collapsible>
+            {FAQS.map((f) => (
+              <AccordionItem key={f.q} value={f.q} className="border-border">
+                <AccordionTrigger className="text-lg font-semibold hover:no-underline">{f.q}</AccordionTrigger>
+                <AccordionContent className="leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </Section>
+
+      {/* ---------- Final CTA ---------- */}
+      <Section>
+        <div className="rounded-xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
+          <h2 className="mx-auto max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Your products deserve their own space.</h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-primary-foreground/85">Create your shop and start sharing your products with the world.</p>
+          <Button asChild size="lg" className="mt-9 min-h-[52px] bg-white text-primary hover:bg-white/90">
+            <Link to="/auth">{t.createFree}</Link>
+          </Button>
+        </div>
+      </Section>
+
+      {/* ---------- Footer ---------- */}
+      <footer className="border-t border-border">
+        <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
+            <div>
+              <Logo />
+              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One beautiful link.</p>
+            </div>
+            <nav aria-label="Product">
+              <h3 className="text-base font-semibold">Product</h3>
+              <ul className="mt-3 space-y-2.5 text-muted-foreground">
+                <li><Link to="/" hash="features" className="transition-colors duration-200 hover:text-foreground">Features</Link></li>
+                <li><Link to="/" hash="how-it-works" className="transition-colors duration-200 hover:text-foreground">How it works</Link></li>
+                <li><Link to="/" hash="examples" className="transition-colors duration-200 hover:text-foreground">Examples</Link></li>
+                <li><Link to="/pricing" className="transition-colors duration-200 hover:text-foreground">Pricing</Link></li>
+                <li><Link to="/guides" className="transition-colors duration-200 hover:text-foreground">Guides</Link></li>
+              </ul>
+            </nav>
+            <nav aria-label="Support and legal">
+              <h3 className="text-base font-semibold">Support &amp; legal</h3>
+              <ul className="mt-3 space-y-2.5 text-muted-foreground">
+                <li><Link to="/contact" className="transition-colors duration-200 hover:text-foreground">Contact</Link></li>
+                <li><Link to="/privacy" className="transition-colors duration-200 hover:text-foreground">Privacy</Link></li>
+                <li><Link to="/terms" className="transition-colors duration-200 hover:text-foreground">Terms</Link></li>
+              </ul>
+            </nav>
+          </div>
+          <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
+            <p>© {new Date().getFullYear()} izzy</p>
+            <p>Your business. Your products. One beautiful link.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
