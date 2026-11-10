@@ -3,6 +3,7 @@ import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
 import { CatalogueCard } from "@/components/CatalogueCard";
+import { ReportShopButton } from "@/components/ReportShopButton";
 import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
 
 const ICONS: Record<string, typeof Instagram> = { instagram: Instagram, youtube: Youtube, x: Twitter, linkedin: Linkedin, whatsapp: MessageCircle };
@@ -27,8 +28,8 @@ export type PublicData = {
  * server already excludes them; the filter here keeps dashboard
  * previews honest too, since they pass raw rows).
  */
-export function PublicProfile({ data, theme, showBranding, onLinkClick, onProductView, compact }: {
-  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; compact?: boolean;
+export function PublicProfile({ data, theme, showBranding, onLinkClick, onProductView, compact, reportable }: {
+  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; compact?: boolean; reportable?: boolean;
 }) {
   const [showUpi, setShowUpi] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -106,8 +107,16 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
           </div>
         )}
 
-        {showBranding && (
-          <a href="/" className="mx-auto mt-12 flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+        {(showBranding || (reportable && data.username)) && (
+          <div className="mx-auto mt-12 flex flex-col items-center gap-1">
+            {showBranding && (
+              <a href="/" className="flex min-h-[44px] items-center text-base font-semibold text-page-muted hover:text-page-fg">Made with Izzy</a>
+            )}
+            {/* Live pages only (the dashboard preview passes no
+                `reportable`): a discreet way for visitors to flag a
+                shop for the admin team to review. */}
+            {reportable && data.username && <ReportShopButton username={data.username} />}
+          </div>
         )}
       </div>
       {/* Floating WhatsApp button, live pages only: shown whenever the

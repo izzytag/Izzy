@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsernameRouteImport } from './routes/$username'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -20,6 +21,13 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as UsernameShopRouteImport } from './routes/$username_.shop'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
+import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
@@ -27,7 +35,9 @@ import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardQrRouteImport } from './routes/_authenticated/dashboard.qr'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardStoreRouteImport } from './routes/_authenticated/dashboard.store'
+import { Route as AuthenticatedDashboardSupportRouteImport } from './routes/_authenticated/dashboard.support'
 import { Route as AuthenticatedDashboardUpgradeRouteImport } from './routes/_authenticated/dashboard.upgrade'
+import { Route as AdminBusinessUserIdRouteImport } from './routes/admin.business.$userId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +51,11 @@ const UsernameRoute = UsernameRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -82,6 +97,41 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -125,16 +175,28 @@ const AuthenticatedDashboardStoreRoute =
     path: '/store',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardSupportRoute =
+  AuthenticatedDashboardSupportRouteImport.update({
+    id: '/support',
+    path: '/support',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardUpgradeRoute =
   AuthenticatedDashboardUpgradeRouteImport.update({
     id: '/upgrade',
     path: '/upgrade',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AdminBusinessUserIdRoute = AdminBusinessUserIdRouteImport.update({
+  id: '/business/$userId',
+  path: '/business/$userId',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
@@ -143,13 +205,22 @@ export interface FileRoutesByFullPath {
   '/$username/shop': typeof UsernameShopRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -162,13 +233,22 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/$username/shop': typeof UsernameShopRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -176,6 +256,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$username': typeof UsernameRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pricing': typeof PricingRoute
@@ -184,13 +265,22 @@ export interface FileRoutesById {
   '/$username_/shop': typeof UsernameShopRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin/': typeof AdminIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/_authenticated/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/store': typeof AuthenticatedDashboardStoreRoute
+  '/_authenticated/dashboard/support': typeof AuthenticatedDashboardSupportRoute
   '/_authenticated/dashboard/upgrade': typeof AuthenticatedDashboardUpgradeRoute
+  '/admin/business/$userId': typeof AdminBusinessUserIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -198,6 +288,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$username'
+    | '/admin'
     | '/auth'
     | '/contact'
     | '/pricing'
@@ -206,13 +297,22 @@ export interface FileRouteTypes {
     | '/$username/shop'
     | '/dashboard'
     | '/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/admin/'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
     | '/dashboard/products'
     | '/dashboard/qr'
     | '/dashboard/settings'
     | '/dashboard/store'
+    | '/dashboard/support'
     | '/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -225,19 +325,29 @@ export interface FileRouteTypes {
     | '/terms'
     | '/$username/shop'
     | '/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/admin'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
     | '/dashboard/products'
     | '/dashboard/qr'
     | '/dashboard/settings'
     | '/dashboard/store'
+    | '/dashboard/support'
     | '/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/$username'
+    | '/admin'
     | '/auth'
     | '/contact'
     | '/pricing'
@@ -246,13 +356,22 @@ export interface FileRouteTypes {
     | '/$username_/shop'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/admin/audit'
+    | '/admin/businesses'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/support'
+    | '/admin/'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/appearance'
     | '/_authenticated/dashboard/products'
     | '/_authenticated/dashboard/qr'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/store'
+    | '/_authenticated/dashboard/support'
     | '/_authenticated/dashboard/upgrade'
+    | '/admin/business/$userId'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -260,6 +379,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   UsernameRoute: typeof UsernameRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   PricingRoute: typeof PricingRoute
@@ -289,6 +409,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -347,6 +474,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/subscriptions': {
+      id: '/admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/admin/subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
@@ -396,12 +572,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardStoreRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/support': {
+      id: '/_authenticated/dashboard/support'
+      path: '/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof AuthenticatedDashboardSupportRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/upgrade': {
       id: '/_authenticated/dashboard/upgrade'
       path: '/upgrade'
       fullPath: '/dashboard/upgrade'
       preLoaderRoute: typeof AuthenticatedDashboardUpgradeRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/admin/business/$userId': {
+      id: '/admin/business/$userId'
+      path: '/business/$userId'
+      fullPath: '/admin/business/$userId'
+      preLoaderRoute: typeof AdminBusinessUserIdRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
@@ -413,6 +603,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardQrRoute: typeof AuthenticatedDashboardQrRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardStoreRoute: typeof AuthenticatedDashboardStoreRoute
+  AuthenticatedDashboardSupportRoute: typeof AuthenticatedDashboardSupportRoute
   AuthenticatedDashboardUpgradeRoute: typeof AuthenticatedDashboardUpgradeRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -426,6 +617,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardQrRoute: AuthenticatedDashboardQrRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardStoreRoute: AuthenticatedDashboardStoreRoute,
+    AuthenticatedDashboardSupportRoute: AuthenticatedDashboardSupportRoute,
     AuthenticatedDashboardUpgradeRoute: AuthenticatedDashboardUpgradeRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
@@ -448,10 +640,35 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminBusinessUserIdRoute: typeof AdminBusinessUserIdRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
+  AdminSupportRoute: AdminSupportRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminBusinessUserIdRoute: AdminBusinessUserIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   UsernameRoute: UsernameRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   PricingRoute: PricingRoute,

@@ -23,7 +23,7 @@ function PrivacyPage() {
         <div className="mt-8 space-y-6 text-[15px] leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-lg font-bold text-foreground">What we collect</h2>
-            <p className="mt-2">When you sign up we store your email address. When you build your page we store the profile details you enter: name, bio, photo, links, social handles, WhatsApp number and UPI ID. We also count page views and link clicks on your public page so we can show you analytics.</p>
+            <p className="mt-2">When you sign up we store your email address. When you build your page we store the profile details you enter: name, bio, photo, links, social handles, WhatsApp number and UPI ID. To show you analytics, we also count activity on your public shop: visits to the shop (counted once per visitor session), times a customer opens one of your products, and taps on the WhatsApp order button, along with a simple source label — for example Instagram, a QR code, or direct — when the link a customer used provides one. These counts describe your shop's traffic only; we don't collect your visitors' names, phone numbers or messages.</p>
           </section>
           <section>
             <h2 className="text-lg font-bold text-foreground">How we use it</h2>

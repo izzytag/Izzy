@@ -37,7 +37,7 @@ const NAV_MAIN = [
 /** Secondary destinations — sidebar lower section / mobile header menu. */
 const NAV_SECONDARY = [
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
-  { to: "/contact", label: "Help / Support", icon: LifeBuoy },
+  { to: "/dashboard/support", label: "Help / Support", icon: LifeBuoy },
 ] as const;
 
 function useSignOut() {
@@ -104,7 +104,7 @@ function DashboardLayout() {
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
               <DropdownMenuItem asChild><Link to="/dashboard/settings"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/contact"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/dashboard/support"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => void signOut()}><LogOut className="h-4 w-4" /> Log out</DropdownMenuItem>
             </DropdownMenuContent>
@@ -113,6 +113,19 @@ function DashboardLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        {/* Suspended shop (Step 06): the owner keeps full dashboard
+            access — only the public storefront is unavailable — and is
+            told plainly, with a path to support. */}
+        {p.suspended && (
+          <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 sm:px-5" role="alert">
+            <p className="mx-auto max-w-6xl text-base leading-relaxed">
+              <strong>Your shop is suspended.</strong> Customers see it as temporarily unavailable and can't place
+              orders right now. Your products and data are untouched. If you think this is a mistake,{" "}
+              <Link to="/dashboard/support" className="font-semibold underline underline-offset-2">contact support</Link>.
+            </p>
+          </div>
+        )}
+
         {/* ---------- Mobile header ---------- */}
         <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
@@ -127,7 +140,7 @@ function DashboardLayout() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild><Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> QR Code</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/dashboard/settings"><Settings className="h-4 w-4" /> Settings</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/contact"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/dashboard/support"><LifeBuoy className="h-4 w-4" /> Help / Support</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => void signOut()}><LogOut className="h-4 w-4" /> Log out</DropdownMenuItem>
               </DropdownMenuContent>

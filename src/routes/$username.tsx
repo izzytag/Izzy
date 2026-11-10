@@ -14,6 +14,7 @@ export const Route = createFileRoute("/$username")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Page not found — izzy" }, { name: "robots", content: "noindex" }] };
+    if (loaderData.suspended) return { meta: [{ title: "Shop unavailable — izzy" }, { name: "robots", content: "noindex" }] };
     const p = loaderData.profile;
     const name = p.display_name || p.username;
     const title = `${name} (@${p.username}) | izzy`;
@@ -44,7 +45,27 @@ export const Route = createFileRoute("/$username")({
 });
 
 function PublicPage() {
-  const { profile, links, isPro } = Route.useLoaderData();
+  const data = Route.useLoaderData();
+  // Suspended shop: a plain unavailable state — no products, no
+  // WhatsApp button, and the tracking effect below never mounts.
+  if (data.suspended) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <h1 className="text-3xl font-bold">This shop is temporarily unavailable</h1>
+        <p className="max-w-md text-muted-foreground">
+          {data.displayName ? `${data.displayName} can't take orders right now. ` : ""}Please check back later.
+        </p>
+        <Link to="/" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Go to izzy</Link>
+      </div>
+    );
+  }
+  return <LiveShop data={data} />;
+}
+
+type LiveData = Extract<Awaited<ReturnType<typeof getPublicPage>>, { suspended: false }>;
+
+function LiveShop({ data }: { data: LiveData }) {
+  const { profile, links, isPro } = data;
   const pro = effectiveIsPro(isPro);
   // Analytics (Step 04, lib/track.ts): one shop view per visitor
   // session, a product view when a customer opens a product's
@@ -63,6 +84,7 @@ function PublicPage() {
       data={{ ...profile, socials: (profile.socials as Record<string, string>) ?? {}, links }}
       theme={effectiveTheme(profile.theme, pro)}
       showBranding={!pro}
+      reportable
       onLinkClick={onClick}
       onProductView={onProductView}
     />

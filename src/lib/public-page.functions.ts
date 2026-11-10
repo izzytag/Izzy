@@ -30,13 +30,19 @@ export const getPublicPage = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: profile } = await sb
       .from("profiles")
-      .select("id, username, display_name, bio, category, avatar_url, theme, socials, whatsapp, upi_id")
+      .select("id, username, display_name, bio, category, avatar_url, theme, socials, whatsapp, upi_id, suspended")
       .eq("username", data.username)
       .maybeSingle();
     if (!profile) return null;
+    // Suspended shops (Step 06) render as unavailable: no products, no
+    // WhatsApp, no tracking — just the state. Only the flag leaves the
+    // server; none of the shop's data is returned.
+    if (profile.suspended) {
+      return { suspended: true as const, username: profile.username, displayName: profile.display_name };
+    }
     const [{ data: links }, { data: isPro }] = await Promise.all([
       sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).in("kind", ["product", "service"]).order("position"),
       sb.rpc("is_pro", { _uid: profile.id }),
     ]);
-    return { profile, links: links ?? [], isPro: !!isPro };
+    return { suspended: false as const, profile, links: links ?? [], isPro: !!isPro };
   });
