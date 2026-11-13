@@ -12,6 +12,10 @@ export const Route = createFileRoute("/$username")({
     if (!data) throw notFound();
     return data;
   },
+  // Shown while the shop loads (client-side navigation): a neutral,
+  // on-brand skeleton in the app tokens — the seller's theme isn't
+  // known until the loader returns, so no theme colours are used.
+  pendingComponent: ShopLoading,
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Page not found — izzy" }, { name: "robots", content: "noindex" }] };
     if (loaderData.suspended) return { meta: [{ title: "Shop unavailable — izzy" }, { name: "robots", content: "noindex" }] };
@@ -63,6 +67,28 @@ export const Route = createFileRoute("/$username")({
   ),
   component: PublicPage,
 });
+
+function ShopLoading() {
+  return (
+    <div className="min-h-screen bg-background px-4 pt-10 pb-28 text-foreground sm:px-5" aria-busy="true" aria-label="Loading shop">
+      <div className="mx-auto w-full max-w-5xl animate-pulse">
+        <div className="flex items-start gap-4 sm:gap-5">
+          <div className="h-16 w-16 shrink-0 rounded-full bg-muted sm:h-20 sm:w-20" />
+          <div className="min-w-0 flex-1 space-y-2.5 pt-1">
+            <div className="h-7 w-48 max-w-full rounded-lg bg-muted" />
+            <div className="h-4 w-32 rounded-lg bg-muted" />
+            <div className="h-4 w-72 max-w-full rounded-lg bg-muted" />
+          </div>
+        </div>
+        <div className="mt-8 columns-2 gap-4 sm:columns-3 lg:columns-4">
+          {[176, 220, 150, 200, 168, 232].map((h) => (
+            <div key={h} className="mb-4 break-inside-avoid rounded-[24px] bg-muted" style={{ height: h }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function PublicPage() {
   const data = Route.useLoaderData();
