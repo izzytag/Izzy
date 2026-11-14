@@ -56,7 +56,18 @@ export const Route = createFileRoute("/$username")({
     if (p.bio) store.description = p.bio;
     const avatar = p.avatar_url;
     if (avatar?.startsWith("https://")) store.image = avatar;
-    return { meta, scripts: [{ type: "application/ld+json", children: JSON.stringify(store) }] };
+    // Escape the serialized JSON: the store fields come from the seller,
+    // and JSON.stringify does not escape < > &, so a bio containing
+    // </script> could otherwise break out of this script block and run
+    // code in every visitor's browser. \uXXXX escapes are valid JSON
+    // and keep the HTML parser from ever seeing a closing tag.
+    const jsonLd = JSON.stringify(store)
+      .replace(/</g, "\\u003c")
+      .replace(/>/g, "\\u003e")
+      .replace(/&/g, "\\u0026")
+      .replace(/\u2028/g, "\\u2028")
+      .replace(/\u2029/g, "\\u2029");
+    return { meta, scripts: [{ type: "application/ld+json", children: jsonLd }] };
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
