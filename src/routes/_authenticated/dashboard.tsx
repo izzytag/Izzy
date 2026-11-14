@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — izzy" }, { name: "robots", content: "noindex" }] }),
   loader: async ({ context }) => {
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
     if (!acc.profile.username) throw redirect({ to: "/onboarding" });
     return acc;
   },
+  pendingComponent: DashboardLoading,
   component: DashboardLayout,
 });
 

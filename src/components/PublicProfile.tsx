@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
+import { Check, Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, Share2, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
 import { CatalogueCard } from "@/components/CatalogueCard";
@@ -34,11 +34,39 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
   const [showUpi, setShowUpi] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
   const items = data.links.filter((l) => l.kind === "product" || l.kind === "service");
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
+
+  // Visitor-side forwarding: the native share sheet, with the same
+  // pitch text sellers share from the dashboard. Where the share
+  // sheet is unavailable the link is copied instead, and the button
+  // confirms it briefly.
+  async function copyShopLink(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable — no further fallback on this device.
+    }
+  }
+
+  async function shareShop() {
+    const url = origin ? `${origin}/${data.username ?? ""}` : `https://izzytag.shop/${data.username ?? ""}`;
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      try {
+        await navigator.share({ title: name, text: `${name} on izzy — browse the catalogue and order on WhatsApp.`, url });
+        return;
+      } catch {
+        return; // user closed the share sheet — not an error
+      }
+    }
+    await copyShopLink(url);
+  }
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
@@ -62,6 +90,9 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             )}
             {data.bio && <p className="mt-2 text-pretty text-[15px] leading-relaxed text-page-muted sm:text-base">{data.bio}</p>}
           </div>
+          <button type="button" onClick={() => void shareShop()} aria-label="Share this shop" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-105 active:scale-95">
+            {copied ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
+          </button>
         </div>
 
         {socials.length > 0 && (

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminGrowth } from "@/lib/admin.functions";
 import { AdminCard, AdminError, AdminLoading } from "@/components/admin-ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export const Route = createFileRoute("/admin/growth")({
   component: AdminGrowthPage,
@@ -19,6 +20,8 @@ function Metric({ label, value, definition }: { label: string; value: string; de
 
 const num = (n: number) => n.toLocaleString("en-IN");
 const pctVal = (n: number, p: number) => `${num(n)} · ${p}%`;
+const dayLabel = (day: string) =>
+  new Date(`${day}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 /**
  * Growth overview — platform funnel counts, every one computed
@@ -40,6 +43,34 @@ function AdminGrowthPage() {
           The platform funnel, counted from real data. Each number states exactly how it is calculated.
         </p>
       </div>
+
+      <AdminCard title="Daily trend · last 30 days">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Day (UTC)</TableHead>
+                <TableHead className="text-right">Registrations</TableHead>
+                <TableHead className="text-right">Shops first published</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...data.dailySeries].reverse().map((d) => (
+                <TableRow key={d.day}>
+                  <TableCell className="font-medium">{dayLabel(d.day)}</TableCell>
+                  <TableCell className="text-right">{num(d.registrations)}</TableCell>
+                  <TableCell className="text-right">{num(d.newlyPublished)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Registrations: profiles created on that UTC calendar day. Shops first published: shops whose earliest
+          currently-live item was added that day, with a username claimed. Items switched on later still count on
+          the day they were added.
+        </p>
+      </AdminCard>
 
       <AdminCard title="Businesses">
         <div className="grid gap-4 sm:grid-cols-3">

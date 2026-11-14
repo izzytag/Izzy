@@ -12,8 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/support")({
   loader: ({ context }) => context.queryClient.ensureQueryData(accountQuery),
+  pendingComponent: DashboardLoading,
   component: SupportPage,
 });
 

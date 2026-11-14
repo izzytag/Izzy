@@ -6,6 +6,7 @@ import { Camera, Check, LogOut, MessageCircle, PartyPopper } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
+import { processCataloguePhoto } from "@/lib/catalogue";
 import { validateUsername } from "@/lib/themes";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   component: OnboardingPage,
 });
 
-const STEP_LABELS = ["Welcome", "Business", "WhatsApp", "Shop link", "Done"];
+const STEP_LABELS = ["Business", "WhatsApp", "Shop link", "Done"];
 
 /** Dial codes offered at the WhatsApp step. India first (the default). */
 const COUNTRIES = [
@@ -108,8 +109,8 @@ function maskWhatsapp(num: string): string {
 
 /** Resume where the owner left off: every step reads saved values. */
 function initialStep(p: { display_name: string | null; whatsapp: string | null }): number {
-  if (p.display_name && p.whatsapp) return 3;
-  if (p.display_name) return 2;
+  if (p.display_name && p.whatsapp) return 2;
+  if (p.display_name) return 1;
   return 0;
 }
 
@@ -122,7 +123,7 @@ function OnboardingPage() {
   const [step, setStep] = useState(() => initialStep(p));
   const [busy, setBusy] = useState(false);
 
-  // Business information (step 2)
+  // Business information (step 0)
   const [name, setName] = useState(p.display_name ?? "");
   const [category, setCategory] = useState(p.category ?? "");
   const [bio, setBio] = useState(p.bio ?? "");
@@ -130,14 +131,14 @@ function OnboardingPage() {
   const [nameError, setNameError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // WhatsApp (step 3)
+  // WhatsApp (step 1)
   const split = splitWhatsapp(p.whatsapp);
   const [cc, setCc] = useState(split.cc);
   const [national, setNational] = useState(split.national);
   const [waError, setWaError] = useState<string | null>(null);
   const [savedWhatsapp, setSavedWhatsapp] = useState(p.whatsapp ?? "");
 
-  // Shop link (step 4)
+  // Shop link (step 2)
   const [raw, setRaw] = useState("");
   const [origin, setOrigin] = useState("");
   const [availability, setAvailability] = useState<"idle" | "checking" | "available" | "taken">("idle");
@@ -165,16 +166,23 @@ function OnboardingPage() {
   }
 
   async function uploadLogo(f: File) {
-    if (f.size > 2 * 1024 * 1024) return void toast.error("Image must be under 2MB");
-    const path = `${acc.user.id}/avatar-${Date.now()}.${f.name.split(".").pop() || "jpg"}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true, contentType: f.type });
-    if (error) return void toast.error(error.message);
-    const { data: s } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-    if (!s) return;
-    await supabase.from("profiles").update({ avatar_url: s.signedUrl }).eq("id", acc.user.id);
-    setAvatar(s.signedUrl);
-    qc.invalidateQueries({ queryKey: ["account"] });
-    toast.success("Logo saved");
+    // Logos go through the same in-browser pipeline as catalogue
+    // photos: big phone photos are shrunk and re-encoded as JPEG
+    // instead of being rejected for being over 2MB.
+    try {
+      const processed = await processCataloguePhoto(f);
+      const path = `${acc.user.id}/avatar-${Date.now()}.jpg`;
+      const { error } = await supabase.storage.from("avatars").upload(path, processed, { upsert: true, contentType: "image/jpeg" });
+      if (error) throw error;
+      const { data: s } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (!s) return;
+      await supabase.from("profiles").update({ avatar_url: s.signedUrl }).eq("id", acc.user.id);
+      setAvatar(s.signedUrl);
+      qc.invalidateQueries({ queryKey: ["account"] });
+      toast.success("Logo saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't upload the logo. Please try again.");
+    }
   }
 
   async function saveBusiness(e: React.FormEvent) {
@@ -190,7 +198,7 @@ function OnboardingPage() {
     setBusy(false);
     if (error) return void toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["account"] });
-    setStep(2);
+    setStep(1);
   }
 
   async function saveWhatsapp(e: React.FormEvent) {
@@ -204,7 +212,7 @@ function OnboardingPage() {
     if (error) return void toast.error(error.message);
     setSavedWhatsapp(built.value);
     qc.invalidateQueries({ queryKey: ["account"] });
-    setStep(3);
+    setStep(2);
   }
 
   async function saveUsername(e: React.FormEvent) {
@@ -216,7 +224,7 @@ function OnboardingPage() {
     if (error) return void toast.error(error.code === "23505" ? "That username is taken" : error.message);
     setSavedUsername(u);
     qc.invalidateQueries({ queryKey: ["account"] });
-    setStep(4);
+    setStep(3);
   }
 
   const selectClass = "h-[52px] w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-base text-foreground";
@@ -239,28 +247,6 @@ function OnboardingPage() {
 
         <div className="mt-6 rounded-xl border bg-card p-6 shadow-soft sm:p-8">
           {step === 0 && (
-            <div>
-              <h1 className="text-3xl font-bold">Let's get your business online.</h1>
-              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                Create your shop in a few simple steps and start receiving orders through WhatsApp.
-              </p>
-              <ul className="mt-6 space-y-3">
-                {[
-                  "Tell us about your business",
-                  "Add the WhatsApp number customers reach you on",
-                  "Choose your shop link — izzytag.shop/yourbusiness",
-                ].map((t, i) => (
-                  <li key={t} className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary">{i + 1}</span>
-                    <span className="pt-0.5 text-base">{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button onClick={() => setStep(1)} className="mt-8 min-h-[52px] w-full text-lg">Get started</Button>
-            </div>
-          )}
-
-          {step === 1 && (
             <form onSubmit={saveBusiness}>
               <h1 className="text-2xl font-bold">About your business</h1>
               <p className="mt-1 text-base text-muted-foreground">This is what customers see at the top of your shop. You can change everything later.</p>
@@ -301,11 +287,10 @@ function OnboardingPage() {
               </div>
 
               <Button type="submit" disabled={busy} className="mt-8 min-h-[52px] w-full text-lg">{busy ? "Saving…" : "Continue"}</Button>
-              <button type="button" onClick={() => setStep(0)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 2 && (
+          {step === 1 && (
             <form onSubmit={saveWhatsapp}>
               <h1 className="text-2xl font-bold">Where should your customers contact you?</h1>
               <p className="mt-1 text-base leading-relaxed text-muted-foreground">
@@ -344,11 +329,16 @@ function OnboardingPage() {
               </div>
 
               <Button type="submit" disabled={busy} className="mt-8 min-h-[52px] w-full text-lg">{busy ? "Saving…" : "Continue"}</Button>
-              <button type="button" onClick={() => setStep(1)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
+              {/* Skippable: the storefront degrades gracefully without a
+                  number, and the seller is reminded in My Shop and on
+                  the Products page. A number that IS entered is still
+                  fully validated by saveWhatsapp above. */}
+              <button type="button" onClick={() => setStep(2)} className="mt-3 min-h-[44px] w-full text-base font-medium text-primary">Skip for now</button>
+              <button type="button" onClick={() => setStep(0)} className="mt-1 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 3 && (
+          {step === 2 && (
             <form onSubmit={saveUsername}>
               <h1 className="text-2xl font-bold">Create your shop link</h1>
               <p className="mt-1 text-base leading-relaxed text-muted-foreground">
@@ -370,11 +360,11 @@ function OnboardingPage() {
               <Button type="submit" disabled={!u || !!uErr || availability !== "available" || busy} className="mt-6 min-h-[52px] w-full text-lg">
                 {busy ? "Creating…" : "Confirm my shop link"}
               </Button>
-              <button type="button" onClick={() => setStep(2)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
+              <button type="button" onClick={() => setStep(1)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <div className="text-center">
               <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-primary">
                 <PartyPopper className="h-7 w-7" />
@@ -405,7 +395,7 @@ function OnboardingPage() {
           )}
         </div>
 
-        {step < 4 && (
+        {step < 3 && (
           <p className="mt-4 text-center text-sm text-muted-foreground">Your answers save as you go — you can leave and pick up where you left off.</p>
         )}
       </div>

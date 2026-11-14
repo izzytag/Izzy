@@ -10,8 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/qr")({
   loader: ({ context }) => context.queryClient.ensureQueryData(accountQuery),
+  pendingComponent: DashboardLoading,
   component: QrPage,
 });
 
@@ -133,7 +136,7 @@ function QrPage() {
   async function shareNative() {
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        await navigator.share({ title: businessName, url: shopUrl });
+        await navigator.share({ title: businessName, text: `${businessName} on izzy — browse the catalogue and order on WhatsApp.`, url: shopUrl });
         return;
       } catch {
         return; // user closed the share sheet — not an error

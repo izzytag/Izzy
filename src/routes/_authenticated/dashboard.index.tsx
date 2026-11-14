@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
  * Analytics too: Free sees the last 7 days, Pro the last 30.
  */
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
       context.queryClient.ensureQueryData(statsQuery(acc.user.id, acc.isPro)),
     ]);
   },
+  pendingComponent: DashboardLoading,
   component: OverviewPage,
 });
 
@@ -68,7 +71,9 @@ function OverviewPage() {
   async function shareLink() {
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        await navigator.share({ title: businessName, url: shopUrl });
+        // The pitch text travels with the link into WhatsApp and
+        // Instagram DMs — a bare link with no context gets ignored.
+        await navigator.share({ title: businessName, text: `${businessName} on izzy — browse the catalogue and order on WhatsApp.`, url: shopUrl });
         return;
       } catch {
         return; // user closed the share sheet — not an error
@@ -76,6 +81,11 @@ function OverviewPage() {
     }
     await copyLink();
   }
+
+  // Drafts are invisible to visitors, so "first product" only counts
+  // once something is actually live. When drafts exist but nothing is
+  // live, the step becomes switching one on — not adding another.
+  const hasDraftsOnly = storeRows.length > 0 && liveCount === 0;
 
   const checklist = [
     {
@@ -103,9 +113,9 @@ function OverviewPage() {
       ctaTo: "/onboarding" as const,
     },
     {
-      done: storeRows.length > 0,
-      label: "Add your first product",
-      hint: "With a photo and a price",
+      done: liveCount > 0,
+      label: hasDraftsOnly ? "Switch your first product on" : "Add your first product",
+      hint: hasDraftsOnly ? "Your items are drafts. Switch one on to publish it to your shop." : "With a photo and a price",
       to: "/dashboard/products" as const,
       ctaTo: "/dashboard/products" as const,
     },
@@ -135,6 +145,10 @@ function OverviewPage() {
               {p.suspended ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-sm font-semibold text-destructive">
                   <span className="h-2 w-2 rounded-full bg-destructive" /> Suspended
+                </span>
+              ) : liveCount === 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
@@ -277,16 +291,20 @@ function OverviewPage() {
                 <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />
               </a>
             </li>
-            <li>
-              <button type="button" onClick={shareLink} className="flex min-h-[56px] w-full items-center gap-3 py-2 text-left">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Share2 className="h-4 w-4 text-muted-foreground" /></span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-medium">Share your shop link</span>
-                  <span className="block text-sm text-muted-foreground">Instagram bio, WhatsApp status, anywhere</span>
-                </span>
-                <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />
-              </button>
-            </li>
+            {/* Sharing an empty shop sends visitors to nothing — the
+                share row only appears once something is live. */}
+            {liveCount > 0 && (
+              <li>
+                <button type="button" onClick={shareLink} className="flex min-h-[56px] w-full items-center gap-3 py-2 text-left">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Share2 className="h-4 w-4 text-muted-foreground" /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">Share your shop link</span>
+                    <span className="block text-sm text-muted-foreground">Instagram bio, WhatsApp status, anywhere</span>
+                  </span>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+                </button>
+              </li>
+            )}
           </ul>
         </section>
       )}
@@ -316,7 +334,13 @@ function OverviewPage() {
             <p className="text-base leading-relaxed text-muted-foreground">
               Your shop's performance will appear here once customers start visiting — views and product taps, counted as they happen.
             </p>
-            <Button variant="outline" onClick={shareLink} className="mt-4 min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            {liveCount > 0 ? (
+              <Button variant="outline" onClick={shareLink} className="mt-4 min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            ) : (
+              <Button variant="outline" asChild className="mt-4 min-h-[44px]">
+                <Link to="/dashboard/products"><Package className="h-4 w-4" /> {hasDraftsOnly ? "Switch on your first product" : "Add your first product"}</Link>
+              </Button>
+            )}
           </div>
         )}
       </section>
