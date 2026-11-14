@@ -12,6 +12,13 @@ import {
   validateReportInput,
 } from "./admin";
 import { PRO_PRICE_INR, PRO_PRICE_USD, TESTING_FREE } from "./billing";
+import {
+  isGenuinelyActive,
+  isMissingReferralColumnError,
+  pendingReferralRewards,
+  REFERRAL_REWARD_REASON,
+  referralYearStart,
+} from "./referral";
 import { FREE_LINK_LIMIT } from "./themes";
 
 /**
@@ -229,6 +236,148 @@ export const adminGrowth = createServerFn({ method: "GET" })
       whatsappClicks30,
       activePro,
       proConversionPct: pct(activePro, totalBusinesses),
+    };
+  });
+
+/* ------------------------------ referrals ----------------------------- */
+
+/**
+ * Referral review (manual fulfilment). Groups every attributed signup
+ * by its referrer, with the activity state of each referred shop and
+ * the rewards already granted this year, so an admin can decide each
+ * grant with the facts in front of them. Nothing here grants
+ * anything: fulfilment goes through the existing manual Pro grant on
+ * the business page, with the reason "Referral reward".
+ *
+ * "Active" uses the same definition as the seller-facing counts
+ * (username claimed, WhatsApp set, at least one live product or
+ * service). "First live product" is the earliest enabled
+ * product/service row — the closest stored fact to when the shop
+ * became active; izzy does not store an activation timestamp.
+ * Pending rewards = active referrals up to the yearly cap of 6,
+ * minus free months already granted this year.
+ */
+export type ReferralReviewRow = {
+  referrerId: string;
+  referrerUsername: string | null;
+  referrerDisplayName: string | null;
+  signups: number;
+  active: number;
+  grantedMonthsThisYear: number;
+  pending: number;
+  referrals: {
+    userId: string;
+    username: string | null;
+    displayName: string | null;
+    signedUpAt: string;
+    active: boolean;
+    firstLiveProductAt: string | null;
+  }[];
+};
+
+export const adminListReferrals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { admin } = await requireAdmin(context);
+    const { data: referred, error } = await admin
+      .from("profiles")
+      .select("id, username, display_name, whatsapp, created_at, referred_by")
+      .not("referred_by", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) {
+      // Migration 0010 not applied yet: referral tracking is not
+      // active, and the review page says so instead of failing.
+      if (isMissingReferralColumnError(error)) {
+        return {
+          available: false as const,
+          referrers: [] as ReferralReviewRow[],
+          totals: { signups: 0, active: 0, grantedMonthsThisYear: 0, pending: 0 },
+        };
+      }
+      throw new Error("Could not load referrals. Please try again.");
+    }
+    const rows = referred ?? [];
+    const referrerIds = [...new Set(rows.map((r) => r.referred_by).filter((x): x is string => !!x))];
+    const referredIds = rows.map((r) => r.id);
+    const [{ data: referrerProfiles }, { data: liveItems }, { data: grants }] = await Promise.all([
+      referrerIds.length > 0
+        ? admin.from("profiles").select("id, username, display_name").in("id", referrerIds)
+        : Promise.resolve({ data: [] as { id: string; username: string | null; display_name: string | null }[] }),
+      referredIds.length > 0
+        ? admin
+            .from("links")
+            .select("user_id, created_at")
+            .in("user_id", referredIds)
+            .in("kind", ["product", "service"])
+            .eq("enabled", true)
+        : Promise.resolve({ data: [] as { user_id: string; created_at: string }[] }),
+      admin
+        .from("admin_audit_log")
+        .select("target_user_id, details")
+        .eq("action", "subscription.grant_pro")
+        .eq("reason", REFERRAL_REWARD_REASON)
+        .gte("created_at", referralYearStart()),
+    ]);
+    const referrerById = new Map((referrerProfiles ?? []).map((p) => [p.id, p]));
+    const liveCounts = new Map<string, number>();
+    const firstLiveAt = new Map<string, string>();
+    for (const item of liveItems ?? []) {
+      liveCounts.set(item.user_id, (liveCounts.get(item.user_id) ?? 0) + 1);
+      const prev = firstLiveAt.get(item.user_id);
+      if (!prev || item.created_at < prev) firstLiveAt.set(item.user_id, item.created_at);
+    }
+    const grantedByReferrer = new Map<string, number>();
+    for (const g of grants ?? []) {
+      if (!g.target_user_id) continue;
+      const details = g.details as { months?: unknown } | null;
+      const months = typeof details?.months === "number" && details.months > 0 ? details.months : 1;
+      grantedByReferrer.set(g.target_user_id, (grantedByReferrer.get(g.target_user_id) ?? 0) + months);
+    }
+    const grouped = new Map<string, ReferralReviewRow>();
+    for (const row of rows) {
+      const referrerId = row.referred_by as string;
+      let group = grouped.get(referrerId);
+      if (!group) {
+        const referrer = referrerById.get(referrerId);
+        group = {
+          referrerId,
+          referrerUsername: referrer?.username ?? null,
+          referrerDisplayName: referrer?.display_name ?? null,
+          signups: 0,
+          active: 0,
+          grantedMonthsThisYear: grantedByReferrer.get(referrerId) ?? 0,
+          pending: 0,
+          referrals: [],
+        };
+        grouped.set(referrerId, group);
+      }
+      const active = isGenuinelyActive(row, liveCounts.get(row.id) ?? 0);
+      group.signups += 1;
+      if (active) group.active += 1;
+      group.referrals.push({
+        userId: row.id,
+        username: row.username,
+        displayName: row.display_name,
+        signedUpAt: row.created_at,
+        active,
+        firstLiveProductAt: firstLiveAt.get(row.id) ?? null,
+      });
+    }
+    const referrers = [...grouped.values()].map((g) => ({
+      ...g,
+      pending: pendingReferralRewards(g.active, g.grantedMonthsThisYear),
+    }));
+    referrers.sort((a, b) => b.pending - a.pending || b.active - a.active || b.signups - a.signups);
+    return {
+      available: true as const,
+      referrers,
+      totals: {
+        signups: rows.length,
+        active: referrers.reduce((n, g) => n + g.active, 0),
+        grantedMonthsThisYear: referrers.reduce((n, g) => n + g.grantedMonthsThisYear, 0),
+        pending: referrers.reduce((n, g) => n + g.pending, 0),
+      },
     };
   });
 

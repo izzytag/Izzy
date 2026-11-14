@@ -11,6 +11,7 @@ import {
 } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import { PricingCards } from "@/components/PricingCards";
+import { ReferralCard } from "@/components/ReferralCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -190,6 +191,8 @@ function UpgradePage() {
           </p>
         )}
       </section>
+
+      <ReferralCard username={acc.profile.username} />
 
       {state.kind !== "free" && (
         <section className="rounded-xl border bg-card p-5 sm:p-6">

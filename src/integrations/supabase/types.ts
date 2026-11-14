@@ -256,6 +256,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          referred_by: string | null
           socials: Json
           suspended: boolean
           theme: string
@@ -270,6 +271,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          referred_by?: string | null
           socials?: Json
           suspended?: boolean
           theme?: string
@@ -284,6 +286,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          referred_by?: string | null
           socials?: Json
           suspended?: boolean
           theme?: string
@@ -291,7 +294,15 @@ export type Database = {
           username?: string | null
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {

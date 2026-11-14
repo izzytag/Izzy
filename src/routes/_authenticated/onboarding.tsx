@@ -6,6 +6,8 @@ import { Camera, Check, LogOut, MessageCircle, PartyPopper } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
+import { clearReferralCapture, readReferralCapture } from "@/lib/referral";
+import { claimReferralAttribution } from "@/lib/referral.functions";
 import { validateUsername } from "@/lib/themes";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -147,6 +149,42 @@ function OnboardingPage() {
 
   useEffect(() => setOrigin(window.location.host), []);
 
+  /**
+   * Referral attribution: if this account arrived via a referral link,
+   * the stored capture is sent to the server function, which resolves
+   * the username and records the attribution. Best-effort by design —
+   * a failed claim never blocks onboarding. The capture is cleared on
+   * every final outcome; only "unavailable" (migration not applied
+   * yet) keeps it, so a later visit retries.
+   */
+  async function maybeClaimReferral() {
+    let capture = null;
+    try {
+      capture = readReferralCapture(window.localStorage, Date.now());
+    } catch {
+      return;
+    }
+    if (!capture) return;
+    try {
+      const result = await claimReferralAttribution({
+        data: { refUsername: capture.username, capturedAt: capture.capturedAt },
+      });
+      if (result.attributed || result.reason !== "unavailable") {
+        clearReferralCapture(window.localStorage);
+      }
+    } catch {
+      // Attribution failure must never surface as an onboarding error.
+    }
+  }
+
+  // Claim on arrival (the profile row already exists) and again after
+  // the first profile save; the server call is idempotent, and the
+  // capture is cleared after the first final outcome.
+  useEffect(() => {
+    void maybeClaimReferral();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!u || validateUsername(u)) { setAvailability("idle"); return; }
     setAvailability("checking");
@@ -190,6 +228,7 @@ function OnboardingPage() {
     setBusy(false);
     if (error) return void toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["account"] });
+    void maybeClaimReferral();
     setStep(2);
   }
 
