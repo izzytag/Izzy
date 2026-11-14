@@ -25,8 +25,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/upgrade")({
   loader: ({ context }) => context.queryClient.ensureQueryData(accountQuery),
+  pendingComponent: DashboardLoading,
   component: UpgradePage,
 });
 

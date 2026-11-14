@@ -13,11 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhonePreview } from "@/components/PhonePreview";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/appearance")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
     await context.queryClient.ensureQueryData(linksQuery(acc.user.id));
   },
+  pendingComponent: DashboardLoading,
   component: AppearancePage,
 });
 

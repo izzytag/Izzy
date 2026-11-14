@@ -7,6 +7,8 @@ import { statsQuery } from "@/lib/stats";
 import { sourceLabel } from "@/lib/source";
 import { Button } from "@/components/ui/button";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/analytics")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/analytics")({
       context.queryClient.ensureQueryData(linksQuery(acc.user.id)),
     ]);
   },
+  pendingComponent: DashboardLoading,
   component: AnalyticsPage,
 });
 

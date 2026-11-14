@@ -60,6 +60,9 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
   const [images, setImages] = useState<string[]>(link.image_urls ?? []);
   const [category, setCategory] = useState(link.category ?? "");
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  // True while CatalogueEditor is uploading photos: Save stays
+  // disabled until every photo has a URL to save.
+  const [photosUploading, setPhotosUploading] = useState(false);
   const deleteTimer = useRef<number | null>(null);
 
   useEffect(() => () => {
@@ -125,9 +128,9 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
             )}
             <p className="pt-1 text-sm font-medium">Product photos</p>
             <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
-            <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} description={desc} onDescription={setDesc} />
+            <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} description={desc} onDescription={setDesc} onUploadingChange={setPhotosUploading} />
             <div className="flex gap-2">
-              <Button size="sm" onClick={save}><Check className="h-4 w-4" /> Save</Button>
+              <Button size="sm" onClick={save} disabled={photosUploading}><Check className="h-4 w-4" /> {photosUploading ? "Uploading photos…" : "Save"}</Button>
               <Button size="sm" variant="outline" onClick={cancel}><X className="h-4 w-4" /> Cancel</Button>
             </div>
           </div>

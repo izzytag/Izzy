@@ -6,6 +6,7 @@ import { Copy, Camera, Eye, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
+import { processCataloguePhoto } from "@/lib/catalogue";
 import { effectiveTheme, waCardLink } from "@/lib/themes";
 import { TESTING_FREE, testingBanner, effectiveIsPro } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
@@ -15,11 +16,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PhonePreview } from "@/components/PhonePreview";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/store")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
     await context.queryClient.ensureQueryData(linksQuery(acc.user.id));
   },
+  pendingComponent: DashboardLoading,
   component: MyShopPage,
 });
 
@@ -99,16 +103,23 @@ function MyShopPage() {
   }
 
   async function uploadAvatar(f: File) {
-    if (f.size > 2 * 1024 * 1024) return void toast.error("Image must be under 2MB");
-    const path = `${acc.user.id}/avatar-${Date.now()}.${f.name.split(".").pop() || "jpg"}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true, contentType: f.type });
-    if (error) return void toast.error(error.message);
-    const { data: s } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-    if (!s) return;
-    await supabase.from("profiles").update({ avatar_url: s.signedUrl }).eq("id", acc.user.id);
-    setAvatar(s.signedUrl);
-    qc.invalidateQueries({ queryKey: ["account"] });
-    toast.success("Logo updated");
+    // Same in-browser pipeline as catalogue photos: big phone photos
+    // are shrunk and re-encoded as JPEG instead of being rejected
+    // for being over 2MB.
+    try {
+      const processed = await processCataloguePhoto(f);
+      const path = `${acc.user.id}/avatar-${Date.now()}.jpg`;
+      const { error } = await supabase.storage.from("avatars").upload(path, processed, { upsert: true, contentType: "image/jpeg" });
+      if (error) throw error;
+      const { data: s } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (!s) return;
+      await supabase.from("profiles").update({ avatar_url: s.signedUrl }).eq("id", acc.user.id);
+      setAvatar(s.signedUrl);
+      qc.invalidateQueries({ queryKey: ["account"] });
+      toast.success("Logo updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't upload the logo. Please try again.");
+    }
   }
 
   const preview = {
@@ -160,9 +171,15 @@ function MyShopPage() {
           <section className="rounded-xl border bg-card p-5 sm:p-6">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-xl font-bold">Your shop link</h2>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
-                <span className="h-2 w-2 rounded-full bg-primary" /> Live
-              </span>
+              {liveCount === 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
+                  <span className="h-2 w-2 rounded-full bg-primary" /> Live
+                </span>
+              )}
             </div>
             <p className="mt-2 break-all text-base font-medium text-primary">{pageUrl.replace(/^https?:\/\//, "")}</p>
             <p className="mt-1 text-base text-muted-foreground">
