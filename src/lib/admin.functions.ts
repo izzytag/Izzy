@@ -161,11 +161,42 @@ export const adminOverview = createServerFn({ method: "GET" })
 /* ------------------------------- growth ------------------------------- */
 
 /**
+ * Page through a table in fixed-size slices, calling fn for each
+ * page. Distinct-user metrics need the ids themselves (PostgREST
+ * exposes no distinct-count), so the pages are reduced to sets and
+ * maps as they stream in and the rows are discarded — memory stays
+ * proportional to distinct users, and there is no row cap that
+ * could silently truncate the numbers as the platform grows.
+ */
+const GROWTH_PAGE_SIZE = 1000;
+
+async function forEachPage<T>(
+  fetchPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+  fn: (rows: T[]) => void,
+): Promise<void> {
+  for (let from = 0; ; from += GROWTH_PAGE_SIZE) {
+    const { data, error } = await fetchPage(from, from + GROWTH_PAGE_SIZE - 1);
+    if (error) throw new Error("Could not load growth data. Please try again.");
+    const rows = data ?? [];
+    if (rows.length === 0) break;
+    fn(rows);
+    if (rows.length < GROWTH_PAGE_SIZE) break;
+  }
+}
+
+/**
  * Platform growth metrics (Step 08) — derived counts only, computed
  * from the same tables the overview reads. Every metric's definition
  * is rendered next to its number on the Growth page; nothing here is
  * estimated, sampled or extrapolated. Windows are fixed (7 days /
  * 30 days / all time) — there is deliberately no range picker.
+ *
+ * Scalar counts run as server-side count queries. Distinct-user
+ * metrics (first product, published shops, active shops) page
+ * through the minimal columns with no row cap. The daily series
+ * covers the last 30 UTC calendar days: registrations counted
+ * server-side per day, and newly published shops derived from each
+ * shop's earliest currently-live item.
  *
  * Data sources: profiles (registrations, usernames), links (product /
  * service rows — enabled = live), subscriptions (plan state),
@@ -179,23 +210,26 @@ export const adminGrowth = createServerFn({ method: "GET" })
     const since = (days: number) => new Date(Date.now() - days * 864e5).toISOString();
     const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
     const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 1000) / 10 : 0);
+    // Last 30 UTC calendar days, oldest first. Day bounds are exact
+    // UTC midnights, so each day's count is one server-side query.
+    const dayKeys: string[] = [];
+    for (let i = 29; i >= 0; i--) dayKeys.push(new Date(Date.now() - i * 864e5).toISOString().slice(0, 10));
+    const dayStart = (key: string) => `${key}T00:00:00.000Z`;
+    const dayEnd = (key: string) => new Date(new Date(dayStart(key)).getTime() + 864e5).toISOString();
     const [
       totalBusinesses,
       newReg7,
       newReg30,
-      { data: profileRows },
-      { data: itemRows },
-      { data: viewRows },
+      completedOnboarding,
       whatsappClicksAll,
       whatsappClicks30,
+      dailyRegistrations,
       { data: subRows },
     ] = await Promise.all([
       count(admin.from("profiles").select("id", { count: "exact", head: true })),
       count(admin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since(7))),
       count(admin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since(30))),
-      admin.from("profiles").select("id, username").limit(10000),
-      admin.from("links").select("user_id, enabled").in("kind", ["product", "service"]).limit(10000),
-      admin.from("page_views").select("profile_id").gte("created_at", since(30)).limit(10000),
+      count(admin.from("profiles").select("id", { count: "exact", head: true }).not("username", "is", null)),
       count(admin.from("link_clicks").select("id", { count: "exact", head: true }).eq("kind", "whatsapp_click")),
       count(
         admin
@@ -204,22 +238,71 @@ export const adminGrowth = createServerFn({ method: "GET" })
           .eq("kind", "whatsapp_click")
           .gte("created_at", since(30)),
       ),
+      Promise.all(
+        dayKeys.map((key) =>
+          count(
+            admin
+              .from("profiles")
+              .select("id", { count: "exact", head: true })
+              .gte("created_at", dayStart(key))
+              .lt("created_at", dayEnd(key)),
+          ),
+        ),
+      ),
       admin.from("subscriptions").select("user_id, plan, status, current_period_end"),
     ]);
-    const profiles = profileRows ?? [];
-    const usernameByUser = new Map(profiles.map((p) => [p.id, p.username]));
-    const completedOnboarding = profiles.filter((p) => !!p.username).length;
+    const usernameUserIds = new Set<string>();
     const withItems = new Set<string>();
-    const withLiveItems = new Set<string>();
-    for (const r of itemRows ?? []) {
-      withItems.add(r.user_id);
-      if (r.enabled) withLiveItems.add(r.user_id);
-    }
+    const earliestLiveByUser = new Map<string, string>();
+    const activeShopIds = new Set<string>();
+    await Promise.all([
+      forEachPage(
+        (from, to) => admin.from("profiles").select("id, username").order("id").range(from, to),
+        (rows) => {
+          for (const r of rows) if (r.username) usernameUserIds.add(r.id);
+        },
+      ),
+      forEachPage(
+        (from, to) =>
+          admin
+            .from("links")
+            .select("user_id, enabled, created_at")
+            .in("kind", ["product", "service"])
+            .order("id")
+            .range(from, to),
+        (rows) => {
+          for (const r of rows) {
+            withItems.add(r.user_id);
+            if (r.enabled) {
+              const prev = earliestLiveByUser.get(r.user_id);
+              if (!prev || r.created_at < prev) earliestLiveByUser.set(r.user_id, r.created_at);
+            }
+          }
+        },
+      ),
+      forEachPage(
+        (from, to) =>
+          admin.from("page_views").select("profile_id").gte("created_at", since(30)).order("id").range(from, to),
+        (rows) => {
+          for (const r of rows) activeShopIds.add(r.profile_id);
+        },
+      ),
+    ]);
     // Published = a shareable link exists AND at least one item on it
-    // is live: username claimed and at least one enabled item.
+    // is live: username claimed and at least one enabled item. A shop
+    // counts as newly published on the day its earliest
+    // currently-live item was added — items switched on later still
+    // count on the day they were added, because enablement has no
+    // timestamp of its own. The Growth page states this exactly.
     let publishedShops = 0;
-    for (const uid of withLiveItems) if (usernameByUser.get(uid)) publishedShops += 1;
-    const activeShops30 = new Set((viewRows ?? []).map((v) => v.profile_id)).size;
+    const publishedByDay = new Map<string, number>();
+    for (const [uid, firstLive] of earliestLiveByUser) {
+      if (!usernameUserIds.has(uid)) continue;
+      publishedShops += 1;
+      const day = firstLive.slice(0, 10);
+      publishedByDay.set(day, (publishedByDay.get(day) ?? 0) + 1);
+    }
+    const activeShops30 = activeShopIds.size;
     const activePro = (subRows ?? []).filter((s) => subIsActivePro(s)).length;
     return {
       totalBusinesses,
@@ -236,6 +319,11 @@ export const adminGrowth = createServerFn({ method: "GET" })
       whatsappClicks30,
       activePro,
       proConversionPct: pct(activePro, totalBusinesses),
+      dailySeries: dayKeys.map((day, i) => ({
+        day,
+        registrations: dailyRegistrations[i] ?? 0,
+        newlyPublished: publishedByDay.get(day) ?? 0,
+      })),
     };
   });
 

@@ -14,11 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardLinkItem, reorderSubset, type LinkRow } from "@/components/DashboardLinkItem";
 
+import { DashboardLoading } from "@/components/DashboardLoading";
+
 export const Route = createFileRoute("/_authenticated/dashboard/products")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
     await context.queryClient.ensureQueryData(linksQuery(acc.user.id));
   },
+  pendingComponent: DashboardLoading,
   component: ProductsPage,
 });
 
@@ -54,14 +57,18 @@ function ProductsPage() {
   );
 
   async function addItem(kind: "product" | "service") {
-    // NOTE: the enforce_link_limit trigger counts ALL of the user's
-    // rows (including legacy link rows), so a free user whose old
-    // link rows fill the quota can still be refused by the database
-    // even when this UI count has room — the trigger's message is
-    // what the toast below then shows.
+    // The free-item limit is enforced by this UI check (the database
+    // trigger currently enforces no limit). If a server-side limit is
+    // ever added, its error is still translated below — the raw
+    // database message is never shown to the seller.
     if (!canAddLink(itemCount, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
     const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind, title: kind === "product" ? "New product" : "New service", url: "", position: links.length, enabled: false }).select().single();
-    if (error) return void toast.error(error.message);
+    if (error) {
+      const hitLimit = /limit|maximum|free plan/i.test(error.message);
+      return void toast.error(hitLimit
+        ? `You've reached the free plan limit of ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited items.`
+        : "Couldn't add that item — please try again.");
+    }
     // Clear any search/filter so the new draft is visible in edit mode.
     setQuery("");
     setStatusFilter("all");
@@ -124,6 +131,26 @@ function ProductsPage() {
           <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
             You've used all {FREE_LINK_LIMIT} free items. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited items.
           </p>
+        )}
+        {storeRows.length > 0 && liveCount === 0 && (
+          <div className="mt-3 rounded-xl border-2 border-primary/30 bg-primary-soft p-4" role="status">
+            <p className="font-semibold text-accent-foreground">Your shop is not published yet</p>
+            <p className="mt-1 text-sm leading-relaxed text-accent-foreground/80">
+              All items below are drafts, and visitors see an empty shop. Switch on your first item to publish it.
+            </p>
+            <Button
+              className="mt-3 min-h-[44px]"
+              onClick={() => {
+                const first = storeRows[0];
+                if (first) {
+                  void updateLink(first.id, { enabled: true });
+                  toast.success(`"${first.title}" is now live on your shop`);
+                }
+              }}
+            >
+              Switch on your first item
+            </Button>
+          </div>
         )}
         {storeRows.length > 0 && (
           <div className="mt-5 space-y-3">

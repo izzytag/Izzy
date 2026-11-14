@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +26,11 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [formError, setFormError] = useState("");
   // Password recovery: a reset link lands here with a recovery session.
   // While recovery is in play the page must NOT bounce to /dashboard
@@ -37,6 +41,7 @@ function AuthPage() {
   const recoveryRef = useRef(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showRecoveryPassword, setShowRecoveryPassword] = useState(false);
   const [recoveryError, setRecoveryError] = useState("");
   const [recoveryBusy, setRecoveryBusy] = useState(false);
   const [recoveryDone, setRecoveryDone] = useState(false);
@@ -128,6 +133,24 @@ function AuthPage() {
     setFormError(`Password reset email sent to ${email}. Check spam too, then use the link to set a password and log in here.`);
   }
 
+  // Resend cooldown: one resend per 30 seconds, so the button cannot
+  // be hammered into a mail flood.
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = window.setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => window.clearTimeout(t);
+  }, [resendCooldown]);
+
+  async function resendConfirmation() {
+    if (resending || resendCooldown > 0 || !email) return;
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo: window.location.origin + "/auth" } });
+    setResending(false);
+    if (error) { toast.error("The confirmation email could not be resent. Please try again."); return; }
+    setResendCooldown(30);
+    toast.success("Confirmation email sent", { description: `Check ${email} for the new link.` });
+  }
+
   // Google sign-in is intentionally NOT offered in this Vercel build (2026-10-26 test):
   // the Supabase project backing this app has no Google OAuth secret configured,
   // so the Supabase authorize step fails with "Unsupported provider: missing OAuth secret"
@@ -155,13 +178,23 @@ function AuthPage() {
                 <form onSubmit={submitNewPassword} className="mt-4 space-y-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="recovery-new-password" className="text-base font-medium">New password</Label>
-                    <Input id="recovery-new-password" type="password" autoComplete="new-password" value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)} placeholder="At least 8 characters" />
+                    <div className="relative">
+                      <Input id="recovery-new-password" type={showRecoveryPassword ? "text" : "password"} autoComplete="new-password" value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)} placeholder="At least 8 characters" className="pr-11" />
+                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                        {showRecoveryPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="recovery-confirm-password" className="text-base font-medium">Type it again</Label>
-                    <Input id="recovery-confirm-password" type="password" autoComplete="new-password" value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)} />
+                    <div className="relative">
+                      <Input id="recovery-confirm-password" type={showRecoveryPassword ? "text" : "password"} autoComplete="new-password" value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)} className="pr-11" />
+                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                        {showRecoveryPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" disabled={recoveryBusy} className="min-h-[52px] w-full rounded-full text-lg">
                     {recoveryBusy ? "Updating…" : "Set new password"}
@@ -174,7 +207,11 @@ function AuthPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold">Check your email</h1>
             <p className="mt-2 text-base leading-relaxed text-muted-foreground">We sent a confirmation link to {email}. Click it to start building your shop. If it does not arrive in a few minutes, check spam, and make sure you used a real email address.</p>
-            <button className="mt-6 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => setSent(false)}>Use a different email</button>
+            <Button onClick={() => void resendConfirmation()} disabled={resending || resendCooldown > 0} className="mt-6 min-h-[52px] w-full rounded-full text-lg">
+              {resending ? "Sending…" : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend confirmation email"}
+            </Button>
+            <button className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => { setSent(false); setMode("signin"); }}>Already confirmed? Log in</button>
+            <button className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-xl border text-base font-semibold" onClick={() => setSent(false)}>Use a different email</button>
           </div>
         ) : (
           <>
@@ -199,7 +236,12 @@ function AuthPage() {
                     <button type="button" onClick={forgotPassword} className="text-sm font-semibold text-primary">Forgot password?</button>
                   )}
                 </div>
-                <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                <div className="relative">
+                  <Input id="pw" type={showPassword ? "text" : "password"} minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="pr-11" />
+                  <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
                 {mode === "signup" && (
                   <p className="text-sm text-muted-foreground">Pick a strong, unique password before you sign up — common or leaked passwords are rejected, so use one you don't use anywhere else.</p>
                 )}

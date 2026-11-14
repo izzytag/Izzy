@@ -8,14 +8,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { CATALOGUE_PHOTO_LIMIT, processCataloguePhoto, validateCataloguePhoto } from "@/lib/catalogue";
 
-export function CatalogueEditor({ userId, images, onImages, category, onCategory, description, onDescription }: {
+export function CatalogueEditor({ userId, images, onImages, category, onCategory, description, onDescription, onUploadingChange }: {
   userId: string; images: string[]; onImages: (v: string[]) => void;
   category: string; onCategory: (v: string) => void;
   description: string; onDescription: (v: string) => void;
+  /** Lets the parent disable Save while a photo upload is in flight,
+      so a save can never land before its photos do. */
+  onUploadingChange?: (uploading: boolean) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const uid = useId();
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+
+  function setUploadingState(v: boolean) {
+    setUploading(v);
+    onUploadingChange?.(v);
+  }
 
   // Picked photos are processed in the browser first (downscaled and
   // re-encoded as JPEG), so ordinary phone photos — big files included —
@@ -25,8 +34,10 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
     if (!picked.length) return;
     const limitError = validateCataloguePhoto(images.length);
     if (limitError) return void toast.error(limitError);
-    setUploading(true);
+    setUploadingState(true);
+    setProgress({ done: 0, total: picked.length });
     let next = [...images];
+    let done = 0;
     try {
       for (const file of picked) {
         if (next.length >= CATALOGUE_PHOTO_LIMIT) {
@@ -46,12 +57,16 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
         } catch (e) {
           toast.error(e instanceof Error ? e.message : "Couldn't upload the photo. Please try again.");
         }
+        done += 1;
+        setProgress({ done, total: picked.length });
       }
     } finally {
-      setUploading(false);
+      setUploadingState(false);
+      setProgress(null);
       if (input.current) input.current.value = "";
     }
   }
+  const currentPhoto = progress ? Math.min(progress.done + 1, progress.total) : 1;
   return <div className="space-y-3">
     <div className="grid grid-cols-4 gap-2">
       {images.map((src, i) => <div key={src} className="relative aspect-square overflow-hidden rounded-lg border bg-muted">
@@ -59,9 +74,12 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
         <Button type="button" size="icon" variant="secondary" className="absolute right-1 top-1 h-8 w-8" aria-label={`Remove photo ${i + 1}`} onClick={() => onImages(images.filter((_, index) => index !== i))}><X /></Button>
       </div>)}
       {images.length < CATALOGUE_PHOTO_LIMIT && <Button type="button" variant="outline" disabled={uploading} className="h-auto min-h-16 aspect-square flex-col gap-1 px-1 text-xs" onClick={() => input.current?.click()}>
-        {uploading ? <LoaderCircle className="animate-spin" /> : <ImagePlus />} {uploading ? "Uploading" : "Add photo"}
+        {uploading ? <LoaderCircle className="animate-spin" /> : <ImagePlus />} {uploading && progress ? `Uploading ${currentPhoto} of ${progress.total}` : uploading ? "Uploading" : "Add photo"}
       </Button>}
     </div>
+    {uploading && progress && (
+      <p role="status" className="text-sm text-muted-foreground">Uploading photo {currentPhoto} of {progress.total}. Saving is paused until the upload completes.</p>
+    )}
     <input ref={input} hidden type="file" accept="image/*" multiple aria-label="Upload item photos" onChange={(e) => { if (e.target.files) void uploadFiles(e.target.files); }} />
     <div className="space-y-1.5">
       <Label htmlFor={`${uid}-category`}>Category</Label>
