@@ -51,7 +51,10 @@ export function PlanBadge({ plan, suspended }: { plan: "pro" | "free"; suspended
 /**
  * Confirmation dialog for sensitive admin actions. A reason is
  * required by default — it lands in the audit log next to the action,
- * written by the same server function that performs it.
+ * written by the same server function that performs it. Callers may
+ * prefill the reason (e.g. the referral review flow pre-fills
+ * "Referral reward" for a 1-month grant); the admin can still edit it
+ * before confirming.
  */
 export function ReasonDialog({
   open,
@@ -61,6 +64,7 @@ export function ReasonDialog({
   confirmLabel,
   destructive,
   reasonRequired = true,
+  initialReason,
   busy,
   onConfirm,
 }: {
@@ -71,13 +75,14 @@ export function ReasonDialog({
   confirmLabel: string;
   destructive?: boolean | undefined;
   reasonRequired?: boolean | undefined;
+  initialReason?: string | undefined;
   busy?: boolean | undefined;
   onConfirm: (reason: string) => void;
 }) {
   const [reason, setReason] = useState("");
   useEffect(() => {
-    if (open) setReason("");
-  }, [open ]);
+    if (open) setReason(initialReason ?? "");
+  }, [open, initialReason]);
   const canConfirm = !busy && (!reasonRequired || reason.trim().length > 0);
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

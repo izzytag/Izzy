@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { statsQuery } from "@/lib/stats";
+import { ReferralCard } from "@/components/ReferralCard";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -173,6 +174,9 @@ function OverviewPage() {
           <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share</Button>
         </div>
       </section>
+
+      {/* ---------- Referrals ---------- */}
+      <ReferralCard username={p.username} />
 
       {/* ---------- Quick actions ---------- */}
       <section>

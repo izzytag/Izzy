@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import {
   BarChart3, LayoutGrid, Link2, MessageCircle, MessagesSquare, MousePointerClick,
   PackagePlus, Palette, QrCode, Search, Store, Zap,
@@ -11,6 +12,7 @@ import { Section, SectionHeading } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLang } from "@/lib/i18n";
+import { captureReferralFromSearch } from "@/lib/referral";
 import { useRegion } from "@/lib/useRegion";
 import type { ThemeId } from "@/lib/themes";
 
@@ -147,6 +149,16 @@ const FAQS = [
 function Landing() {
   const { t } = useLang();
   const region = useRegion();
+  // Referral capture: arriving via ?ref=<username> stores a first-touch
+  // capture (username + timestamp) in localStorage. Attribution itself
+  // happens server-side when the new account saves its profile.
+  useEffect(() => {
+    try {
+      captureReferralFromSearch(window.location.search, window.localStorage, Date.now());
+    } catch {
+      // Storage unavailable — referral capture is best-effort.
+    }
+  }, []);
   return (
     <div className="min-h-screen">
       <SiteHeader />

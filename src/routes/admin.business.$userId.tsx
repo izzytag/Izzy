@@ -10,11 +10,19 @@ import {
   adminSetSuspended,
 } from "@/lib/admin.functions";
 import { GRANT_MONTHS } from "@/lib/admin";
+import { REFERRAL_REWARD_MONTHS, REFERRAL_REWARD_REASON } from "@/lib/referral";
 import { AdminCard, AdminError, AdminLoading, fmtDate, fmtDateTime, PlanBadge, ReasonDialog } from "@/components/admin-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/business/$userId")({
+  // ?grant=referral arrives from the referral review page: it pre-fills
+  // the reason on a 1-month grant so referral rewards are recorded
+  // with the exact reason the review page counts. Nothing is granted
+  // automatically — the admin still confirms the dialog. The key is
+  // optional, so existing links to this page need no search prop.
+  validateSearch: (search: Record<string, unknown>): { grant?: "referral" } =>
+    search["grant"] === "referral" ? { grant: "referral" } : {},
   component: AdminBusinessDetailPage,
 });
 
@@ -51,6 +59,7 @@ function describe(action: Exclude<Action, null>, shopName: string): string {
 
 function AdminBusinessDetailPage() {
   const { userId } = Route.useParams();
+  const search = Route.useSearch();
   const qc = useQueryClient();
   const [action, setAction] = useState<Action>(null);
   const { data, isPending, error } = useQuery({
@@ -197,6 +206,11 @@ function AdminBusinessDetailPage() {
           description={describe(action, shopName)}
           confirmLabel={ACTION_COPY[action.kind].confirm}
           destructive={ACTION_COPY[action.kind].destructive}
+          initialReason={
+            search.grant === "referral" && action.kind === "grant" && action.months === REFERRAL_REWARD_MONTHS
+              ? REFERRAL_REWARD_REASON
+              : undefined
+          }
           busy={mutation.isPending}
           onConfirm={(reason) => mutation.mutate({ act: action, reason })}
         />

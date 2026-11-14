@@ -26,6 +26,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminGrowthRouteImport } from './routes/admin.growth'
+import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
@@ -126,6 +127,11 @@ const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
 const AdminGrowthRoute = AdminGrowthRouteImport.update({
   id: '/growth',
   path: '/growth',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReferralsRoute = AdminReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -239,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/growth': typeof AdminGrowthRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/growth': typeof AdminGrowthRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/growth': typeof AdminGrowthRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/growth'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
@@ -377,6 +387,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/growth'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/growth'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/subscriptions'
@@ -566,6 +578,13 @@ declare module '@tanstack/react-router' {
       path: '/growth'
       fullPath: '/admin/growth'
       preLoaderRoute: typeof AdminGrowthRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/referrals': {
+      id: '/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AdminReferralsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reports': {
@@ -738,6 +757,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminGrowthRoute: typeof AdminGrowthRoute
+  AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
@@ -750,6 +770,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminGrowthRoute: AdminGrowthRoute,
+  AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
