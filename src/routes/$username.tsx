@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { trackProductView, trackShopView, trackWhatsappClick } from "@/lib/track";
 import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 import { effectiveTheme } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
 
@@ -23,19 +24,22 @@ export const Route = createFileRoute("/$username")({
     const name = p.display_name || p.username;
     const title = `${name} (@${p.username}) | izzy`;
     const desc = p.bio || `Shop ${name}'s products and services — order on WhatsApp.`;
+    const shopUrl = `${SITE_URL}/${p.username}`;
     const meta = [
       { title },
       { name: "description", content: desc },
       { property: "og:title", content: title },
       { property: "og:description", content: desc },
       { property: "og:type", content: "profile" },
+      { property: "og:url", content: shopUrl },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: desc },
     ];
-    if (p.avatar_url?.startsWith("https://")) {
-      meta.push({ property: "og:image", content: p.avatar_url }, { name: "twitter:image", content: p.avatar_url });
-    }
+    // Share image: the seller's avatar when one is set, otherwise the
+    // repo-owned default — every shop share should carry an image.
+    const shareImage = p.avatar_url?.startsWith("https://") ? p.avatar_url : DEFAULT_OG_IMAGE;
+    meta.push({ property: "og:image", content: shareImage }, { name: "twitter:image", content: shareImage });
     // Structured data for the shop itself — built only from the
     // business's own saved fields (name, link, description, photo).
     const store: {
@@ -67,7 +71,7 @@ export const Route = createFileRoute("/$username")({
       .replace(/&/g, "\\u0026")
       .replace(/\u2028/g, "\\u2028")
       .replace(/\u2029/g, "\\u2029");
-    return { meta, scripts: [{ type: "application/ld+json", children: jsonLd }] };
+    return { meta, links: [{ rel: "canonical", href: shopUrl }], scripts: [{ type: "application/ld+json", children: jsonLd }] };
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">

@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
-    meta: [
-      { title: "Privacy Policy — izzy" },
-      { name: "description", content: "How izzy collects, uses and protects your data." },
-      { property: "og:title", content: "Privacy Policy — izzy" },
-      { property: "og:description", content: "How izzy collects, uses and protects your data." },
-    ],
+    ...seoHead({
+      title: "Privacy Policy — izzy",
+      description: "How izzy collects, uses and protects your data.",
+      path: "/privacy",
+    }),
   }),
   component: PrivacyPage,
 });

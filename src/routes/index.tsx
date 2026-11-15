@@ -13,19 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLang } from "@/lib/i18n";
 import { captureReferralFromSearch } from "@/lib/referral";
+import { faqPageJsonLd, seoHead } from "@/lib/seo";
 import { useRegion } from "@/lib/useRegion";
 import type { ThemeId } from "@/lib/themes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "izzy — Your business. Your products. One beautiful link." },
-      { name: "description", content: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required." },
-      { property: "og:title", content: "izzy — Your business. Your products. One beautiful link." },
-      { property: "og:description", content: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required." },
-    ],
+    ...seoHead({
+      title: "izzy — Your business. Your products. One beautiful link.",
+      description: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required.",
+      path: "/",
+    }),
     // Structured data: only facts — the platform's name, URL and
-    // logo. No ratings or reviews are claimed anywhere.
+    // logo, plus the FAQ content rendered on this page. No ratings
+    // or reviews are claimed anywhere.
     scripts: [
       {
         type: "application/ld+json",
@@ -36,6 +37,10 @@ export const Route = createFileRoute("/")({
             { "@type": "WebSite", name: "izzy", url: "https://izzytag.shop/" },
           ],
         }),
+      },
+      {
+        type: "application/ld+json",
+        children: faqPageJsonLd(FAQS),
       },
     ],
   }),
