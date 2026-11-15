@@ -6,8 +6,8 @@ import { waCardLink } from "@/lib/themes";
 
 export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null };
 
-export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView }: {
-  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined;
+export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode }: {
+  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; demoMode?: boolean | undefined;
 }) {
   const [selected, setSelected] = useState(0);
   const [pinImgFailed, setPinImgFailed] = useState(false);
@@ -17,11 +17,21 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   const Icon = service ? Briefcase : ShoppingBag;
   const href = whatsapp && /\d{6,}/.test(whatsapp.replace(/\D/g, "")) ? waCardLink(whatsapp, item.kind ?? "product", item.title, `${pageUrl}#item-${item.id}`, { price: item.price, shopName }) : null;
   const [open, setOpen] = useState(false);
+  // Demo mode (the /demo example shop): there is no seller and no
+  // WhatsApp number, so the order action is replaced by a signup
+  // call to action — a visitor can never message a wrong number or
+  // mistake the demo for a real shop. Live shops are unaffected.
+  const demoAction = (
+    <div className="space-y-2.5">
+      <p className="text-center text-sm leading-relaxed text-muted-foreground">This is a demo shop. On your own shop, this button opens WhatsApp with the order message ready.</p>
+      <Button asChild className="min-h-[52px] w-full rounded-full text-[17px] font-semibold"><a href="/auth">Create your own shop</a></Button>
+    </div>
+  );
   // The dialog renders in a portal outside the `.theme-*` wrapper, so
   // it must use the app-level tokens (defined on :root) — the
   // page-* theme variables do not resolve there. WhatsApp green is
   // the designated colour for WhatsApp actions.
-  const action = href ? <Button asChild className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button> : null;
+  const action = demoMode ? demoAction : href ? <Button asChild className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{service ? "Book on WhatsApp" : "Order on WhatsApp"}</a></Button> : null;
   return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
       {/* Pins show the photo at its natural ratio (capped, so an

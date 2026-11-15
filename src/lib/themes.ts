@@ -25,7 +25,7 @@ export function canAddLink(count: number, isPro: boolean) {
   return isPro || count < FREE_LINK_LIMIT;
 }
 
-export const RESERVED = ["auth", "dashboard", "pricing", "upgrade", "analytics", "onboarding", "api", "admin", "login", "signup", "settings", "izzy"];
+export const RESERVED = ["auth", "dashboard", "demo", "pricing", "upgrade", "analytics", "onboarding", "api", "admin", "login", "signup", "settings", "izzy"];
 
 export function validateUsername(u: string): string | null {
   if (!/^[a-z0-9_]{3,30}$/.test(u)) return "Use 3–30 lowercase letters, numbers or _";

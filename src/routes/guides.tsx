@@ -23,7 +23,7 @@ function GuidesLayout() {
           <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
             <div>
               <Logo />
-              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One beautiful link.</p>
+              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One shop link.</p>
             </div>
             <nav aria-label="Product">
               <h3 className="text-base font-semibold">Product</h3>
@@ -46,7 +46,7 @@ function GuidesLayout() {
           </div>
           <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
             <p>© {new Date().getFullYear()} izzy</p>
-            <p>Your business. Your products. One beautiful link.</p>
+            <p>Your business. Your products. One shop link.</p>
           </div>
         </div>
       </footer>

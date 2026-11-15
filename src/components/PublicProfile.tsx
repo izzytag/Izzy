@@ -28,8 +28,8 @@ export type PublicData = {
  * server already excludes them; the filter here keeps dashboard
  * previews honest too, since they pass raw rows).
  */
-export function PublicProfile({ data, theme, showBranding, onLinkClick, onProductView, compact, reportable }: {
-  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; compact?: boolean; reportable?: boolean;
+export function PublicProfile({ data, theme, showBranding, onLinkClick, onProductView, compact, reportable, demoMode }: {
+  data: PublicData; theme: ThemeId; showBranding: boolean; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; compact?: boolean; reportable?: boolean; demoMode?: boolean | undefined;
 }) {
   const [showUpi, setShowUpi] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -142,7 +142,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
           // the live page widens to 3/4 columns on bigger screens.
           <div className={`mt-8 w-full columns-2 gap-4 ${compact ? "" : "sm:columns-3 lg:columns-4"}`}>
             {items.map((l) => (
-              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} onProductView={onProductView} />
+              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} onProductView={onProductView} demoMode={demoMode} />
             ))}
           </div>
         )}

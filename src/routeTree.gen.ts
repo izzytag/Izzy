@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -75,6 +76,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidesRoute = GuidesRouteImport.update({
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/$username': typeof UsernameRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -333,6 +341,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -374,6 +383,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/guides'
     | '/pricing'
     | '/privacy'
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
     | '/$username'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/demo'
     | '/guides'
     | '/pricing'
     | '/privacy'
@@ -491,6 +503,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  DemoRoute: typeof DemoRoute
   GuidesRoute: typeof GuidesRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -540,6 +553,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guides': {
@@ -870,6 +890,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  DemoRoute: DemoRoute,
   GuidesRoute: GuidesRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
