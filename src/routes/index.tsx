@@ -45,45 +45,45 @@ export const Route = createFileRoute("/")({
 /* ---------- Demo shops: original demo content rendered by the real
    storefront component, using the site's own example photos. ---------- */
 
-function demoShop(name: string, username: string, bio: string, items: [string, string, string, string][]): PublicData {
+function demoShop(name: string, username: string, bio: string, avatar: string, items: [string, string, string, string][]): PublicData {
   return {
-    display_name: name, username, bio, avatar_url: null, socials: {}, whatsapp: null, upi_id: null,
+    display_name: name, username, bio, avatar_url: avatar, socials: {}, whatsapp: null, upi_id: null,
     links: items.map(([title, price, description, img], i) => ({
       id: `${username}-${i}`, title, url: "#", kind: "product", price, description, image_urls: [img], category: null,
     })),
   };
 }
 
-const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", [
+export const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/chocolate-cake.webp", [
   ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
-  ["Handmade candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
   ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
-  ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
+  ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/chocolate-cake.webp"],
+  ["Sourdough loaf (pack of 2)", "₹349", "Two slow-fermented loaves, baked fresh every morning.", "/examples/sourdough-loaf.webp"],
 ]);
 
-const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
+export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
   {
     label: "Fashion boutique", theme: "rose",
-    data: demoShop("Thread Studio", "threadstudio", "Handmade totes, gifts & everyday fashion", [
+    data: demoShop("Thread Studio", "threadstudio", "Handmade totes, gifts & everyday fashion", "/examples/tote-bag.webp", [
       ["Canvas tote bag", "₹349", "Sturdy everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
-      ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
-      ["Scented candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
+      ["Canvas tote bag, large", "₹449", "A larger everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
+      ["Canvas tote bag, mini", "₹249", "A compact tote for everyday essentials.", "/examples/tote-bag.webp"],
     ]),
   },
   {
     label: "Food & bakery", theme: "marigold",
-    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes & tiffins in Pune 🍛 Order by 10am for lunch", [
+    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/chocolate-cake.webp", [
       ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
       ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
-      ["Ceramic mug", "₹449", "Hand-thrown stoneware, each piece unique.", "/examples/ceramic-mug.webp"],
+      ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/chocolate-cake.webp"],
     ]),
   },
   {
     label: "Beauty & lifestyle", theme: "mint",
-    data: demoShop("Glow Lab", "glowlab", "Clean skincare & self-care essentials", [
+    data: demoShop("Glow Lab", "glowlab", "Clean skincare & self-care essentials", "/examples/face-serum.webp", [
       ["Face serum", "₹599", "Vitamin C serum for a daily glow.", "/examples/face-serum.webp"],
-      ["Handmade candle", "₹299", "Soy wax, sandalwood scent.", "/examples/handmade-candle.webp"],
-      ["Canvas tote bag", "₹349", "Sturdy everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
+      ["Soy candle", "₹299", "Lavender and vanilla soy candle, hand-poured.", "/examples/handmade-candle.webp"],
+      ["Face serum (50 ml)", "₹899", "Vitamin C serum for a daily glow, in a larger bottle.", "/examples/face-serum.webp"],
     ]),
   },
 ];
@@ -177,14 +177,13 @@ function Landing() {
                 <Link to="/auth">{t.createFree}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="min-h-[52px] text-base">
-                <a href="#examples">Explore demo shops</a>
+                <a href="#examples">See shop designs</a>
               </Button>
             </div>
             <p className="mt-4 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
           </div>
           <div>
             <PhoneMockup data={HERO_SHOP} theme="light" height={600} whatsappButton />
-            <p className="mt-4 text-center text-sm text-muted-foreground">Example shop — yours will look like this</p>
           </div>
         </div>
       </section>
@@ -223,7 +222,7 @@ function Landing() {
       <Section id="examples" className="bg-card">
         <SectionHeading
           title="A beautiful shop that represents your business."
-          sub="One product, many kinds of businesses. Each shop below is an example built with izzy."
+          sub="Shops built with izzy, across different kinds of businesses."
         />
         <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {SHOWCASE.map((s) => (
@@ -271,7 +270,7 @@ function Landing() {
             </div>
           ))}
         </div>
-        <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="Example WhatsApp conversation">
+        <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="WhatsApp conversation">
           <div className="flex items-center gap-3 border-b border-border pb-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">P</span>
             <div>
@@ -285,10 +284,10 @@ function Landing() {
               <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
             </p>
             <p className="ml-auto max-w-[85%] rounded-xl rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">
-              Hi, thank you! 😊 When would you like it delivered?
+              Hi, thank you! When would you like it delivered?
             </p>
           </div>
-          <p className="pt-4 text-center text-sm text-muted-foreground">An example conversation — you and your customer talk directly.</p>
+          <p className="pt-4 text-center text-sm text-muted-foreground">You and your customer talk directly.</p>
         </div>
       </Section>
 
@@ -345,7 +344,7 @@ function Landing() {
               <ul className="mt-3 space-y-2.5 text-muted-foreground">
                 <li><Link to="/" hash="features" className="transition-colors duration-200 hover:text-foreground">Features</Link></li>
                 <li><Link to="/" hash="how-it-works" className="transition-colors duration-200 hover:text-foreground">How it works</Link></li>
-                <li><Link to="/" hash="examples" className="transition-colors duration-200 hover:text-foreground">Examples</Link></li>
+                <li><Link to="/" hash="examples" className="transition-colors duration-200 hover:text-foreground">Shop designs</Link></li>
                 <li><Link to="/pricing" className="transition-colors duration-200 hover:text-foreground">Pricing</Link></li>
                 <li><Link to="/guides" className="transition-colors duration-200 hover:text-foreground">Guides</Link></li>
               </ul>
