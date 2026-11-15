@@ -74,14 +74,21 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
           WhatsApp button never covers the footer on small screens. */}
       <div className={`mx-auto flex w-full max-w-5xl flex-col px-4 ${compact ? "py-8" : "pt-10 pb-28 sm:px-5"}`}>
         {/* Store header: logo beside the store name, at the top.
-            No @username here — the username stays in the URL only. */}
-        <div className="flex w-full items-start gap-4 sm:gap-5">
+            No @username here — the username stays in the URL only.
+            On phones the identity is centered (logo above the name,
+            share as a labeled row under the bio) so nothing crowds
+            the name; the horizontal layout returns on wider
+            screens. Compact mode (the narrow preview/mockup frames)
+            always uses the centered layout — viewport breakpoints
+            can't be trusted there, since the frame is narrow even
+            on a desktop-width viewport. */}
+        <div className={compact ? "flex w-full flex-col items-center gap-3 text-center" : "flex w-full flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left"}>
           {data.avatar_url && !avatarFailed ? (
             <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70 sm:h-20 sm:w-20" />
           ) : (
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-page-btn text-2xl font-bold text-page-btn-fg shadow-pin ring-4 ring-white/70 sm:h-20 sm:w-20 sm:text-3xl">{name.charAt(0).toUpperCase() || "?"}</div>
           )}
-          <div className="min-w-0 flex-1 pt-0.5">
+          <div className={compact ? "w-full min-w-0" : "w-full min-w-0 sm:flex-1 sm:pt-0.5"}>
             <h1 className="text-balance text-[28px] font-bold leading-[1.15] tracking-tight sm:text-[32px]">{name}</h1>
             {data.category && (
               <p className="mt-2">
@@ -90,13 +97,20 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             )}
             {data.bio && <p className="mt-2 text-pretty text-[15px] leading-relaxed text-page-muted sm:text-base">{data.bio}</p>}
           </div>
-          <button type="button" onClick={() => void shareShop()} aria-label="Share this shop" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-105 active:scale-95">
-            {copied ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
-          </button>
+          {!compact && (
+            <button type="button" onClick={() => void shareShop()} aria-label="Share this shop" className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-105 active:scale-95 sm:flex">
+              {copied ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
+            </button>
+          )}
         </div>
 
+        <button type="button" onClick={() => void shareShop()} className={compact ? "mt-5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 text-sm font-semibold text-page-btn-fg shadow-sm transition active:scale-[0.98]" : "mt-5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 text-sm font-semibold text-page-btn-fg shadow-sm transition active:scale-[0.98] sm:hidden"}>
+          {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+          {copied ? "Link copied" : "Share this shop"}
+        </button>
+
         {socials.length > 0 && (
-          <div className="mt-6 flex gap-3 self-start">
+          <div className={`mt-6 flex gap-3 ${compact ? "self-center" : "self-center sm:self-start"}`}>
             {socials.map(([k, v]) => {
               const Icon = ICONS[k] ?? LinkIcon;
               return (
@@ -161,9 +175,8 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
       </div>
       {/* Floating WhatsApp button, live pages only: shown whenever the
           seller set a number (the component returns null otherwise).
-          In the dashboard preview (compact) PhonePreview renders its
-          own absolute version inside the phone frame, so this fixed
-          one is skipped there. */}
+          Compact previews and mockups are static illustrations, so
+          this fixed button is skipped there. */}
       {!compact && (
         <FloatingWhatsAppButton whatsapp={data.whatsapp} floating="fixed" />
       )}
