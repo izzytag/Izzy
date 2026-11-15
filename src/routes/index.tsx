@@ -20,7 +20,7 @@ import type { ThemeId } from "@/lib/themes";
 export const Route = createFileRoute("/")({
   head: () => ({
     ...seoHead({
-      title: "izzy — Your business. Your products. One beautiful link.",
+      title: "izzy — Your business. Your products. One shop link.",
       description: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required.",
       path: "/",
     }),
@@ -240,6 +240,11 @@ function Landing() {
             </figure>
           ))}
         </div>
+        <div className="mt-12 text-center">
+          <Button asChild size="lg" variant="outline" className="min-h-[52px] text-base">
+            <Link to="/demo">Try a demo shop</Link>
+          </Button>
+        </div>
       </Section>
 
       {/* ---------- Features ---------- */}
@@ -342,7 +347,7 @@ function Landing() {
           <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
             <div>
               <Logo />
-              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One beautiful link.</p>
+              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One shop link.</p>
             </div>
             <nav aria-label="Product">
               <h3 className="text-base font-semibold">Product</h3>
@@ -365,7 +370,7 @@ function Landing() {
           </div>
           <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
             <p>© {new Date().getFullYear()} izzy</p>
-            <p>Your business. Your products. One beautiful link.</p>
+            <p>Your business. Your products. One shop link.</p>
           </div>
         </div>
       </footer>
