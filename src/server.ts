@@ -1,6 +1,7 @@
 import "./lib/error-capture";
 
 import { handleRazorpayWebhookRequest } from "./lib/razorpay-webhook-route.server";
+import { handleSitemapRequest } from "./lib/sitemap-route.server";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -58,6 +59,16 @@ export default {
           return new Response(null, { status: 405, headers: { Allow: "POST" } });
         }
         return await handleRazorpayWebhookRequest(request);
+      }
+      // Dynamic sitemap: same interception pattern as the webhook —
+      // this TanStack Start version has no API file routes. The
+      // static public/sitemap.xml was removed so the request reaches
+      // this handler instead of being served as a stale file.
+      if (new URL(request.url).pathname === "/sitemap.xml") {
+        if (request.method !== "GET") {
+          return new Response(null, { status: 405, headers: { Allow: "GET" } });
+        }
+        return await handleSitemapRequest();
       }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

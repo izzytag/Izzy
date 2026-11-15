@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
+import { seoHead } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,12 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
-    meta: [
-      { title: "Contact us — izzy" },
-      { name: "description", content: "Questions, feedback or help with your Izzy page — send us a message." },
-      { property: "og:title", content: "Contact us — izzy" },
-      { property: "og:description", content: "Questions, feedback or help with your Izzy page — send us a message." },
-    ],
+    ...seoHead({
+      title: "Contact us — izzy",
+      description: "Questions, feedback or help with your Izzy page — send us a message.",
+      path: "/contact",
+    }),
   }),
   component: ContactPage,
 });

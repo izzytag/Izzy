@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
-    meta: [
-      { title: "Terms of Service — izzy" },
-      { name: "description", content: "The rules for using izzy." },
-      { property: "og:title", content: "Terms of Service — izzy" },
-      { property: "og:description", content: "The rules for using izzy." },
-    ],
+    ...seoHead({
+      title: "Terms of Service — izzy",
+      description: "The rules for using izzy.",
+      path: "/terms",
+    }),
   }),
   component: TermsPage,
 });

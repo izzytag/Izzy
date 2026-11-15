@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GuideArticle, GuideH2, GuideList, GuideP } from "@/components/GuideArticle";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/instagram-bio-link")({
   head: () => ({
-    meta: [
-      { title: "Your Instagram bio link: turn followers into enquiries — izzy guides" },
-      { name: "description", content: "Your Instagram bio gets one link. Make it a shop page with your products and prices that ends in a WhatsApp enquiry — a practical guide for creators, boutiques, bakers and resellers." },
-      { property: "og:title", content: "Your Instagram bio link: turn followers into enquiries" },
-      { property: "og:description", content: "One link that shows your products and prices and ends in a WhatsApp conversation — instead of “DM to order”." },
-    ],
+    ...seoHead({
+      title: "Your Instagram bio link: turn followers into enquiries — izzy guides",
+      description: "Your Instagram bio gets one link. Make it a shop page with your products and prices that ends in a WhatsApp enquiry — a practical guide for creators, boutiques, bakers and resellers.",
+      path: "/guides/instagram-bio-link",
+      ogTitle: "Your Instagram bio link: turn followers into enquiries",
+      ogDescription: "One link that shows your products and prices and ends in a WhatsApp conversation — instead of “DM to order”.",
+    }),
   }),
   component: InstagramBioLink,
 });

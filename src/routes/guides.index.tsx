@@ -1,20 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Instagram, MessageCircle } from "lucide-react";
+import { ArrowRight, Instagram, LayoutGrid, Link2, MessageCircle, Store } from "lucide-react";
 import { Section, SectionHeading } from "@/components/Section";
+import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/")({
   head: () => ({
-    meta: [
-      { title: "Guides — izzy | Practical help for selling online" },
-      { name: "description", content: "Short, practical guides for small businesses: sell on WhatsApp with a shop link, and turn your Instagram bio link into enquiries." },
-      { property: "og:title", content: "izzy guides — practical help for selling online" },
-      { property: "og:description", content: "Sell on WhatsApp with a shop link, and turn your Instagram bio link into enquiries." },
-    ],
+    ...seoHead({
+      title: "Guides — izzy | Practical help for selling online",
+      description: "Short, practical guides for small businesses: sell on WhatsApp with or without a website, set up your Instagram bio shop link, and create a free online catalogue.",
+      path: "/guides",
+      ogTitle: "izzy guides — practical help for selling online",
+      ogDescription: "Sell on WhatsApp, set up your Instagram bio shop link, and create a free online catalogue.",
+    }),
   }),
   component: GuidesIndex,
 });
 
-const GUIDES = [
+export const GUIDES = [
   {
     to: "/guides/sell-on-whatsapp" as const,
     icon: MessageCircle,
@@ -30,6 +32,30 @@ const GUIDES = [
     title: "Your Instagram bio link: turn followers into enquiries",
     summary:
       "Your bio gets one link. Make it a shop page that shows your products and prices and ends in a WhatsApp conversation — instead of another list of links or a “DM to order” dead end.",
+  },
+  {
+    to: "/guides/sell-on-whatsapp-without-website" as const,
+    icon: Store,
+    label: "Getting started",
+    title: "How to sell on WhatsApp without a website",
+    summary:
+      "You do not need a website to sell online. Compare the no-website options honestly, and set up a shop page that shows your products and prices and brings enquiries to your WhatsApp.",
+  },
+  {
+    to: "/guides/instagram-bio-shop-link-setup" as const,
+    icon: Link2,
+    label: "Instagram",
+    title: "How to set up a shop link for your Instagram bio",
+    summary:
+      "A step-by-step setup: create your shop page, add products and prices, connect WhatsApp, and put the link in your bio — then check it works before you tell anyone about it.",
+  },
+  {
+    to: "/guides/free-online-catalogue-india" as const,
+    icon: LayoutGrid,
+    label: "Catalogue",
+    title: "How to create a free online catalogue for your small business in India",
+    summary:
+      "What a good catalogue contains, how to photograph products with a phone, and what “free” honestly includes — prices in rupees, UPI payments, and orders on WhatsApp.",
   },
 ];
 

@@ -2,16 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PricingCards } from "@/components/PricingCards";
 import { proPriceLine } from "@/lib/billing";
+import { faqPageJsonLd, seoHead } from "@/lib/seo";
 import { useRegion } from "@/lib/useRegion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
-    meta: [
-      { title: "Pricing — izzy | Free or Pro" },
-      { name: "description", content: "Start free with 5 products and services. Go Pro (monthly): unlimited products and services, all themes, no branding, full analytics." },
-      { property: "og:title", content: "izzy pricing — Free or Pro" },
-      { property: "og:description", content: "Unlimited products and services, all themes and no branding (Pro, monthly)." },
+    ...seoHead({
+      title: "Pricing — izzy | Free or Pro",
+      description: "Start free with 5 products and services. Go Pro (monthly): unlimited products and services, all themes, no branding, full analytics.",
+      path: "/pricing",
+      ogTitle: "izzy pricing — Free or Pro",
+      ogDescription: "Unlimited products and services, all themes and no branding (Pro, monthly).",
+    }),
+    // FAQ structured data for the billing questions rendered below.
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: faqPageJsonLd(BILLING_FAQ),
+      },
     ],
   }),
   component: Pricing,
