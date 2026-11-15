@@ -9,8 +9,10 @@ import { waLink } from "@/lib/themes";
  * - Shown only when the seller has a WhatsApp number set.
  * - Generic chat link (waLink) — the product-specific prefilled message
  *   stays only inside the product details dialog (waCardLink).
- * - Green circle, white chat icon (lucide MessageCircle — not the
- *   official WhatsApp logo asset), soft shadow, bottom-right.
+ * - Green pill with a label ("Chat on WhatsApp"), white chat icon
+ *   (lucide MessageCircle — not the official WhatsApp logo asset),
+ *   soft shadow, bottom-right. The label states what the button
+ *   does — a bare circle left visitors guessing.
  * - Live pages: fixed to the viewport, z-40 so it sits BELOW the
  *   product details dialog (z-50) and never covers its buttons.
  *   Its offset respects the phone's safe area (home indicator,
@@ -38,10 +40,11 @@ export function FloatingWhatsAppButton({ whatsapp, floating }: {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-pin transition hover:scale-105 active:scale-95 ${position}`}
+      className={`flex h-14 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold text-white shadow-pin transition hover:scale-105 active:scale-95 ${position}`}
       style={style}
     >
-      <MessageCircle className="h-7 w-7" />
+      <MessageCircle className="h-6 w-6" />
+      Chat on WhatsApp
     </a>
   );
 }

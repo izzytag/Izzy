@@ -37,13 +37,14 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
       {/* Pins show the photo at its natural ratio (capped, so an
           extreme panorama or portrait can't dominate the column) —
           no stretching, and no routine cropping of faces. The
-          masonry columns absorb the varied heights. */}
-      {photos[0] && !pinImgFailed ? <img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /> : <div className="flex aspect-[4/5] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
+          masonry columns absorb the varied heights. The wrapper
+          reserves a minimum height while the photo loads, so pins
+          below don't jump down the page. */}
+      {photos[0] && !pinImgFailed ? <div className="min-h-[120px] bg-page-bg"><img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /></div> : <div className="flex aspect-[4/5] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1 p-3.5 sm:p-4">
         <h3 className="break-words text-[15px] font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-[17px] font-bold tracking-tight">{item.price}</p>}
         {item.description && <p className="line-clamp-2 break-words pt-0.5 text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
-        <p className="pt-1.5 text-sm font-medium text-page-muted">See details →</p>
       </div>
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the
@@ -66,7 +67,12 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
           {item.price && <p className="break-words text-[22px] font-bold tracking-tight">{item.price}</p>}
           {item.description && <p className="whitespace-pre-wrap break-words text-pretty text-base leading-relaxed">{item.description}</p>}
         </div>
-        <div className="flex flex-col gap-2">
+        {/* The action block sticks to the bottom of the scrolling
+            dialog, so ordering never requires scrolling past a long
+            description or photo list. It bleeds to the dialog edges
+            with a solid background and top border, and its bottom
+            padding respects the phone's safe area. */}
+        <div className="sticky bottom-0 z-10 -mx-6 flex flex-col gap-2 border-t border-border bg-background px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
           {action ?? (
             <p className="flex min-h-[52px] items-center justify-center rounded-2xl bg-muted px-4 py-3 text-center text-sm leading-relaxed text-muted-foreground">
               This shop hasn&apos;t added WhatsApp ordering yet.

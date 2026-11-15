@@ -44,7 +44,7 @@ export function ReportShopButton({ username }: { username: string }) {
         <Flag className="h-4 w-4" /> Report this shop
       </button>
       <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSent(false); }}>
-        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
+        <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Report this shop</DialogTitle>
           </DialogHeader>

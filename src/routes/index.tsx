@@ -59,11 +59,11 @@ function demoShop(name: string, username: string, bio: string, avatar: string, i
   };
 }
 
-export const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/chocolate-cake.webp", [
+export const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/priya-logo.webp", [
   ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
   ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
-  ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/chocolate-cake.webp"],
-  ["Sourdough loaf (pack of 2)", "₹349", "Two slow-fermented loaves, baked fresh every morning.", "/examples/sourdough-loaf.webp"],
+  ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/priya-cake-1kg.webp"],
+  ["Sourdough loaf (pack of 2)", "₹349", "Two slow-fermented loaves, baked fresh every morning.", "/examples/priya-sourdough-two.webp"],
 ]);
 
 export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
@@ -77,10 +77,10 @@ export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
   },
   {
     label: "Food & bakery", theme: "marigold",
-    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/chocolate-cake.webp", [
+    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/priya-logo.webp", [
       ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
       ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
-      ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/chocolate-cake.webp"],
+      ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/priya-cake-1kg.webp"],
     ]),
   },
   {
@@ -94,8 +94,10 @@ export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
 ];
 
 /** Static phone-frame mockup of a live storefront (illustration only —
-    the whole frame is non-interactive, exactly like a product photo). */
-function PhoneMockup({ data, theme, height, whatsappButton }: { data: PublicData; theme: ThemeId; height: number; whatsappButton?: boolean }) {
+    the whole frame is non-interactive, exactly like a product photo).
+    No WhatsApp button inside the frame: the mockup is a static
+    illustration, and a floating button would cover catalogue cards. */
+function PhoneMockup({ data, theme, height }: { data: PublicData; theme: ThemeId; height: number }) {
   return (
     <div className="relative mx-auto w-full max-w-[320px]">
       <div className="overflow-hidden rounded-[2.5rem] border-[10px] border-foreground bg-card shadow-soft">
@@ -103,11 +105,6 @@ function PhoneMockup({ data, theme, height, whatsappButton }: { data: PublicData
           <PublicProfile data={data} theme={theme} showBranding={false} compact />
         </div>
       </div>
-      {whatsappButton && (
-        <span aria-hidden className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-soft">
-          <MessageCircle className="h-7 w-7" />
-        </span>
-      )}
     </div>
   );
 }
@@ -188,7 +185,7 @@ function Landing() {
             <p className="mt-4 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
           </div>
           <div>
-            <PhoneMockup data={HERO_SHOP} theme="light" height={600} whatsappButton />
+            <PhoneMockup data={HERO_SHOP} theme="light" height={600} />
           </div>
         </div>
       </section>
