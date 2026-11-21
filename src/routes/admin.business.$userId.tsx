@@ -134,7 +134,7 @@ function AdminBusinessDetailPage() {
               </dd>
             </div>
             <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">Published</dt><dd className="font-medium">{p.username ? "Yes — live at the shop URL" : "No"}</dd></div>
-            <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">Products & services</dt><dd className="font-medium">{data.productCount}</dd></div>
+            <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">Products</dt><dd className="font-medium">{data.productCount}</dd></div>
             <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">Shop visits</dt><dd className="font-medium">{data.shopViews.toLocaleString("en-IN")} (all time)</dd></div>
             <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">WhatsApp clicks</dt><dd className="font-medium">{data.whatsappClicks.toLocaleString("en-IN")} (all time)</dd></div>
             <div className="flex gap-2"><dt className="w-36 shrink-0 text-muted-foreground">Theme</dt><dd className="font-medium">{p.theme}</dd></div>

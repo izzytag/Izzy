@@ -87,7 +87,7 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
     </div>
     <div className="space-y-1.5">
       <Label htmlFor={`${uid}-description`}>Description</Label>
-      <Textarea id={`${uid}-description`} value={description} onChange={(e) => onDescription(e.target.value)} placeholder="Full details: sizes, materials, specifications, delivery, or what your service includes" maxLength={4000} rows={5} />
+      <Textarea id={`${uid}-description`} value={description} onChange={(e) => onDescription(e.target.value)} placeholder="Full details: sizes, materials, specifications, or delivery" maxLength={4000} rows={5} />
     </div>
   </div>;
 }

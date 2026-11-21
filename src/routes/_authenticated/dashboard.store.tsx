@@ -184,7 +184,7 @@ function MyShopPage() {
             <p className="mt-2 break-all text-base font-medium text-primary">{pageUrl.replace(/^https?:\/\//, "")}</p>
             <p className="mt-1 text-base text-muted-foreground">
               {liveCount > 0
-                ? `${liveCount} ${liveCount === 1 ? "product or service is" : "products and services are"} live on your shop.`
+                ? `${liveCount} ${liveCount === 1 ? "product is" : "products are"} live on your shop.`
                 : <>No products live yet — visitors will see your shop with nothing to order. <Link to="/dashboard/products" className="font-semibold text-primary underline">Add your first product</Link>.</>}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">

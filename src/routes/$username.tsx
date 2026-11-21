@@ -23,7 +23,7 @@ export const Route = createFileRoute("/$username")({
     const p = loaderData.profile;
     const name = p.display_name || p.username;
     const title = `${name} (@${p.username}) | izzy`;
-    const desc = p.bio || `Shop ${name}'s products and services — order on WhatsApp.`;
+    const desc = p.bio || `Shop ${name}'s products — order on WhatsApp.`;
     const shopUrl = `${SITE_URL}/${p.username}`;
     const meta = [
       { title },
@@ -138,7 +138,7 @@ function LiveShop({ data }: { data: LiveData }) {
   const onClick = (id: string) => trackWhatsappClick(profile.id, id);
   const onProductView = (id: string) => trackProductView(profile.id, id);
   // The main page IS the storefront: the loader returns the enabled
-  // products and services, and PublicProfile renders them as the
+  // products, and PublicProfile renders them as the
   // catalogue under the store header.
   return (
     <PublicProfile

@@ -33,7 +33,6 @@ export const DEMO_SHOP: PublicData = {
     { id: "demo-1", title: "Sourdough loaf", url: "#", kind: "product", price: "₹199", description: "Slow-fermented, crusty and fresh every morning.", image_urls: ["/examples/sourdough-loaf.webp"], category: null },
     { id: "demo-2", title: "Chocolate cake (1 kg)", url: "#", kind: "product", price: "₹899", description: "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", image_urls: ["/examples/priya-cake-1kg.webp"], category: null },
     { id: "demo-3", title: "Sourdough loaf (pack of 2)", url: "#", kind: "product", price: "₹349", description: "Two slow-fermented loaves, baked fresh every morning.", image_urls: ["/examples/priya-sourdough-two.webp"], category: null },
-    { id: "demo-4", title: "Celebration cake consultation", url: "#", kind: "service", price: "₹999", description: "A one-to-one session to plan your celebration cake, from flavours to design.", image_urls: ["/examples/priya-consultation.webp"], category: null },
   ],
 };
 

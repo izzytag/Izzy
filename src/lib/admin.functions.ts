@@ -134,7 +134,7 @@ export const adminOverview = createServerFn({ method: "GET" })
       count(admin.from("profiles").select("id", { count: "exact", head: true })),
       count(admin.from("profiles").select("id", { count: "exact", head: true }).not("username", "is", null)),
       count(admin.from("profiles").select("id", { count: "exact", head: true }).eq("suspended", true)),
-      count(admin.from("links").select("id", { count: "exact", head: true }).in("kind", ["product", "service"])),
+      count(admin.from("links").select("id", { count: "exact", head: true }).eq("kind", "product")),
       count(admin.from("page_views").select("id", { count: "exact", head: true })),
       count(admin.from("link_clicks").select("id", { count: "exact", head: true }).eq("kind", "whatsapp_click")),
       admin.from("subscriptions").select("user_id, plan, status, current_period_end"),
@@ -198,8 +198,8 @@ async function forEachPage<T>(
  * server-side per day, and newly published shops derived from each
  * shop's earliest currently-live item.
  *
- * Data sources: profiles (registrations, usernames), links (product /
- * service rows — enabled = live), subscriptions (plan state),
+ * Data sources: profiles (registrations, usernames), links (product
+ * rows — enabled = live), subscriptions (plan state),
  * page_views (one row per shop visit session), link_clicks filtered
  * to kind = "whatsapp_click" (Order/Book taps — NOT orders).
  */
@@ -267,7 +267,7 @@ export const adminGrowth = createServerFn({ method: "GET" })
           admin
             .from("links")
             .select("user_id, enabled, created_at")
-            .in("kind", ["product", "service"])
+            .eq("kind", "product")
             .order("id")
             .range(from, to),
         (rows) => {
@@ -338,9 +338,9 @@ export const adminGrowth = createServerFn({ method: "GET" })
  * the business page, with the reason "Referral reward".
  *
  * "Active" uses the same definition as the seller-facing counts
- * (username claimed, WhatsApp set, at least one live product or
- * service). "First live product" is the earliest enabled
- * product/service row — the closest stored fact to when the shop
+ * (username claimed, WhatsApp set, at least one live product).
+ * "First live product" is the earliest enabled product row — the
+ * closest stored fact to when the shop
  * became active; izzy does not store an activation timestamp.
  * Pending rewards = active referrals up to the yearly cap of 6,
  * minus free months already granted this year.
@@ -397,7 +397,7 @@ export const adminListReferrals = createServerFn({ method: "GET" })
             .from("links")
             .select("user_id, created_at")
             .in("user_id", referredIds)
-            .in("kind", ["product", "service"])
+            .eq("kind", "product")
             .eq("enabled", true)
         : Promise.resolve({ data: [] as { user_id: string; created_at: string }[] }),
       admin
@@ -483,7 +483,7 @@ export const adminListBusinesses = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false })
         .limit(500),
       admin.from("subscriptions").select("user_id, plan, status, current_period_end"),
-      admin.from("links").select("user_id").in("kind", ["product", "service"]),
+      admin.from("links").select("user_id").eq("kind", "product"),
     ]);
     const productCounts = new Map<string, number>();
     for (const r of linkRows ?? []) productCounts.set(r.user_id, (productCounts.get(r.user_id) ?? 0) + 1);
@@ -526,7 +526,7 @@ export const adminGetBusiness = createServerFn({ method: "GET" })
           .from("links")
           .select("id", { count: "exact", head: true })
           .eq("user_id", data.userId)
-          .in("kind", ["product", "service"])
+          .eq("kind", "product")
           .then((r) => r.count ?? 0),
         admin
           .from("page_views")

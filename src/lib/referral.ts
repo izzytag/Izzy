@@ -14,7 +14,7 @@
  *   0010_referral_attribution.sql rejects it).
  * - A referral earns its reward only when the referred shop becomes
  *   genuinely active: username claimed, WhatsApp number set, and at
- *   least one live (enabled) product or service.
+ *   least one live (enabled) product.
  * - Reward: 1 month of Pro free per genuinely active referral, capped
  *   at 6 free months per referrer per calendar year, no cash.
  *   Fulfilment is manual admin review through the existing grant flow
@@ -167,7 +167,7 @@ export function buildReferralLink(origin: string, username: string): string {
 /**
  * Genuinely active: the shop can actually take orders — a claimed
  * shop link, a WhatsApp number for customers to reach, and at least
- * one live product or service. Mere signup earns nothing.
+ * one live product. Mere signup earns nothing.
  */
 export function isGenuinelyActive(
   profile: { username: string | null; whatsapp: string | null },

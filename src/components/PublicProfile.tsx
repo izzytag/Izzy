@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, Share2, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
+import { isCatalogueProduct } from "@/lib/catalogue";
 import { CatalogueCard } from "@/components/CatalogueCard";
 import { ReportShopButton } from "@/components/ReportShopButton";
 import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
@@ -23,8 +24,8 @@ export type PublicData = {
 /**
  * The public storefront — the only public page Izzy has. Store header
  * (logo, store name, bio), socials, an optional UPI pay block, then the
- * catalogue: every product AND service row together in one Pinterest
- * masonry, ordered by position. Link-kind rows are never shown (the
+ * catalogue: every product row together in one Pinterest masonry,
+ * ordered by position. Link-kind rows are never shown (the
  * server already excludes them; the filter here keeps dashboard
  * previews honest too, since they pass raw rows).
  */
@@ -38,7 +39,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
-  const items = data.links.filter((l) => l.kind === "product" || l.kind === "service");
+  const items = data.links.filter(isCatalogueProduct);
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
 
   // Visitor-side forwarding: the native share sheet, with the same

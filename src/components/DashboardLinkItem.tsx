@@ -12,7 +12,7 @@ import type { Tables } from "@/integrations/supabase/types";
 export type LinkRow = Tables<"links">;
 
 /**
- * Reorder a filtered subset (e.g. only the store's product/service
+ * Reorder a filtered subset (e.g. only the store's product
  * rows) inside the full row list, keeping the other rows' relative
  * order and reassigning positions across the full list. Returns null
  * when the drag target is not in the subset, so the caller can ignore
@@ -37,7 +37,7 @@ export function reorderSubset<T extends { id: string; position: number }>(
     .map((l, i) => ({ ...l, position: i }));
 }
 
-/** One editable dashboard row: a shop product or a service.
+/** One editable dashboard row: a shop product.
  *  The edit view includes the product photo editor (CatalogueEditor):
  *  photos upload to the "catalogue" bucket when picked, and Save
  *  persists the resulting URLs plus the category to the row.
@@ -52,7 +52,6 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
   hasWhatsApp?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
-  const kindLabel = link.kind === "service" ? "Service" : "Product";
   const [editing, setEditing] = useState(justCreated);
   const [title, setTitle] = useState(link.title);
   const [price, setPrice] = useState(link.price ?? "");
@@ -112,7 +111,7 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
     onDelete(link.id);
   }
 
-  const summary = `${kindLabel}${link.price ? ` · ${link.price}` : " · No price yet"}${link.image_urls?.length ? ` · ${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}` : " · No photo yet"}${hasWhatsApp ? " · WhatsApp button" : ""}`;
+  const summary = `Product${link.price ? ` · ${link.price}` : " · No price yet"}${link.image_urls?.length ? ` · ${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}` : " · No photo yet"}${hasWhatsApp ? " · WhatsApp button" : ""}`;
 
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
@@ -122,9 +121,9 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
         {editing ? (
           <div className="space-y-2">
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-            <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder={link.kind === "service" ? "Fee, e.g. ₹500 / session" : "Price, e.g. ₹499"} maxLength={30} />
+            <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price, e.g. ₹499" maxLength={30} />
             {!price.trim() && (
-              <p className="text-sm text-muted-foreground">{link.kind === "service" ? "Add a fee — services without a price get fewer bookings." : "Add a price — products without a price get fewer orders."}</p>
+              <p className="text-sm text-muted-foreground">{"Add a price — products without a price get fewer orders."}</p>
             )}
             <p className="pt-1 text-sm font-medium">Product photos</p>
             <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
@@ -142,11 +141,11 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
         )}
       </div>
       <div className="flex flex-col items-center gap-3">
-        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label={`Show ${kindLabel.toLowerCase()}`} />
+        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show product" />
         {confirmingDelete ? (
-          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="whitespace-nowrap rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold text-destructive-foreground" aria-label={`Confirm delete ${kindLabel.toLowerCase()}`}>Confirm delete?</button>
+          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="whitespace-nowrap rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold text-destructive-foreground" aria-label="Confirm delete product">Confirm delete?</button>
         ) : (
-          <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive" aria-label={`Delete ${kindLabel.toLowerCase()}`}><Trash2 className="h-4 w-4" /></button>
+          <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive" aria-label="Delete product"><Trash2 className="h-4 w-4" /></button>
         )}
       </div>
     </li>
