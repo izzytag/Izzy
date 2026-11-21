@@ -21,6 +21,18 @@ function InstagramBioShopLinkSetup() {
       title="How to set up a shop link for your Instagram bio"
       intro="Your Instagram bio holds one link. This guide walks through setting it up properly: creating the shop page behind it, putting the link in your bio, and making sure it works before you tell anyone about it. The whole setup takes a few minutes, and you can change every part of it later."
     >
+      <GuideH2>Why “DM to order” loses people</GuideH2>
+      <GuideP>
+        A follower who has to DM you just to learn a price is a follower who often doesn&apos;t. Every extra step
+        between “that looks nice” and an actual enquiry loses people: they have to wait for a reply, you have to
+        spot the message among dozens, and half the conversation is just discovering what you sell and what it
+        costs. A generic link-in-bio page does not fix this either — it sends visitors to more links. A shop page
+        is different: it <em>is</em> the destination. Your products with photos and prices, your business name
+        and story, and on every product a button that opens a WhatsApp chat with an enquiry about that item already
+        written. The follower&apos;s journey is: tap the bio link, see something they like, tap one button, talk
+        to you.
+      </GuideP>
+
       <GuideH2>Step 1 — Create your shop page</GuideH2>
       <GuideP>
         Sign up and follow the short setup: your business name, what you sell, and a line or two about your
@@ -79,11 +91,22 @@ function InstagramBioShopLinkSetup() {
         <li><strong>Reels:</strong> a reel that shows the product and its price sends ready-to-buy viewers straight to the same-priced product on your page.</li>
       </GuideList>
 
+      <GuideH2>Know what you can measure</GuideH2>
+      <GuideP>
+        Your izzy Analytics shows shop views, product views and WhatsApp taps, and — when visitors arrive from a
+        labelled link like your QR code or a campaign link — where they came from. Be clear-eyed about the boundary:
+        a WhatsApp tap means someone started an enquiry; whether they pressed send and whether it became a sale
+        happens inside your WhatsApp, where only you can see it. That&apos;s still the number that matters for
+        judging whether your bio link is working: more taps, from the same followers, means the page is doing its
+        job.
+      </GuideP>
+
       <GuideH2>Keep it working</GuideH2>
       <GuideList>
         <li>Add new products whenever you launch them — the bio link never changes, so old posts, Highlights and shared links keep working.</li>
         <li>Update prices when they change, and switch products off (instead of deleting them) when they are out of stock.</li>
         <li>After any big change, tap the bio link yourself and check the page still looks right.</li>
+        <li>Offline counts too: your dashboard includes a QR code for your shop — print it for your counter, stall, or packaging, and walk-in customers can open the same shop page on their phones and order later on WhatsApp.</li>
         <li>Check your dashboard&apos;s Analytics now and then: shop views and WhatsApp taps tell you whether the bio link is doing its job. A tap means someone started an enquiry — whether it became a sale happens in your WhatsApp, where only you can see it.</li>
       </GuideList>
     </GuideArticle>

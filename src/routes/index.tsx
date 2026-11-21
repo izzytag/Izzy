@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import {
-  BarChart3, LayoutGrid, Link2, MessageCircle, MessagesSquare, MousePointerClick,
-  PackagePlus, Palette, QrCode, Search, Store, Zap,
+  LayoutGrid, Link2, MessageCircle,
+  PackagePlus, Palette, Store,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Logo } from "@/components/Logo";
+import { SiteFooter } from "@/components/SiteFooter";
 import { PricingCards } from "@/components/PricingCards";
 import { PublicProfile, type PublicData } from "@/components/PublicProfile";
 import { Section, SectionHeading } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useLang } from "@/lib/i18n";
 import { captureReferralFromSearch } from "@/lib/referral";
 import { faqPageJsonLd, seoHead } from "@/lib/seo";
 import { useRegion } from "@/lib/useRegion";
@@ -109,12 +108,6 @@ function PhoneMockup({ data, theme, height }: { data: PublicData; theme: ThemeId
   );
 }
 
-const TRUST = [
-  { icon: Zap, t: "Simple setup" },
-  { icon: Link2, t: "Your own shop link" },
-  { icon: MessageCircle, t: "Orders through WhatsApp" },
-];
-
 const STEPS = [
   { n: "01", icon: Store, t: "Create your shop", d: "Set up your business profile in minutes." },
   { n: "02", icon: PackagePlus, t: "Add your products", d: "Upload photos, descriptions and prices." },
@@ -122,34 +115,20 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  { icon: LayoutGrid, t: "Beautiful online catalog", d: "A clean catalog with photos, descriptions and prices — no website building, no code." },
+  { icon: LayoutGrid, t: "Beautiful online catalog", d: "A clean catalog with photos, descriptions and prices — add, edit, reorder or draft products anytime from your dashboard, and changes go live instantly. No website building, no code." },
   { icon: MessageCircle, t: "Direct WhatsApp ordering", d: "Customers tap Order on a product and reach you on WhatsApp with the product already in the message." },
-  { icon: PackagePlus, t: "Easy product management", d: "Add, edit, reorder or draft products anytime from your dashboard — changes go live instantly." },
-  { icon: Link2, t: "Shareable shop link", d: "One link — izzytag.shop/yourname — for your Instagram bio, stories, status and everywhere else." },
-  { icon: QrCode, t: "QR code sharing", d: "Put your shop's QR code on your counter, packaging or posters; customers scan and land in your shop." },
+  { icon: Link2, t: "One link and a QR code", d: "One link — izzytag.shop/yourname — for your Instagram bio, stories, status and everywhere else, plus a QR code for your counter, packaging or posters." },
   { icon: Palette, t: "Shop customization", d: "Eight themes, your logo, your bio — a shop that looks like your business, not a template." },
-  { icon: BarChart3, t: "Basic analytics", d: "See how many people visit your shop and which products they tap." },
-];
-
-const WA_STEPS = [
-  { icon: Search, t: "Customer discovers a product", d: "They open your link and browse your catalog." },
-  { icon: MousePointerClick, t: "They tap Order", d: "Every product carries its own WhatsApp order button." },
-  { icon: MessageCircle, t: "WhatsApp opens, message ready", d: "The product name and link are already written for them." },
-  { icon: MessagesSquare, t: "You take it from there", d: "Chat, confirm, and arrange payment and delivery directly." },
 ];
 
 const FAQS = [
   { q: "What is izzy?", a: "izzy is a simple way for small businesses, creators, resellers and local shops to sell online. You create a shop page with your products and prices, share one link, and customers order through WhatsApp. No website, no technical skills needed." },
   { q: "How do I create my online shop?", a: "Sign up free, pick your shop name (your link becomes izzytag.shop/yourname), add your business name and logo, then add products with photos and prices. Most shops are ready to share in a few minutes." },
-  { q: "Can customers order through WhatsApp?", a: "Yes — that's how ordering works on izzy. A customer taps Order on any product and WhatsApp opens with a prefilled message about that product, sent straight to your number." },
-  { q: "Do I need technical knowledge?", a: "None at all. If you can post on Instagram and chat on WhatsApp, you can run an izzy shop. Everything is forms and buttons — no code, no setup help needed." },
-  { q: "Can I share my shop on Instagram?", a: "Yes. Your shop link is made for your Instagram bio, and you can also share it in stories, posts and WhatsApp status — or print your shop's QR code for your counter and packaging." },
   { q: "Does izzy process payments?", a: "No. izzy never touches the money for your orders: customers pay you directly — UPI, cash, bank transfer, whatever you both agree on WhatsApp. (If you choose an izzy Pro subscription, that subscription is billed separately.)" },
   { q: "Can I edit my products later?", a: "Anytime. From your dashboard you can change prices, photos and descriptions, hide a product, or prepare new products as drafts and switch them on when you're ready. Changes appear on your shop straight away." },
 ];
 
-function Landing() {
-  const { t } = useLang();
+export function Landing() {
   const region = useRegion();
   // Referral capture: arriving via ?ref=<username> stores a first-touch
   // capture (username + timestamp) in localStorage. Attribution itself
@@ -172,11 +151,11 @@ function Landing() {
             <span className="inline-flex items-center rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
               For small businesses, creators &amp; local shops
             </span>
-            <h1 className="mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">{t.tagline}</h1>
-            <p className="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">{t.sub}</p>
+            <h1 className="mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
+            <p className="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">Create your own online shop, showcase your products and get orders directly on WhatsApp.</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild size="lg" className="min-h-[52px] text-base">
-                <Link to="/auth">{t.createFree}</Link>
+                <Link to="/auth">Create your free shop</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="min-h-[52px] text-base">
                 <a href="#examples">See shop designs</a>
@@ -187,17 +166,6 @@ function Landing() {
           <div>
             <PhoneMockup data={HERO_SHOP} theme="light" height={600} />
           </div>
-        </div>
-      </section>
-
-      {/* ---------- Trust strip ---------- */}
-      <section className="border-y border-border bg-card">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 py-8 sm:flex-row sm:gap-12 sm:px-6 lg:px-8">
-          {TRUST.map((item) => (
-            <span key={item.t} className="flex items-center gap-2.5 text-base font-semibold">
-              <item.icon className="h-5 w-5 text-primary" /> {item.t}
-            </span>
-          ))}
         </div>
       </section>
 
@@ -247,7 +215,7 @@ function Landing() {
       {/* ---------- Features ---------- */}
       <Section id="features">
         <SectionHeading title="Everything you need to showcase your products." />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {FEATURES.map((f) => (
             <div key={f.t} className="rounded-xl border border-border bg-card p-7">
               <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
@@ -264,19 +232,7 @@ function Landing() {
       <Section className="bg-card">
         <SectionHeading
           title="Your customers are already on WhatsApp. Meet them there."
-          sub="No new app for your customers to learn, and no inbox for you to check — the order lands in the WhatsApp you already use."
         />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {WA_STEPS.map((s, i) => (
-            <div key={s.t} className="rounded-xl border border-border bg-background p-6">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-whatsapp/10 text-whatsapp">
-                <s.icon className="h-5 w-5" />
-              </span>
-              <h3 className="mt-4 text-lg font-semibold">{i + 1}. {s.t}</h3>
-              <p className="mt-1.5 leading-relaxed text-muted-foreground">{s.d}</p>
-            </div>
-          ))}
-        </div>
         <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="WhatsApp conversation">
           <div className="flex items-center gap-3 border-b border-border pb-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">P</span>
@@ -333,44 +289,12 @@ function Landing() {
           <h2 className="mx-auto max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Your products deserve their own space.</h2>
           <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-primary-foreground/85">Create your shop and start sharing your products with the world.</p>
           <Button asChild size="lg" className="mt-9 min-h-[52px] bg-white text-primary hover:bg-white/90">
-            <Link to="/auth">{t.createFree}</Link>
+            <Link to="/auth">Create your free shop</Link>
           </Button>
         </div>
       </Section>
 
-      {/* ---------- Footer ---------- */}
-      <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
-            <div>
-              <Logo />
-              <p className="mt-3 max-w-xs leading-relaxed text-muted-foreground">Your business. Your products. One shop link.</p>
-            </div>
-            <nav aria-label="Product">
-              <h3 className="text-base font-semibold">Product</h3>
-              <ul className="mt-3 space-y-2.5 text-muted-foreground">
-                <li><Link to="/" hash="features" className="transition-colors duration-200 hover:text-foreground">Features</Link></li>
-                <li><Link to="/" hash="how-it-works" className="transition-colors duration-200 hover:text-foreground">How it works</Link></li>
-                <li><Link to="/" hash="examples" className="transition-colors duration-200 hover:text-foreground">Shop designs</Link></li>
-                <li><Link to="/pricing" className="transition-colors duration-200 hover:text-foreground">Pricing</Link></li>
-                <li><Link to="/guides" className="transition-colors duration-200 hover:text-foreground">Guides</Link></li>
-              </ul>
-            </nav>
-            <nav aria-label="Support and legal">
-              <h3 className="text-base font-semibold">Support &amp; legal</h3>
-              <ul className="mt-3 space-y-2.5 text-muted-foreground">
-                <li><Link to="/contact" className="transition-colors duration-200 hover:text-foreground">Contact</Link></li>
-                <li><Link to="/privacy" className="transition-colors duration-200 hover:text-foreground">Privacy</Link></li>
-                <li><Link to="/terms" className="transition-colors duration-200 hover:text-foreground">Terms</Link></li>
-              </ul>
-            </nav>
-          </div>
-          <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
-            <p>© {new Date().getFullYear()} izzy</p>
-            <p>Your business. Your products. One shop link.</p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

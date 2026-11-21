@@ -13,7 +13,6 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { LangProvider } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -101,10 +100,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LangProvider>
-        <Outlet />
-        <Toaster position="top-center" />
-      </LangProvider>
+      <Outlet />
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
