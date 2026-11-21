@@ -159,29 +159,29 @@ function MyShopPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">My Shop</h1>
-            <p className="mt-1 text-base text-muted-foreground">Your business details, shown at the top of your shop page.</p>
+            <h1 className="text-xl font-semibold">My Shop</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Your business details, shown at the top of your shop page.</p>
           </div>
 
           {TESTING_FREE && (
-            <p className="rounded-xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
+            <p className="border p-4 text-base font-medium">{testingBanner(region)}</p>
           )}
 
           {/* Shop link + publishing status */}
-          <section className="rounded-xl border bg-card p-5 sm:p-6">
+          <section className="border-b pb-8">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold">Your shop link</h2>
+              <h2 className="text-lg font-semibold">Your shop link</h2>
               {liveCount === 0 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
-                  <span className="h-2 w-2 rounded-full bg-primary" /> Live
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-foreground" /> Live
                 </span>
               )}
             </div>
-            <p className="mt-2 break-all text-base font-medium text-primary">{pageUrl.replace(/^https?:\/\//, "")}</p>
+            <p className="mt-2 break-all text-base font-medium text-foreground">{pageUrl.replace(/^https?:\/\//, "")}</p>
             <p className="mt-1 text-base text-muted-foreground">
               {liveCount > 0
                 ? `${liveCount} ${liveCount === 1 ? "product or service is" : "products and services are"} live on your shop.`
@@ -197,8 +197,8 @@ function MyShopPage() {
           </section>
 
           {/* Business details */}
-          <section className="rounded-xl border bg-card p-5 sm:p-6">
-            <h2 className="text-xl font-bold">Business details</h2>
+          <section className="border-b pb-8">
+            <h2 className="text-lg font-semibold">Business details</h2>
             <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row">
               <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload shop logo">
                 {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
@@ -232,11 +232,11 @@ function MyShopPage() {
                   {whatsappError && <p className="text-sm font-medium text-destructive">{whatsappError}</p>}
                 </div>
                 {enquiryText && (
-                  <div className="rounded-xl bg-muted p-4">
+                  <div className="border p-4">
                     <p className="flex items-center gap-2 text-sm font-semibold">
                       <MessageCircle className="h-4 w-4 text-primary" /> Example — what a customer sends you
                     </p>
-                    <p className="mt-2 rounded-lg rounded-tl-none bg-card p-3 text-sm leading-relaxed shadow-sm">{enquiryText}</p>
+                    <p className="mt-2 rounded rounded-tl-none border p-3 text-sm leading-relaxed">{enquiryText}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       This is the message WhatsApp opens with when a customer taps Order on a product (shown
                       here for a “Sample product” at ₹499), addressed to the number above. The customer can

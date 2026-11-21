@@ -88,15 +88,15 @@ function UpgradePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">Plan &amp; billing</h1>
+        <h1 className="text-xl font-semibold">Plan &amp; billing</h1>
         <p className="mt-1 text-muted-foreground">
           {proPriceLine(region)}, cancel anytime. {isRow ? "Stripe checkout coming soon." : "Card, UPI, or netbanking at checkout."}
         </p>
       </div>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
+      <section className="border-b pb-8">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-xl font-bold">Your plan</h2>
+          <h2 className="text-lg font-semibold">Your plan</h2>
           {state.kind === "free" ? (
             <Badge variant="secondary">Free</Badge>
           ) : (
@@ -130,7 +130,7 @@ function UpgradePage() {
               <p>Your subscription renews automatically each month until you cancel.</p>
             )}
             {cancelScheduled ? (
-              <p className="rounded-xl bg-primary-soft p-3 font-medium text-accent-foreground">
+              <p className="border p-3 font-medium">
                 Cancellation scheduled. Pro stays active until{" "}
                 {cancelScheduled.periodEnd ? fmtDate(cancelScheduled.periodEnd) : "the end of your paid period"},
                 then your shop moves to Free. Nothing is deleted, and Razorpay won&apos;t charge you again.
@@ -198,8 +198,8 @@ function UpgradePage() {
       <ReferralCard username={acc.profile.username} />
 
       {state.kind !== "free" && (
-        <section className="rounded-xl border bg-card p-5 sm:p-6">
-          <h2 className="text-xl font-bold">What happens when Pro ends</h2>
+        <section className="border-b pb-8">
+          <h2 className="text-lg font-semibold">What happens when Pro ends</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
             <li>Your products, services and shop stay exactly as they are — <span className="font-medium text-foreground">nothing is ever deleted</span>.</li>
             <li>If you have more than 5 products &amp; services, they all stay live — you just can&apos;t add new ones until you&apos;re under the Free limit or back on Pro.</li>
@@ -209,8 +209,8 @@ function UpgradePage() {
         </section>
       )}
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-xl font-bold">Billing history</h2>
+      <section className="border-b pb-8">
+        <h2 className="text-lg font-semibold">Billing history</h2>
         {sub?.plan === "pro" ? (
           <>
             <dl className="mt-4 space-y-3">
@@ -252,17 +252,17 @@ function UpgradePage() {
       </section>
 
       {isRow && !acc.isPro && (
-        <p className="rounded-xl border p-3 text-base text-muted-foreground">Stripe checkout coming soon — Pro is $1/month. Razorpay checkout is for India only.</p>
+        <p className="border p-3 text-base text-muted-foreground">Stripe checkout coming soon — Pro is $1/month. Razorpay checkout is for India only.</p>
       )}
       <div>
         <PricingCards
           region={region}
-          freeCta={<Button variant="outline" disabled className="min-h-[52px] w-full rounded-xl text-base">{acc.isPro ? "Free plan" : "Current plan"}</Button>}
+          freeCta={<Button variant="outline" disabled className="min-h-[52px] w-full text-base">{acc.isPro ? "Free plan" : "Current plan"}</Button>}
           proCta={acc.isPro
-            ? <Button disabled className="min-h-[52px] w-full rounded-xl text-base">Current plan</Button>
+            ? <Button disabled className="min-h-[52px] w-full text-base">Current plan</Button>
             : isRow
-              ? <Button disabled className="min-h-[52px] w-full rounded-xl text-lg">Stripe checkout coming soon</Button>
-              : <Button onClick={() => void startProSubscription({ region, email: acc.user.email ?? null, onSuccess: () => void qc.invalidateQueries({ queryKey: ["account"] }) })} className="min-h-[52px] w-full rounded-xl text-lg">Upgrade ({proPriceLine(region)})</Button>}
+              ? <Button disabled className="min-h-[52px] w-full text-base">Stripe checkout coming soon</Button>
+              : <Button onClick={() => void startProSubscription({ region, email: acc.user.email ?? null, onSuccess: () => void qc.invalidateQueries({ queryKey: ["account"] }) })} className="min-h-[52px] w-full text-base">Upgrade ({proPriceLine(region)})</Button>}
         />
       </div>
     </div>

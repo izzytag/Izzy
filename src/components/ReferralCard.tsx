@@ -57,43 +57,31 @@ export function ReferralCard({ username }: { username: string | null }) {
   const showCounts = stats?.available === true;
 
   return (
-    <section className="rounded-xl border bg-card p-5 sm:p-6">
-      <h2 className="text-xl font-bold">Invite sellers, earn free Pro</h2>
-      <p className="mt-1 max-w-2xl text-base leading-relaxed text-muted-foreground">
+    <div>
+      <h3 className="text-base font-semibold">Invite sellers, earn free Pro</h3>
+      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         Share your referral link. When a referred shop becomes active — shop link claimed, WhatsApp
         number set, and at least one live product — you receive one month of Pro at no cost. The
         annual limit is six months.
       </p>
 
-      <div className="mt-4">
-        <p className="text-sm font-medium text-muted-foreground">Your referral link</p>
-        <p className="mt-1 break-all text-base font-medium text-primary">{link.replace(/^https?:\/\//, "")}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button variant="outline" onClick={copyLink} className="min-h-[44px]">
-            <Copy className="h-4 w-4" /> Copy link
-          </Button>
-          <Button onClick={shareLink} className="min-h-[44px]">
-            <Share2 className="h-4 w-4" /> Share
-          </Button>
-        </div>
+      <p className="mt-3 break-all text-sm font-medium text-foreground">{link.replace(/^https?:\/\//, "")}</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button variant="outline" onClick={copyLink} className="min-h-[44px]">
+          <Copy className="h-4 w-4" /> Copy link
+        </Button>
+        <Button onClick={shareLink} className="min-h-[44px]">
+          <Share2 className="h-4 w-4" /> Share
+        </Button>
       </div>
 
       {showCounts && (
-        <div className="mt-5 grid grid-cols-3 gap-3 border-t pt-5">
-          <div>
-            <p className="font-display text-2xl font-bold sm:text-3xl">{stats.signups}</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Shops signed up</p>
-          </div>
-          <div>
-            <p className="font-display text-2xl font-bold sm:text-3xl">{stats.active}</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Active shops</p>
-          </div>
-          <div>
-            <p className="font-display text-2xl font-bold sm:text-3xl">{stats.freeMonthsEarned}</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Free months earned</p>
-          </div>
-        </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{stats.signups}</span> signed up ·{" "}
+          <span className="font-medium text-foreground">{stats.active}</span> active ·{" "}
+          <span className="font-medium text-foreground">{stats.freeMonthsEarned}</span> free months earned
+        </p>
       )}
-    </section>
+    </div>
   );
 }

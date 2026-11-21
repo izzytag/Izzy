@@ -111,31 +111,31 @@ function ProductsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">Products</h1>
-        <p className="mt-1 text-base text-muted-foreground">
+        <h1 className="text-xl font-semibold">Products</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Everything you add appears on your shop page. {acc.isPro ? `${itemCount} items.` : `${itemCount} of ${FREE_LINK_LIMIT} free items used.`}
         </p>
       </div>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
+      <section>
         <div className="grid grid-cols-2 gap-2">
           <Button variant="outline" onClick={() => addItem("product")} className="min-h-[48px] text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
           <Button variant="outline" onClick={() => addItem("service")} className="min-h-[48px] text-base"><Briefcase className="h-4 w-4" /> Service</Button>
         </div>
         {!p.whatsapp && storeRows.some((l) => l.enabled) && (
-          <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
+          <p className="mt-3 border p-3 text-sm">
             Add your WhatsApp number in <Link to="/dashboard/store" className="font-semibold underline">My Shop</Link>, so visitors can order or book on WhatsApp.
           </p>
         )}
         {!canAddLink(itemCount, acc.isPro) && (
-          <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
+          <p className="mt-3 border p-3 text-sm">
             You've used all {FREE_LINK_LIMIT} free items. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro ({proPriceLine(region)})</Link> for unlimited items.
           </p>
         )}
         {storeRows.length > 0 && liveCount === 0 && (
-          <div className="mt-3 rounded-xl border-2 border-primary/30 bg-primary-soft p-4" role="status">
-            <p className="font-semibold text-accent-foreground">Your shop is not published yet</p>
-            <p className="mt-1 text-sm leading-relaxed text-accent-foreground/80">
+          <div className="mt-3 border p-4" role="status">
+            <p className="font-semibold">Your shop is not published yet</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               All items below are drafts, and visitors see an empty shop. Switch on your first item to publish it.
             </p>
             <Button

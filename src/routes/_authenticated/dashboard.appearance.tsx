@@ -51,8 +51,8 @@ function AppearancePage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
-        <section className="rounded-3xl border bg-card p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Theme</h2>
+        <section className="border-b pb-8">
+          <h2 className="text-lg font-semibold">Theme</h2>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {THEMES.map((t) => {
               const locked = !t.free && !pro;
@@ -76,8 +76,8 @@ function AppearancePage() {
             : !pro && <p className="mt-3 text-sm text-muted-foreground">Light and Dark are free. <Link to="/dashboard/upgrade" className="font-semibold text-primary">Unlock 6 more with Pro</Link>.</p>}
         </section>
 
-        <section className="space-y-4 rounded-3xl border bg-card p-5 sm:p-6">
-          <h2 className="text-xl font-bold">WhatsApp & UPI</h2>
+        <section className="space-y-4 border-b pb-8">
+          <h2 className="text-lg font-semibold">WhatsApp & UPI</h2>
           <div className="space-y-1.5"><Label>WhatsApp number</Label><Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="98765 43210" inputMode="tel" /></div>
           <div className="space-y-1.5">
             <Label>UPI ID</Label>
@@ -86,8 +86,8 @@ function AppearancePage() {
           </div>
         </section>
 
-        <section className="space-y-4 rounded-3xl border bg-card p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Social links</h2>
+        <section className="space-y-4 border-b pb-8">
+          <h2 className="text-lg font-semibold">Social links</h2>
           {SOCIALS.filter((s) => s.key !== "whatsapp").map((s) => (
             <div key={s.key} className="space-y-1.5">
               <Label>{s.label}</Label>
@@ -96,7 +96,7 @@ function AppearancePage() {
             </div>
           ))}
         </section>
-        <Button onClick={save} className="min-h-[52px] w-full rounded-xl text-lg">Save changes</Button>
+        <Button onClick={save} className="min-h-[52px] w-full text-base">Save changes</Button>
       </div>
       <aside className="lg:sticky lg:top-32 lg:self-start">
         <PhonePreview data={preview} theme={theme} showBranding={!pro} />

@@ -148,16 +148,16 @@ function QrPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">QR Code</h1>
-        <p className="mt-1 text-base text-muted-foreground">Take your shop offline — counters, packaging, flyers, market stalls.</p>
+        <h1 className="text-xl font-semibold">QR Code</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Take your shop offline — counters, packaging, flyers, market stalls.</p>
       </div>
 
-      <section className="rounded-xl border bg-card p-5 text-center sm:p-8">
-        <h2 className="text-xl font-bold">Take your shop offline.</h2>
+      <section className="border-b pb-8 text-center">
+        <h2 className="text-lg font-semibold">Take your shop offline.</h2>
         <p className="mx-auto mt-1 max-w-md text-base text-muted-foreground">
           Let customers scan your QR code and explore your products instantly.
         </p>
-        <div className="mx-auto mt-6 w-fit rounded-2xl border bg-white p-4">
+        <div className="mx-auto mt-6 w-fit rounded border bg-white p-4">
           <canvas ref={canvasRef} className="h-60 w-60" role="img" aria-label={`QR code linking to ${shopUrl}`} />
         </div>
         <p className="mt-4 text-lg font-bold">{businessName}</p>
@@ -185,8 +185,8 @@ function QrPage() {
         </p>
       </section>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-xl font-bold">Labelled share links</h2>
+      <section className="border-t pt-8">
+        <h2 className="text-lg font-semibold">Labelled share links</h2>
         <p className="mt-1 text-base leading-relaxed text-muted-foreground">
           Use a labelled link in each place you share your shop. Visits from these links are grouped under
           that source in Analytics — the links all open the same shop.
@@ -213,7 +213,7 @@ function QrPage() {
             </div>
           )}
           <div className="flex flex-wrap items-center gap-2">
-            <p className="min-w-0 flex-1 break-all rounded-lg bg-muted px-3 py-2.5 text-sm font-medium">{campaignUrl}</p>
+            <p className="min-w-0 flex-1 break-all rounded border px-3 py-2.5 text-sm font-medium">{campaignUrl}</p>
             <Button variant="outline" onClick={() => copyText(campaignUrl, "Labelled link copied")} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy</Button>
           </div>
         </div>

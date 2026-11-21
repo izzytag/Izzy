@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  ArrowRight, BarChart3, Check, Copy, Eye, Package, Palette, QrCode, Share2, Store, TrendingUp,
+  ArrowRight, Check, Copy, Eye, Package, Palette, QrCode, Share2, Store,
 } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { statsQuery } from "@/lib/stats";
@@ -37,7 +37,7 @@ function greeting(): string {
   return "Good evening";
 }
 
-function OverviewPage() {
+export function OverviewPage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id, acc.isPro));
@@ -130,34 +130,34 @@ function OverviewPage() {
   const needsVisitors = setupDone && liveCount >= 1 && viewsLast7 === 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* ---------- Welcome ---------- */}
       <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">{greeting()}, {businessName}</h1>
-        <p className="mt-1 text-base text-muted-foreground">Here's what's happening with your business.</p>
+        <h1 className="text-xl font-semibold">{greeting()}, {businessName}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Here's what's happening with your business.</p>
       </div>
 
       {/* ---------- Shop status ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
+      <section className="border-b pb-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="truncate text-xl font-bold">{p.display_name || p.username}</h2>
+              <h2 className="truncate text-lg font-semibold">{p.display_name || p.username}</h2>
               {p.suspended ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-sm font-semibold text-destructive">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-destructive">
                   <span className="h-2 w-2 rounded-full bg-destructive" /> Suspended
                 </span>
               ) : liveCount === 0 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
-                  <span className="h-2 w-2 rounded-full bg-primary" /> Live
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-foreground" /> Live
                 </span>
               )}
             </div>
-            <p className="mt-1 break-all text-base font-medium text-primary">{shopUrlDisplay}</p>
+            <p className="mt-1 break-all text-base font-medium text-foreground">{shopUrlDisplay}</p>
             {liveCount === 0 && (
               <p className="mt-2 text-base text-muted-foreground">
                 No products live yet — <Link to="/dashboard/products" className="font-semibold text-primary underline">add your first product</Link> and it will appear on your shop.
@@ -175,49 +175,61 @@ function OverviewPage() {
         </div>
       </section>
 
-      {/* ---------- Referrals ---------- */}
-      <ReferralCard username={p.username} />
-
       {/* ---------- Quick actions ---------- */}
       <section>
-        <h2 className="text-lg font-bold">Quick actions</h2>
-        <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-5">
-          <Link to="/dashboard/products" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Package className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Add a product</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Photo, price, done</p>
+        <h2 className="text-base font-semibold">Quick actions</h2>
+        <div className="mt-2 divide-y border-y">
+          <Link to="/dashboard/products" className="flex items-center gap-3 py-3">
+            <Package className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">Add a product</span>
+              <span className="block text-sm text-muted-foreground">Photo, price, done</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
-          <Link to="/dashboard/store" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Store className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Edit shop details</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Name, logo, WhatsApp</p>
+          <Link to="/dashboard/store" className="flex items-center gap-3 py-3">
+            <Store className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">Edit shop details</span>
+              <span className="block text-sm text-muted-foreground">Name, logo, WhatsApp</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
-          <Link to="/dashboard/appearance" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Palette className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Customize appearance</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Theme and socials</p>
+          <Link to="/dashboard/appearance" className="flex items-center gap-3 py-3">
+            <Palette className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">Customize appearance</span>
+              <span className="block text-sm text-muted-foreground">Theme and socials</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
-          <button type="button" onClick={shareLink} className="rounded-xl border bg-card p-4 text-left transition hover:border-primary/40">
-            <Share2 className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Share shop link</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Put it in your bio</p>
+          <button type="button" onClick={shareLink} className="flex w-full items-center gap-3 py-3 text-left">
+            <Share2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">Share shop link</span>
+              <span className="block text-sm text-muted-foreground">Put it in your bio</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </button>
-          <Link to="/dashboard/qr" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <QrCode className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Shop QR code</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Print it for your counter</p>
+          <Link to="/dashboard/qr" className="flex items-center gap-3 py-3">
+            <QrCode className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">Shop QR code</span>
+              <span className="block text-sm text-muted-foreground">Print it for your counter</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
         </div>
       </section>
 
       {/* ---------- Your next step ---------- */}
       {nextStep ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+        <section className="border-t pt-8">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Your next step · {nextStepNumber} of {checklist.length}
           </p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">{nextStep.label}</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+          <h2 className="mt-1 text-lg font-semibold">{nextStep.label}</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-muted-foreground">
             {nextStep.hint} — finish your setup one step at a time, and your shop is ready to share.
           </p>
           <Button asChild className="mt-4 min-h-[44px]">
@@ -225,10 +237,10 @@ function OverviewPage() {
           </Button>
         </section>
       ) : needsVisitors ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+        <section className="border-t pt-8">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Your next step</p>
+          <h2 className="mt-1 text-lg font-semibold">Your shop is ready — now it needs visitors</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-muted-foreground">
             You have {liveCount} {liveCount === 1 ? "product or service" : "products and services"} live, but nobody has
             visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
             WhatsApp status, or a printed QR code.
@@ -242,10 +254,10 @@ function OverviewPage() {
           </div>
         </section>
       ) : (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+        <section className="border-t pt-8">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Your next step</p>
+          <h2 className="mt-1 text-lg font-semibold">Share your shop link</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-muted-foreground">
             Your setup is complete. Put your link where customers already are — Instagram bio, WhatsApp status,
             or a printed QR code on your counter.
           </p>
@@ -258,23 +270,23 @@ function OverviewPage() {
 
       {/* ---------- Setup checklist ---------- */}
       {setupDone ? (
-        <section className="flex flex-wrap items-center gap-3 rounded-xl border bg-primary-soft p-4 sm:p-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-5 w-5" /></span>
+        <section className="flex flex-wrap items-center gap-3 border-t pt-8">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background"><Check className="h-4 w-4" /></span>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-accent-foreground">Setup complete</p>
-            <p className="text-sm text-accent-foreground/80">Your shop is ready — keep sharing your link so customers find it.</p>
+            <p className="font-medium">Setup complete</p>
+            <p className="text-sm text-muted-foreground">Your shop is ready — keep sharing your link so customers find it.</p>
           </div>
           <Button size="sm" onClick={shareLink} className="min-h-[40px]"><Share2 className="h-4 w-4" /> Share</Button>
         </section>
       ) : (
-        <section className="rounded-xl border bg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold">Finish setting up your shop</h2>
-          <p className="mt-1 text-base text-muted-foreground">A few steps and you're ready to take orders.</p>
-          <ul className="mt-4 divide-y">
+        <section className="border-t pt-8">
+          <h2 className="text-base font-semibold">Finish setting up your shop</h2>
+          <p className="mt-1 text-sm text-muted-foreground">A few steps and you're ready to take orders.</p>
+          <ul className="mt-4 divide-y border-y">
             {checklist.map((c) => (
               <li key={c.label}>
                 <Link to={c.to} className="flex min-h-[56px] items-center gap-3 py-2">
-                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${c.done ? "bg-primary text-primary-foreground" : "border-2 border-border bg-card"}`}>
+                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${c.done ? "bg-foreground text-background" : "border border-input bg-background"}`}>
                     {c.done && <Check className="h-4 w-4" />}
                   </span>
                   <span className="min-w-0 flex-1">
@@ -287,7 +299,7 @@ function OverviewPage() {
             ))}
             <li>
               <a href={`/${p.username}`} target="_blank" rel="noreferrer" className="flex min-h-[56px] items-center gap-3 py-2">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Eye className="h-4 w-4 text-muted-foreground" /></span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-input bg-background"><Eye className="h-4 w-4 text-muted-foreground" /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">Preview your shop</span>
                   <span className="block text-sm text-muted-foreground">See exactly what customers see</span>
@@ -300,7 +312,7 @@ function OverviewPage() {
             {liveCount > 0 && (
               <li>
                 <button type="button" onClick={shareLink} className="flex min-h-[56px] w-full items-center gap-3 py-2 text-left">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Share2 className="h-4 w-4 text-muted-foreground" /></span>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-input bg-background"><Share2 className="h-4 w-4 text-muted-foreground" /></span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-medium">Share your shop link</span>
                     <span className="block text-sm text-muted-foreground">Instagram bio, WhatsApp status, anywhere</span>
@@ -314,24 +326,24 @@ function OverviewPage() {
       )}
 
       {/* ---------- Performance ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
+      <section className="border-t pt-8">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-lg font-bold"><TrendingUp className="h-5 w-5 text-primary" /> Shop performance</h2>
-          <Link to="/dashboard/analytics" className="flex items-center gap-1 text-sm font-semibold text-primary">Analytics <ArrowRight className="h-4 w-4" /></Link>
+          <h2 className="text-base font-semibold">Shop performance</h2>
+          <Link to="/dashboard/analytics" className="flex items-center gap-1 text-sm font-medium text-muted-foreground">Analytics <ArrowRight className="h-4 w-4" /></Link>
         </div>
         {hasActivity ? (
           <>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-muted p-4">
+            <div className="mt-4 grid grid-cols-2 gap-6">
+              <div>
                 <p className="text-sm text-muted-foreground">Shop views · last {days} days</p>
-                <p className="mt-1 font-display text-3xl font-bold">{viewsInWindow}</p>
+                <p className="mt-1 text-2xl font-semibold">{viewsInWindow}</p>
               </div>
-              <div className="rounded-xl bg-muted p-4">
+              <div>
                 <p className="text-sm text-muted-foreground">Product taps · last {days} days</p>
-                <p className="mt-1 font-display text-3xl font-bold">{tapsInWindow}</p>
+                <p className="mt-1 text-2xl font-semibold">{tapsInWindow}</p>
               </div>
             </div>
-            <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground"><BarChart3 className="h-4 w-4" /> {stats.totalViews} total views since you opened your shop.</p>
+            <p className="mt-3 text-sm text-muted-foreground">{stats.totalViews} total views since you opened your shop.</p>
           </>
         ) : (
           <div className="mt-3">
@@ -350,14 +362,22 @@ function OverviewPage() {
       </section>
 
       {/* ---------- Recent activity ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-lg font-bold">Recent activity</h2>
+      <section className="border-t pt-8">
+        <h2 className="text-base font-semibold">Recent activity</h2>
         <p className="mt-2 text-base leading-relaxed text-muted-foreground">
           Nothing here yet. When customers view your shop and tap your products, you'll see the numbers in Analytics.
         </p>
         <Button variant="outline" asChild className="mt-4 min-h-[44px]">
           <Link to="/dashboard/products"><Package className="h-4 w-4" /> Add a product</Link>
         </Button>
+      </section>
+
+      {/* ---------- More ---------- */}
+      <section className="border-t pt-8">
+        <h2 className="text-base font-semibold">More</h2>
+        <div className="mt-2">
+          <ReferralCard username={p.username} />
+        </div>
       </section>
     </div>
   );

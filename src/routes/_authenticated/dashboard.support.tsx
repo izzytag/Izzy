@@ -113,15 +113,15 @@ function SupportPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold">Help &amp; support</h1>
+        <h1 className="text-xl font-semibold">Help &amp; support</h1>
         <p className="mt-1 max-w-2xl text-base leading-relaxed text-muted-foreground">
           Quick answers first — and if you're still stuck, send us a message. We reply by email to{" "}
           <span className="font-medium text-foreground">{acc.user.email}</span>.
         </p>
       </div>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-xl font-bold">Common questions</h2>
+      <section className="border-b pb-8">
+        <h2 className="text-lg font-semibold">Common questions</h2>
         <Accordion type="single" collapsible className="mt-2">
           {FAQS.map((f) => (
             <AccordionItem key={f.q} value={f.q}>
@@ -132,10 +132,10 @@ function SupportPage() {
         </Accordion>
       </section>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-xl font-bold">Contact support</h2>
+      <section className="border-b pb-8">
+        <h2 className="text-lg font-semibold">Contact support</h2>
         {sent ? (
-          <div className="mt-4 flex flex-col items-center gap-2 rounded-xl bg-muted p-6 text-center">
+          <div className="mt-4 flex flex-col items-center gap-2 border p-6 text-center">
             <CheckCircle2 className="h-10 w-10 text-primary" />
             <p className="text-lg font-semibold">Message sent</p>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground">
@@ -196,14 +196,14 @@ function SupportPage() {
         )}
       </section>
 
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-xl font-bold">Beta feedback</h2>
+      <section className="border-b pb-8">
+        <h2 className="text-lg font-semibold">Beta feedback</h2>
         <p className="mt-1 max-w-2xl text-base leading-relaxed text-muted-foreground">
           izzy is still in beta, and your answers shape what we fix and build next. They go to the izzy team
           and are read in our support inbox — four quick questions, nothing else is collected.
         </p>
         {fbSent ? (
-          <div className="mt-4 flex flex-col items-center gap-2 rounded-xl bg-muted p-6 text-center">
+          <div className="mt-4 flex flex-col items-center gap-2 border p-6 text-center">
             <CheckCircle2 className="h-10 w-10 text-primary" />
             <p className="text-lg font-semibold">Thank you!</p>
             <p className="max-w-md text-base leading-relaxed text-muted-foreground">

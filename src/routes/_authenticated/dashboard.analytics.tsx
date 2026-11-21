@@ -85,20 +85,20 @@ function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Analytics</h1>
-        <div className="flex rounded-full bg-muted p-1 text-sm">
+        <h1 className="text-xl font-semibold">Analytics</h1>
+        <div className="flex rounded-full border p-1 text-sm">
           {[7, 30].map((r) => (
             <button key={r} onClick={() => setRange(r as 7 | 30)} disabled={r === 30 && !acc.isPro}
-              className={`rounded-full px-3 py-1.5 font-medium ${days === r ? "bg-card shadow-sm" : "text-muted-foreground"} disabled:opacity-50`}>
-              {r} days{r === 30 && !acc.isPro ? " 🔒" : ""}
+              className={`rounded-full px-3 py-1.5 font-medium ${days === r ? "bg-muted" : "text-muted-foreground"} disabled:opacity-50`}>
+              {r} days{r === 30 && !acc.isPro ? " (Pro)" : ""}
             </button>
           ))}
         </div>
       </div>
 
       {nothingYet ? (
-        <section className="rounded-3xl border bg-card p-6 sm:p-8">
-          <h2 className="text-lg font-bold">No visits yet</h2>
+        <section className="border-t pt-8">
+          <h2 className="text-base font-semibold">No visits yet</h2>
           <p className="mt-2 max-w-xl text-base leading-relaxed text-muted-foreground">
             Your analytics will appear here once customers start visiting your shop — shop views, product views
             and WhatsApp taps, counted as they happen.
@@ -128,8 +128,8 @@ function AnalyticsPage() {
             />
           </div>
 
-          <section className="rounded-3xl border bg-card p-5 sm:p-6">
-            <h2 className="text-lg font-bold">Shop views per day · last {days} days</h2>
+          <section className="border-t pt-8">
+            <h2 className="text-base font-semibold">Shop views per day · last {days} days</h2>
             {views.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">No shop views in this period yet.</p>
             ) : (
@@ -157,8 +157,8 @@ function AnalyticsPage() {
             )}
           </section>
 
-          <section className="rounded-3xl border bg-card p-5 sm:p-6">
-            <h2 className="text-lg font-bold">Where your visitors came from · {days}d</h2>
+          <section className="border-t pt-8">
+            <h2 className="text-base font-semibold">Where your visitors came from · {days}d</h2>
             {sources.length === 0 ? (
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 Sources will appear here once visits come in. When a customer arrives from a labelled link
@@ -182,18 +182,18 @@ function AnalyticsPage() {
           </section>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <section className="rounded-3xl border bg-card p-5 sm:p-6">
-              <h2 className="text-lg font-bold">Most viewed products</h2>
+            <section className="border-t pt-8">
+              <h2 className="text-base font-semibold">Most viewed products</h2>
               <RankedList rows={mostViewed} empty="No product views in this period yet. When a customer opens a product's details, it counts here." />
             </section>
-            <section className="rounded-3xl border bg-card p-5 sm:p-6">
-              <h2 className="text-lg font-bold">Most WhatsApp clicks</h2>
+            <section className="border-t pt-8">
+              <h2 className="text-base font-semibold">Most WhatsApp clicks</h2>
               <RankedList rows={mostClicked} empty="No WhatsApp clicks in this period yet. A click means a customer tapped Order or Book on WhatsApp — not a confirmed order." />
             </section>
           </div>
 
-          <section className="rounded-3xl border bg-card p-5 sm:p-6">
-            <h2 className="text-lg font-bold">Products with no engagement yet</h2>
+          <section className="border-t pt-8">
+            <h2 className="text-base font-semibold">Products with no engagement yet</h2>
             {liveItems.length === 0 ? (
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 You have no live products right now. <Link to="/dashboard/products" className="font-semibold text-primary underline">Add or publish a product</Link> and it will show up here.
@@ -220,13 +220,13 @@ function AnalyticsPage() {
       )}
 
       {!acc.isPro && (
-        <p className="rounded-2xl bg-primary-soft p-4 text-sm text-accent-foreground">
+        <p className="border p-4 text-sm">
           Free shows the last 7 days. <Link to="/dashboard/upgrade" className="font-semibold underline">Go Pro</Link> for 30-day analytics.
         </p>
       )}
 
-      <section className="rounded-3xl border bg-card p-5 sm:p-6">
-        <h2 className="text-lg font-bold">What these numbers mean</h2>
+      <section className="border-t pt-8">
+        <h2 className="text-base font-semibold">What these numbers mean</h2>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
           How a visit becomes an enquiry — and where izzy's counting stops.
         </p>
@@ -235,7 +235,7 @@ function AnalyticsPage() {
             <li key={m.title} className="flex gap-3">
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  m.tracked ? "bg-primary text-primary-foreground" : "border-2 border-border text-muted-foreground"
+                  m.tracked ? "bg-primary text-primary-foreground" : "border border-input text-muted-foreground"
                 }`}
               >
                 {i + 1}
@@ -244,9 +244,7 @@ function AnalyticsPage() {
                 <p className="flex flex-wrap items-center gap-2 font-semibold">
                   {m.title}
                   {!m.tracked && (
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Not tracked by izzy
-                    </span>
+                    <span className="text-sm font-normal text-muted-foreground">(not tracked)</span>
                   )}
                 </p>
                 <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
@@ -315,9 +313,9 @@ function RankedList({ rows, empty }: { rows: { id: string; title: string; n: num
 
 function Stat({ label, value, hint, sub }: { label: string; value: number | string; hint: string; sub?: string }) {
   return (
-    <div className="rounded-2xl border bg-card p-5">
+    <div>
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-2xl font-bold">{value}</p>
+      <p className="mt-1 text-2xl font-semibold">{value}</p>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{hint}</p>
       {sub && <p className="mt-1 text-sm font-medium">{sub}</p>}
     </div>
