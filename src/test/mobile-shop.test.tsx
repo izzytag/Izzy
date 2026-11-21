@@ -72,22 +72,19 @@ describe("Mobile shop fixes", () => {
     expect(cta.classList.contains("sm:w-auto")).toBe(true);
   });
 
-  it("centers the shop header on phones with a labeled share row", () => {
+  it("centers the shop header on phones with no share button", () => {
     const { container } = render(<PublicProfile data={SHOP} theme="light" showBranding />);
 
     const heading = screen.getByRole("heading", { name: "Test Shop" });
     const header = heading.parentElement?.parentElement;
-    const cornerButton = container.querySelector("button[aria-label='Share this shop']");
 
     expect(header?.classList.contains("flex-col")).toBe(true);
     expect(header?.classList.contains("sm:flex-row")).toBe(true);
-    expect(screen.getByText("Share this shop")).toBeInTheDocument();
-    // The corner icon button exists only for wider screens.
-    expect(cornerButton?.classList.contains("hidden")).toBe(true);
-    expect(cornerButton?.classList.contains("sm:flex")).toBe(true);
+    expect(screen.queryByText("Share this shop")).toBeNull();
+    expect(container.querySelector("button[aria-label='Share this shop']")).toBeNull();
   });
 
-  it("always centers the header in compact mode, with no corner share button", () => {
+  it("always centers the header in compact mode, with no share button", () => {
     const { container } = render(<PublicProfile data={SHOP} theme="light" showBranding compact />);
 
     const heading = screen.getByRole("heading", { name: "Test Shop" });
@@ -96,7 +93,7 @@ describe("Mobile shop fixes", () => {
     expect(header?.classList.contains("flex-col")).toBe(true);
     expect(header?.classList.contains("items-center")).toBe(true);
     expect(header?.classList.contains("sm:flex-row")).toBe(false);
-    expect(screen.getByText("Share this shop")).toBeInTheDocument();
+    expect(screen.queryByText("Share this shop")).toBeNull();
     expect(container.querySelector("button[aria-label='Share this shop']")).toBeNull();
   });
 
