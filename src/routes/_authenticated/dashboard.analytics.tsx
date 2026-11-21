@@ -5,6 +5,7 @@ import { Share2 } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { statsQuery } from "@/lib/stats";
 import { sourceLabel } from "@/lib/source";
+import { isCatalogueProduct } from "@/lib/catalogue";
 import { Button } from "@/components/ui/button";
 
 import { DashboardLoading } from "@/components/DashboardLoading";
@@ -61,7 +62,7 @@ function AnalyticsPage() {
   const sources = SOURCE_ORDER.filter((l) => sourceCounts.has(l)).map((l) => ({ label: l, n: sourceCounts.get(l)! }));
   const maxSource = Math.max(1, ...sources.map((s) => s.n));
 
-  const items = links.filter((l) => l.kind === "product" || l.kind === "service");
+  const items = links.filter(isCatalogueProduct);
   const countBy = (rows: { link_id: string }[]) => {
     const m = new Map<string, number>();
     for (const r of rows) m.set(r.link_id, (m.get(r.link_id) ?? 0) + 1);
@@ -188,7 +189,7 @@ function AnalyticsPage() {
             </section>
             <section className="rounded-3xl border bg-card p-5 sm:p-6">
               <h2 className="text-lg font-bold">Most WhatsApp clicks</h2>
-              <RankedList rows={mostClicked} empty="No WhatsApp clicks in this period yet. A click means a customer tapped Order or Book on WhatsApp — not a confirmed order." />
+              <RankedList rows={mostClicked} empty="No WhatsApp clicks in this period yet. A click means a customer tapped Order on WhatsApp — not a confirmed order." />
             </section>
           </div>
 
@@ -279,7 +280,7 @@ const MEANINGS = [
   {
     title: "WhatsApp click",
     tracked: true,
-    text: "A customer tapped the Order or Book button on a product. WhatsApp opens with an enquiry about that product already written for them.",
+    text: "A customer tapped the Order button on a product. WhatsApp opens with an enquiry about that product already written for them.",
   },
   {
     title: "Message sent",

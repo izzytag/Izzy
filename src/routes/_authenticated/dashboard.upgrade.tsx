@@ -109,9 +109,9 @@ function UpgradePage() {
 
         {state.kind === "free" && (
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-            You&apos;re on the <span className="font-medium text-foreground">Free plan</span> — up to 5 products
-            &amp; services, the Light and Dark themes, and 7-day analytics. Pro gives you unlimited products
-            &amp; services, all 8 themes, no izzy branding and 30-day analytics.
+            You&apos;re on the <span className="font-medium text-foreground">Free plan</span> — up to 5 products,
+            the Light and Dark themes, and 7-day analytics. Pro gives you unlimited products, all 8 themes,
+            no izzy branding and 30-day analytics.
           </p>
         )}
 
@@ -119,7 +119,7 @@ function UpgradePage() {
           <div className="mt-3 space-y-3 text-base leading-relaxed text-muted-foreground">
             <p>
               You&apos;re on <span className="font-medium text-foreground">izzy Pro</span> ({proPriceLine(region)}) —
-              unlimited products &amp; services, all themes, no izzy branding, 30-day analytics.
+              unlimited products, all themes, no izzy branding, 30-day analytics.
             </p>
             {state.periodEnd ? (
               <p>
@@ -148,8 +148,8 @@ function UpgradePage() {
                         Your Pro stays active until{" "}
                         {state.periodEnd ? fmtDate(state.periodEnd) : "the end of your current paid period"} —
                         Razorpay won&apos;t charge you again after that. When it ends, your shop moves to Free:
-                        everything stays and nothing is deleted, but if you have more than 5 products &amp;
-                        services you won&apos;t be able to add new ones until you&apos;re under the Free limit
+                        everything stays and nothing is deleted, but if you have more than 5 products you won&apos;t be able to
+                        add new ones until you&apos;re under the Free limit
                         or back on Pro. There&apos;s no refund for the current period.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -201,8 +201,8 @@ function UpgradePage() {
         <section className="rounded-xl border bg-card p-5 sm:p-6">
           <h2 className="text-xl font-bold">What happens when Pro ends</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
-            <li>Your products, services and shop stay exactly as they are — <span className="font-medium text-foreground">nothing is ever deleted</span>.</li>
-            <li>If you have more than 5 products &amp; services, they all stay live — you just can&apos;t add new ones until you&apos;re under the Free limit or back on Pro.</li>
+            <li>Your products and shop stay exactly as they are — <span className="font-medium text-foreground">nothing is ever deleted</span>.</li>
+            <li>If you have more than 5 products, they all stay live — you just can&apos;t add new ones until you&apos;re under the Free limit or back on Pro.</li>
             <li>Pro themes stop applying and your shop falls back to the Light theme (Light and Dark are free), and the &quot;Made with Izzy&quot; footer returns.</li>
             <li>Analytics goes back to the last 7 days.</li>
           </ul>

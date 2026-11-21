@@ -134,7 +134,7 @@ export const referralStats = createServerFn({ method: "GET" })
         .from("links")
         .select("user_id")
         .in("user_id", ids)
-        .in("kind", ["product", "service"])
+        .eq("kind", "product")
         .eq("enabled", true);
       const liveCounts = new Map<string, number>();
       for (const item of liveItems ?? []) {

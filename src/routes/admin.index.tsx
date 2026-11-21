@@ -34,7 +34,7 @@ function AdminOverviewPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Metric label="Registered businesses" value={data.totalBusinesses} />
         <Metric label="Published shops" value={data.publishedShops} hint="Businesses with a shop link claimed" />
-        <Metric label="Products & services" value={data.totalProducts} hint="Across all shops, drafts included" />
+        <Metric label="Products" value={data.totalProducts} hint="Across all shops, drafts included" />
         <Metric label="Active Pro subscriptions" value={data.activePro} />
         <Metric label="Free accounts" value={data.freeAccounts} hint="Businesses not on active Pro" />
         <Metric label="Suspended shops" value={data.suspendedShops} />

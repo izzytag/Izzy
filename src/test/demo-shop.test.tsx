@@ -42,7 +42,6 @@ describe("Demo shop", () => {
     expect(screen.getByRole("heading", { name: "Priya's Kitchen" })).toBeInTheDocument();
     expect(screen.getByText("Chocolate cake")).toBeInTheDocument();
     expect(screen.getByText("₹499")).toBeInTheDocument();
-    expect(screen.getByText("Celebration cake consultation")).toBeInTheDocument();
   });
 
   it("links the banner call to action to /auth", async () => {
@@ -73,14 +72,4 @@ describe("Demo shop", () => {
     expect(within(dialog).getByRole("link", { name: "Create your own shop" })).toHaveAttribute("href", "/auth");
   });
 
-  it("shows the same signup call to action for a service", async () => {
-    renderDemoPage();
-    await screen.findByText("Demo shop");
-
-    fireEvent.click(screen.getByRole("button", { name: "View Celebration cake consultation" }));
-
-    const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).queryByText(/Book on WhatsApp/)).not.toBeInTheDocument();
-    expect(within(dialog).getByRole("link", { name: "Create your own shop" })).toHaveAttribute("href", "/auth");
-  });
 });

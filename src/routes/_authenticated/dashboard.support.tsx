@@ -47,7 +47,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What happens when Pro ends?",
-    a: "Your shop goes back to the Free plan and nothing is deleted — all your products and services stay live. If you have more than 5 items you just can't add new ones until you're under the Free limit or back on Pro. Pro themes stop applying and analytics go back to the last 7 days.",
+    a: "Your shop goes back to the Free plan and nothing is deleted — all your products stay live. If you have more than 5 items you just can't add new ones until you're under the Free limit or back on Pro. Pro themes stop applying and analytics go back to the last 7 days.",
   },
   {
     q: "What does izzy count in Analytics?",

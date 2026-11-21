@@ -164,7 +164,7 @@ function OverviewPage() {
               </p>
             )}
             {liveCount > 0 && (
-              <p className="mt-2 text-base text-muted-foreground">{liveCount} {liveCount === 1 ? "product or service is" : "products and services are"} live on your shop.</p>
+              <p className="mt-2 text-base text-muted-foreground">{liveCount} {liveCount === 1 ? "product is" : "products are"} live on your shop.</p>
             )}
           </div>
         </div>
@@ -229,7 +229,7 @@ function OverviewPage() {
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
           <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
           <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            You have {liveCount} {liveCount === 1 ? "product or service" : "products and services"} live, but nobody has
+            You have {liveCount} {liveCount === 1 ? "product" : "products"} live, but nobody has
             visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
             WhatsApp status, or a printed QR code.
           </p>

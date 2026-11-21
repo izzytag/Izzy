@@ -47,7 +47,7 @@ function AdminSettingsPage() {
         <dl className="divide-y">
           <Row label="Pro price — India" value={`₹${data.proPriceInr}/month`} hint="Via Razorpay subscription checkout" />
           <Row label="Pro price — rest of world" value={`$${data.proPriceUsd}/month`} hint="Checkout not built yet — the upgrade button shows a coming-soon state" />
-          <Row label="Free catalogue limit" value={`${data.freeLinkLimit} products & services`} hint="Enforced by the database trigger, not just the UI" />
+          <Row label="Free catalogue limit" value={`${data.freeLinkLimit} products`} hint="Enforced by the database trigger, not just the UI" />
           <Row label="Free-for-testing mode" value={data.testingFree ? "ON — everyone gets Pro display behaviour" : "Off — live payments"} />
           <Row label="Analytics windows" value="Free: last 7 days · Pro: last 30 days" />
         </dl>

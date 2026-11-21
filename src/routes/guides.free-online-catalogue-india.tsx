@@ -37,10 +37,10 @@ function FreeOnlineCatalogueIndia() {
       <GuideH2>What “free” honestly includes</GuideH2>
       <GuideP>
         Free plans are worth reading carefully, so here is the full picture for izzy&apos;s Free plan: up to 5
-        products and services, your shop at izzytag.shop/yourname, Light and Dark themes, WhatsApp and UPI
+        products, your shop at izzytag.shop/yourname, Light and Dark themes, WhatsApp and UPI
         buttons, a QR code for your shop, 7-day analytics, and a “Made with Izzy” footer on your page. No card is
-        needed to start, and there are no setup fees. Pro is ₹99 a month in India: unlimited products and
-        services, all themes, no footer branding, and 30-day analytics. That is the whole pricing — there is no
+        needed to start, and there are no setup fees. Pro is ₹99 a month in India: unlimited products,
+        all themes, no footer branding, and 30-day analytics. That is the whole pricing — there is no
         annual plan and no discount to chase.
       </GuideP>
 

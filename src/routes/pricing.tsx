@@ -10,10 +10,10 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     ...seoHead({
       title: "Pricing — izzy | Free or Pro",
-      description: "Start free with 5 products and services. Go Pro (monthly): unlimited products and services, all themes, no branding, full analytics.",
+      description: "Start free with 5 products. Go Pro (monthly): unlimited products, all themes, no branding, full analytics.",
       path: "/pricing",
       ogTitle: "izzy pricing — Free or Pro",
-      ogDescription: "Unlimited products and services, all themes and no branding (Pro, monthly).",
+      ogDescription: "Unlimited products, all themes and no branding (Pro, monthly).",
     }),
     // FAQ structured data for the billing questions rendered below.
     scripts: [
@@ -45,7 +45,7 @@ const BILLING_FAQ = [
   },
   {
     q: "What happens when Pro ends?",
-    a: "Your shop moves back to Free and nothing is deleted — all your products and services stay live. If you have more than 5, you just can't add new ones until you're under the Free limit or back on Pro. Pro themes stop applying, the \"Made with Izzy\" footer returns, and analytics goes back to the last 7 days.",
+    a: "Your shop moves back to Free and nothing is deleted — all your products stay live. If you have more than 5, you just can't add new ones until you're under the Free limit or back on Pro. Pro themes stop applying, the \"Made with Izzy\" footer returns, and analytics goes back to the last 7 days.",
   },
   {
     q: "Is there an annual plan or a discount?",

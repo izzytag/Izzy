@@ -19,8 +19,8 @@ function publicClient() {
 }
 
 /**
- * Public storefront data: the profile plus its ENABLED products and
- * services, in position order. Izzy is shop/catalog only — link-kind
+ * Public storefront data: the profile plus its ENABLED products,
+ * in position order. Izzy is shop/catalog only — link-kind
  * rows (legacy data, kept in the DB) are never returned here, so they
  * never appear on the public page.
  */
@@ -58,7 +58,7 @@ export const getPublicPage = createServerFn({ method: "GET" })
       return { suspended: true as const, username: profile.username, displayName: profile.display_name };
     }
     const [{ data: links }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).in("kind", ["product", "service"]).order("position"),
+      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position"),
       sb.rpc("is_pro", { _uid: profile.id }),
     ]);
     return { suspended: false as const, profile, links: links ?? [], isPro: !!isPro };

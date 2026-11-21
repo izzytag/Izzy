@@ -107,7 +107,7 @@ function AdminReferralsPage() {
           Referral rewards are reviewed here and granted manually. A referral earns{" "}
           {REFERRAL_REWARD_MONTHS} month of Pro when the referred shop becomes active. The annual limit is{" "}
           {REFERRAL_REWARD_CAP_PER_YEAR} months per referrer. Active means the shop link is claimed, a WhatsApp
-          number is set, and at least one product or service is live.
+          number is set, and at least one product is live.
         </p>
       </div>
 

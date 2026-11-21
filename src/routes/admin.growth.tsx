@@ -102,12 +102,12 @@ function AdminGrowthPage() {
           <Metric
             label="Added a first product"
             value={pctVal(data.withFirstProduct, data.withFirstProductPct)}
-            definition="Businesses with at least one product or service row, drafts included, out of all registered businesses."
+            definition="Businesses with at least one product row, drafts included, out of all registered businesses."
           />
           <Metric
             label="Published shops"
             value={pctVal(data.publishedShops, data.publishedPct)}
-            definition="Businesses with a username claimed AND at least one live (enabled) product or service, out of all registered businesses."
+            definition="Businesses with a username claimed AND at least one live (enabled) product, out of all registered businesses."
           />
         </div>
       </AdminCard>

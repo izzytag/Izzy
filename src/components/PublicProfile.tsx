@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, Share2, ShoppingBag } from "lucide-react";
+import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
+import { isCatalogueProduct } from "@/lib/catalogue";
 import { CatalogueCard } from "@/components/CatalogueCard";
 import { ReportShopButton } from "@/components/ReportShopButton";
 import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
@@ -23,8 +24,8 @@ export type PublicData = {
 /**
  * The public storefront — the only public page Izzy has. Store header
  * (logo, store name, bio), socials, an optional UPI pay block, then the
- * catalogue: every product AND service row together in one Pinterest
- * masonry, ordered by position. Link-kind rows are never shown (the
+ * catalogue: every product row together in one Pinterest masonry,
+ * ordered by position. Link-kind rows are never shown (the
  * server already excludes them; the filter here keeps dashboard
  * previews honest too, since they pass raw rows).
  */
@@ -34,39 +35,11 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
   const [showUpi, setShowUpi] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [origin, setOrigin] = useState("");
-  const [copied, setCopied] = useState(false);
   useEffect(() => setOrigin(window.location.origin), []);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
-  const items = data.links.filter((l) => l.kind === "product" || l.kind === "service");
+  const items = data.links.filter(isCatalogueProduct);
   const btn = "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 py-3.5 text-center text-base font-semibold text-page-btn-fg shadow-sm transition hover:-translate-y-0.5 hover:shadow-pin active:scale-[0.98]";
-
-  // Visitor-side forwarding: the native share sheet, with the same
-  // pitch text sellers share from the dashboard. Where the share
-  // sheet is unavailable the link is copied instead, and the button
-  // confirms it briefly.
-  async function copyShopLink(url: string) {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard unavailable — no further fallback on this device.
-    }
-  }
-
-  async function shareShop() {
-    const url = origin ? `${origin}/${data.username ?? ""}` : `https://izzytag.shop/${data.username ?? ""}`;
-    if (typeof navigator !== "undefined" && "share" in navigator) {
-      try {
-        await navigator.share({ title: name, text: `${name} on izzy — browse the catalogue and order on WhatsApp.`, url });
-        return;
-      } catch {
-        return; // user closed the share sheet — not an error
-      }
-    }
-    await copyShopLink(url);
-  }
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
@@ -75,13 +48,12 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
       <div className={`mx-auto flex w-full max-w-5xl flex-col px-4 ${compact ? "py-8" : "pt-10 pb-28 sm:px-5"}`}>
         {/* Store header: logo beside the store name, at the top.
             No @username here — the username stays in the URL only.
-            On phones the identity is centered (logo above the name,
-            share as a labeled row under the bio) so nothing crowds
-            the name; the horizontal layout returns on wider
-            screens. Compact mode (the narrow preview/mockup frames)
-            always uses the centered layout — viewport breakpoints
-            can't be trusted there, since the frame is narrow even
-            on a desktop-width viewport. */}
+            On phones the identity is centered (logo above the name)
+            so nothing crowds the name; the horizontal layout returns
+            on wider screens. Compact mode (the narrow preview/mockup
+            frames) always uses the centered layout — viewport
+            breakpoints can't be trusted there, since the frame is
+            narrow even on a desktop-width viewport. */}
         <div className={compact ? "flex w-full flex-col items-center gap-3 text-center" : "flex w-full flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left"}>
           {data.avatar_url && !avatarFailed ? (
             <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70 sm:h-20 sm:w-20" />
@@ -97,17 +69,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             )}
             {data.bio && <p className="mt-2 text-pretty text-[15px] leading-relaxed text-page-muted sm:text-base">{data.bio}</p>}
           </div>
-          {!compact && (
-            <button type="button" onClick={() => void shareShop()} aria-label="Share this shop" className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-105 active:scale-95 sm:flex">
-              {copied ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
-            </button>
-          )}
         </div>
-
-        <button type="button" onClick={() => void shareShop()} className={compact ? "mt-5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 text-sm font-semibold text-page-btn-fg shadow-sm transition active:scale-[0.98]" : "mt-5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-page-border bg-page-btn px-5 text-sm font-semibold text-page-btn-fg shadow-sm transition active:scale-[0.98] sm:hidden"}>
-          {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
-          {copied ? "Link copied" : "Share this shop"}
-        </button>
 
         {socials.length > 0 && (
           <div className={`mt-6 flex gap-3 ${compact ? "self-center" : "self-center sm:self-start"}`}>

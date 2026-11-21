@@ -4,6 +4,16 @@ export const CATALOGUE_IMAGE_BYTES = 2 * 1024 * 1024;
 /** Longest side a processed catalogue photo is allowed to keep. */
 export const CATALOGUE_MAX_DIMENSION = 1600;
 
+/**
+ * Catalogue rows Izzy sells: product rows only. Service rows stay in
+ * the database but are never shown, counted, or creatable — the
+ * storefront, the dashboard list, and analytics all filter through
+ * this one check.
+ */
+export function isCatalogueProduct(link: { kind?: string | null }): boolean {
+  return link.kind === "product";
+}
+
 export function validateCataloguePhoto(count: number) {
   if (count >= CATALOGUE_PHOTO_LIMIT) return "You can add up to 4 photos per item.";
   return null;
