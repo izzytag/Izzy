@@ -3,22 +3,20 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
-import { useLang } from "@/lib/i18n";
 
 /**
  * Marketing header: wordmark left, section anchors centre (they point
  * at homepage sections, so from other pages they go home first),
- * language switch, Log in and the primary CTA right. On mobile the
- * anchors collapse into a compact menu panel.
+ * Log in and the primary CTA right. On mobile the anchors collapse
+ * into a compact menu panel.
  */
 export function SiteHeader() {
-  const { lang, setLang, t } = useLang();
   const [open, setOpen] = useState(false);
   const anchors = [
-    { hash: "features", label: t.features },
-    { hash: "how-it-works", label: t.how },
-    { hash: "examples", label: t.examples },
-    { hash: "pricing", label: t.pricing },
+    { hash: "features", label: "Features" },
+    { hash: "how-it-works", label: "How it works" },
+    { hash: "examples", label: "Examples" },
+    { hash: "pricing", label: "Pricing" },
   ];
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
@@ -32,14 +30,11 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <button onClick={() => setLang(lang === "en" ? "hi" : "en")} className="flex h-11 w-11 items-center justify-center rounded-lg border border-input bg-card text-sm font-medium transition-colors duration-200 hover:bg-muted" aria-label="Switch language">
-            {lang === "en" ? "हिं" : "EN"}
-          </button>
           <Link to="/auth" className="hidden h-11 items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:flex">
-            {t.login}
+            Log in
           </Link>
           <Button asChild className="hidden sm:inline-flex">
-            <Link to="/auth">{t.createFree}</Link>
+            <Link to="/auth">Create your free shop</Link>
           </Button>
           <button onClick={() => setOpen((o) => !o)} className="flex h-11 w-11 items-center justify-center rounded-lg border border-input bg-card md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -55,10 +50,10 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link to="/auth" onClick={() => setOpen(false)} className="flex min-h-[48px] items-center rounded-lg px-3 text-base font-medium hover:bg-muted">
-              {t.login}
+              Log in
             </Link>
             <Button asChild className="mt-2 w-full">
-              <Link to="/auth" onClick={() => setOpen(false)}>{t.createFree}</Link>
+              <Link to="/auth" onClick={() => setOpen(false)}>Create your free shop</Link>
             </Button>
           </div>
         </nav>
