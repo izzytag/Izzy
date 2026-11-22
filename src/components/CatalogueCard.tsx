@@ -48,8 +48,12 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the
         details below, and ordering happens from there only. */}
+    {/* Product details open as a bottom sheet on phones (the buyer
+        is almost always on a phone) and as the usual centered dialog
+        on wider screens. The sticky action block below keeps the
+        Order button pinned at the bottom of the sheet. */}
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] gap-5 overflow-y-auto rounded-2xl sm:max-w-lg sm:rounded-2xl">
+      <DialogContent variant="sheet" className="max-h-[92dvh] gap-5 overflow-y-auto rounded-t-3xl rounded-b-none sm:max-h-[90dvh] sm:max-w-lg sm:rounded-2xl">
         <DialogHeader className="text-left"><DialogTitle className="break-words pr-8 text-left text-[22px] font-bold leading-tight tracking-tight">{item.title}</DialogTitle></DialogHeader>
         {photos.length > 0 ? <div className="space-y-2.5">
           {detailImgFailed ? (

@@ -137,6 +137,52 @@ function OverviewPage() {
         <p className="mt-1 text-base text-muted-foreground">Here's what's happening with your business.</p>
       </div>
 
+      {/* ---------- Your next step ---------- */}
+      {nextStep ? (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+            Your next step · {nextStepNumber} of {checklist.length}
+          </p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">{nextStep.label}</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            {nextStep.hint} — finish your setup one step at a time, and your shop is ready to share.
+          </p>
+          <Button asChild className="mt-4 min-h-[52px] w-full sm:w-auto">
+            <Link to={nextStep.ctaTo}>{nextStep.label} <ArrowRight className="h-4 w-4" /></Link>
+          </Button>
+        </section>
+      ) : needsVisitors ? (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            You have {liveCount} {liveCount === 1 ? "product" : "products"} live, but nobody has
+            visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
+            WhatsApp status, or a printed QR code.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button onClick={shareLink} className="min-h-[52px] w-full sm:w-auto"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
+            <Button variant="outline" asChild className="min-h-[44px]">
+              <Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> Get your QR code</Link>
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
+          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
+          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
+            Your setup is complete. Put your link where customers already are — Instagram bio, WhatsApp status,
+            or a printed QR code on your counter.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button onClick={shareLink} className="min-h-[52px] w-full sm:w-auto"><Share2 className="h-4 w-4" /> Share your shop link</Button>
+            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
+          </div>
+        </section>
+      )}
+
       {/* ---------- Shop status ---------- */}
       <section className="rounded-xl border bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -175,9 +221,6 @@ function OverviewPage() {
         </div>
       </section>
 
-      {/* ---------- Referrals ---------- */}
-      <ReferralCard username={p.username} />
-
       {/* ---------- Quick actions ---------- */}
       <section>
         <h2 className="text-lg font-bold">Quick actions</h2>
@@ -210,52 +253,6 @@ function OverviewPage() {
         </div>
       </section>
 
-      {/* ---------- Your next step ---------- */}
-      {nextStep ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-            Your next step · {nextStepNumber} of {checklist.length}
-          </p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">{nextStep.label}</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            {nextStep.hint} — finish your setup one step at a time, and your shop is ready to share.
-          </p>
-          <Button asChild className="mt-4 min-h-[44px]">
-            <Link to={nextStep.ctaTo}>{nextStep.label} <ArrowRight className="h-4 w-4" /></Link>
-          </Button>
-        </section>
-      ) : needsVisitors ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            You have {liveCount} {liveCount === 1 ? "product" : "products"} live, but nobody has
-            visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
-            WhatsApp status, or a printed QR code.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
-            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
-            <Button variant="outline" asChild className="min-h-[44px]">
-              <Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> Get your QR code</Link>
-            </Button>
-          </div>
-        </section>
-      ) : (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            Your setup is complete. Put your link where customers already are — Instagram bio, WhatsApp status,
-            or a printed QR code on your counter.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
-            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
-          </div>
-        </section>
-      )}
-
       {/* ---------- Setup checklist ---------- */}
       {setupDone ? (
         <section className="flex flex-wrap items-center gap-3 rounded-xl border bg-primary-soft p-4 sm:p-5">
@@ -264,7 +261,7 @@ function OverviewPage() {
             <p className="font-semibold text-accent-foreground">Setup complete</p>
             <p className="text-sm text-accent-foreground/80">Your shop is ready — keep sharing your link so customers find it.</p>
           </div>
-          <Button size="sm" onClick={shareLink} className="min-h-[40px]"><Share2 className="h-4 w-4" /> Share</Button>
+          <Button size="sm" onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share</Button>
         </section>
       ) : (
         <section className="rounded-xl border bg-card p-5 sm:p-6">
@@ -349,16 +346,8 @@ function OverviewPage() {
         )}
       </section>
 
-      {/* ---------- Recent activity ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-lg font-bold">Recent activity</h2>
-        <p className="mt-2 text-base leading-relaxed text-muted-foreground">
-          Nothing here yet. When customers view your shop and tap your products, you'll see the numbers in Analytics.
-        </p>
-        <Button variant="outline" asChild className="mt-4 min-h-[44px]">
-          <Link to="/dashboard/products"><Package className="h-4 w-4" /> Add a product</Link>
-        </Button>
-      </section>
+      {/* ---------- Referrals ---------- */}
+      <ReferralCard username={p.username} />
     </div>
   );
 }

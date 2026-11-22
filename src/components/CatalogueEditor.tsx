@@ -71,7 +71,7 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
     <div className="grid grid-cols-4 gap-2">
       {images.map((src, i) => <div key={src} className="relative aspect-square overflow-hidden rounded-lg border bg-muted">
         <img src={src} alt={`Item photo ${i + 1}`} className="h-full w-full object-cover" />
-        <Button type="button" size="icon" variant="secondary" className="absolute right-1 top-1 h-8 w-8" aria-label={`Remove photo ${i + 1}`} onClick={() => onImages(images.filter((_, index) => index !== i))}><X /></Button>
+        <Button type="button" size="icon" variant="secondary" className="absolute right-1 top-1 h-11 w-11" aria-label={`Remove photo ${i + 1}`} onClick={() => onImages(images.filter((_, index) => index !== i))}><X /></Button>
       </div>)}
       {images.length < CATALOGUE_PHOTO_LIMIT && <Button type="button" variant="outline" disabled={uploading} className="h-auto min-h-16 aspect-square flex-col gap-1 px-1 text-xs" onClick={() => input.current?.click()}>
         {uploading ? <LoaderCircle className="animate-spin" /> : <ImagePlus />} {uploading && progress ? `Uploading ${currentPhoto} of ${progress.total}` : uploading ? "Uploading" : "Add photo"}

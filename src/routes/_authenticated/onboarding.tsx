@@ -31,6 +31,14 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 const STEP_LABELS = ["Business", "WhatsApp", "Shop link", "Done"];
 
+/**
+ * One question per screen (Duolingo-style): the Business step asks
+ * three questions in turn — name, category, description — then
+ * WhatsApp, Shop link, Done. Six screens, the same four steps and
+ * the same data as before; only the presentation changed.
+ */
+const SCREEN_COUNT = 6;
+
 /** Dial codes offered at the WhatsApp step. India first (the default). */
 const COUNTRIES = [
   { name: "India", code: "91" },
@@ -109,20 +117,23 @@ function maskWhatsapp(num: string): string {
   return `+${num.slice(0, ccLen)} ••••• ${num.slice(-3)}`;
 }
 
-/** Resume where the owner left off: every step reads saved values. */
-function initialStep(p: { display_name: string | null; whatsapp: string | null }): number {
-  if (p.display_name && p.whatsapp) return 2;
-  if (p.display_name) return 1;
+/** Resume where the owner left off: every screen reads saved values. */
+function initialScreen(p: { display_name: string | null; whatsapp: string | null }): number {
+  if (p.display_name && p.whatsapp) return 4;
+  if (p.display_name) return 3;
   return 0;
 }
 
-function OnboardingPage() {
+export function OnboardingPage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
   const qc = useQueryClient();
   const navigate = useNavigate();
   const p = acc.profile;
 
-  const [step, setStep] = useState(() => initialStep(p));
+  const [screen, setScreen] = useState(() => initialScreen(p));
+  // Screens 0–2 are the Business step, 3 is WhatsApp, 4 the shop
+  // link, 5 Done.
+  const step = screen < 3 ? 0 : screen - 2;
   const [busy, setBusy] = useState(false);
 
   // Business information (step 0)
@@ -223,21 +234,41 @@ function OnboardingPage() {
     }
   }
 
-  async function saveBusiness(e: React.FormEvent) {
+  /** Each question saves its own answer as the seller moves on, so
+      leaving mid-way keeps what was already answered. */
+  async function saveName(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) { setNameError("Give your business a name — this is what customers see at the top of your shop."); return; }
     setNameError(null);
     setBusy(true);
-    const { error } = await supabase.from("profiles").update({
-      display_name: name.trim().slice(0, 60),
-      bio: bio.slice(0, 160),
-      category: category || null,
-    }).eq("id", acc.user.id);
+    const { error } = await supabase.from("profiles").update({ display_name: name.trim().slice(0, 60) }).eq("id", acc.user.id);
     setBusy(false);
     if (error) return void toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["account"] });
     void maybeClaimReferral();
-    setStep(1);
+    setScreen(1);
+  }
+
+  /** Tapping a category card saves it and moves on immediately —
+      the Duolingo tap-to-advance pattern. */
+  async function saveCategory(next: string) {
+    setCategory(next);
+    setBusy(true);
+    const { error } = await supabase.from("profiles").update({ category: next || null }).eq("id", acc.user.id);
+    setBusy(false);
+    if (error) return void toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["account"] });
+    setScreen(2);
+  }
+
+  async function saveBio(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.from("profiles").update({ bio: bio.slice(0, 160) }).eq("id", acc.user.id);
+    setBusy(false);
+    if (error) return void toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["account"] });
+    setScreen(3);
   }
 
   async function saveWhatsapp(e: React.FormEvent) {
@@ -251,7 +282,7 @@ function OnboardingPage() {
     if (error) return void toast.error(error.message);
     setSavedWhatsapp(built.value);
     qc.invalidateQueries({ queryKey: ["account"] });
-    setStep(2);
+    setScreen(4);
   }
 
   async function saveUsername(e: React.FormEvent) {
@@ -263,9 +294,10 @@ function OnboardingPage() {
     if (error) return void toast.error(error.code === "23505" ? "That username is taken" : error.message);
     setSavedUsername(u);
     qc.invalidateQueries({ queryKey: ["account"] });
-    setStep(3);
+    setScreen(5);
   }
 
+  /** Country-code picker on the WhatsApp screen. */
   const selectClass = "h-[52px] w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-base text-foreground";
 
   return (
@@ -276,19 +308,50 @@ function OnboardingPage() {
       </div>
 
       <div className="mx-auto mt-8 w-full max-w-xl">
-        {/* Progress indicator */}
-        <p className="text-sm font-medium text-muted-foreground">Step {step + 1} of {STEP_LABELS.length} — {STEP_LABELS[step]}</p>
-        <div className="mt-2 flex gap-1.5" aria-hidden="true">
-          {STEP_LABELS.map((label, i) => (
-            <span key={label} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
+        {/* Progress indicator — one segment per question screen, so
+            the seller always sees how far along setup is. */}
+        <p className="text-sm font-medium text-muted-foreground">Step {screen + 1} of {SCREEN_COUNT} — {STEP_LABELS[step]}</p>
+        <div className="mt-2 flex gap-1.5" data-testid="onboarding-progress" aria-hidden="true">
+          {Array.from({ length: SCREEN_COUNT }, (_, i) => (
+            <span key={i} className={`h-2 flex-1 rounded-full ${i <= screen ? "bg-primary" : "bg-muted"}`} />
           ))}
         </div>
 
         <div className="mt-6 rounded-xl border bg-card p-6 shadow-soft sm:p-8">
-          {step === 0 && (
-            <form onSubmit={saveBusiness}>
-              <h1 className="text-2xl font-bold">About your business</h1>
-              <p className="mt-1 text-base text-muted-foreground">This is what customers see at the top of your shop. You can change everything later.</p>
+          {screen === 0 && (
+            <form onSubmit={saveName}>
+              <h1 className="text-2xl font-bold">What&apos;s your business called?</h1>
+              <p className="mt-1 text-base text-muted-foreground">This is the name customers see at the top of your shop.</p>
+              <div className="mt-6 space-y-1.5">
+                <Label htmlFor="ob-name" className="text-base font-medium">Business name</Label>
+                <Input id="ob-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Priya's Kitchen" maxLength={60} className="min-h-[52px] text-base" autoFocus />
+                {nameError && <p className="text-sm font-medium text-destructive">{nameError}</p>}
+              </div>
+              <Button type="submit" disabled={busy} className="mt-8 min-h-[52px] w-full text-lg">{busy ? "Saving…" : "Continue"}</Button>
+            </form>
+          )}
+
+          {screen === 1 && (
+            <div>
+              <h1 className="text-2xl font-bold">What do you sell?</h1>
+              <p className="mt-1 text-base text-muted-foreground">Pick the closest match — it helps customers find you. Tap one to continue.</p>
+              <div className="mt-6 grid grid-cols-2 gap-3" role="group" aria-label="Business category">
+                {BUSINESS_CATEGORIES.map((c) => (
+                  <button key={c} type="button" disabled={busy} onClick={() => void saveCategory(c)}
+                    className={`flex min-h-[56px] items-center justify-center rounded-xl border-2 px-3 py-3 text-center text-base font-semibold transition active:scale-[0.98] ${category === c ? "border-primary bg-primary-soft text-primary" : "border-border bg-card hover:border-primary/40"}`}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+              <button type="button" onClick={() => setScreen(2)} className="mt-4 min-h-[44px] w-full text-base font-medium text-primary">Skip for now</button>
+              <button type="button" onClick={() => setScreen(0)} className="mt-1 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
+            </div>
+          )}
+
+          {screen === 2 && (
+            <form onSubmit={saveBio}>
+              <h1 className="text-2xl font-bold">Tell customers about your business</h1>
+              <p className="mt-1 text-base text-muted-foreground">A short description and a logo, if you have one. Both are optional — you can add them later.</p>
 
               <div className="mt-6 flex items-center gap-4">
                 <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload business logo">
@@ -302,38 +365,22 @@ function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="mt-6 space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="ob-name" className="text-base font-medium">Business name</Label>
-                  <Input id="ob-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Priya's Kitchen" maxLength={60} className="min-h-[52px] text-base" autoFocus />
-                  {nameError && <p className="text-sm font-medium text-destructive">{nameError}</p>}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ob-category" className="text-base font-medium">Business category <span className="font-normal text-muted-foreground">(optional)</span></Label>
-                  <div className="relative">
-                    <select id="ob-category" value={category} onChange={(e) => setCategory(e.target.value)} className={selectClass}>
-                      <option value="">Choose a category…</option>
-                      {BUSINESS_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">▾</span>
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ob-bio" className="text-base font-medium">Short description <span className="font-normal text-muted-foreground">(optional)</span></Label>
-                  <Textarea id="ob-bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="What do you sell? e.g. Eggless cakes and bakes, made fresh in Pune." maxLength={160} rows={3} className="text-base" />
-                  <p className="text-sm text-muted-foreground">Up to 160 characters, shown under your business name.</p>
-                </div>
+              <div className="mt-6 space-y-1.5">
+                <Label htmlFor="ob-bio" className="text-base font-medium">Short description <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                <Textarea id="ob-bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="What do you sell? e.g. Eggless cakes and bakes, made fresh in Pune." maxLength={160} rows={3} className="text-base" />
+                <p className="text-sm text-muted-foreground">Up to 160 characters, shown under your business name.</p>
               </div>
 
               <Button type="submit" disabled={busy} className="mt-8 min-h-[52px] w-full text-lg">{busy ? "Saving…" : "Continue"}</Button>
+              <button type="button" onClick={() => setScreen(1)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 1 && (
+          {screen === 3 && (
             <form onSubmit={saveWhatsapp}>
               <h1 className="text-2xl font-bold">Where should your customers contact you?</h1>
               <p className="mt-1 text-base leading-relaxed text-muted-foreground">
-                When a customer taps Order on one of your products, WhatsApp opens a conversation with this number — with the product already in the message. You chat and arrange payment and delivery directly.
+                When a customer taps Order, WhatsApp opens a chat with this number — the product is already in the message.
               </p>
 
               <div className="mt-6 space-y-1.5">
@@ -351,33 +398,41 @@ function OnboardingPage() {
                 <p className="text-sm text-muted-foreground">Use the number on the phone where you reply to customers. You can change it later in My Shop.</p>
               </div>
 
-              {/* Example of what the customer sees */}
-              <div className="mt-6 rounded-xl border bg-background p-4" aria-label="Example WhatsApp conversation">
-                <div className="flex items-center gap-3 border-b pb-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-whatsapp text-sm font-bold text-whatsapp-foreground"><MessageCircle className="h-4 w-4" /></span>
-                  <div>
-                    <p className="text-base font-semibold leading-tight">{name.trim() || "Your business"}</p>
-                    <p className="text-sm text-muted-foreground">WhatsApp</p>
+              {/* The example sits behind a tap, not above the button:
+                  on a phone the Continue button must be visible
+                  without scrolling. */}
+              <details className="mt-6 rounded-xl border bg-background p-4">
+                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between text-base font-medium">
+                  See what your customer sees
+                  <span className="text-muted-foreground">▾</span>
+                </summary>
+                <div className="mt-3 border-t pt-3" aria-label="Example WhatsApp conversation">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-whatsapp text-sm font-bold text-whatsapp-foreground"><MessageCircle className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-base font-semibold leading-tight">{name.trim() || "Your business"}</p>
+                      <p className="text-sm text-muted-foreground">WhatsApp</p>
+                    </div>
                   </div>
+                  <p className="mt-3 max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3 leading-relaxed">
+                    Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on {name.trim() || "Your business"}&apos;s izzy shop. Could you please share more details?
+                    <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
+                  </p>
+                  <p className="mt-3 text-center text-sm text-muted-foreground">An example — the chat opens on your number.</p>
                 </div>
-                <p className="mt-3 max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3 leading-relaxed">
-                  Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on {name.trim() || "Your business"}&apos;s izzy shop. Could you please share more details?
-                  <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
-                </p>
-                <p className="mt-3 text-center text-sm text-muted-foreground">An example — the chat opens on your number.</p>
-              </div>
+              </details>
 
               <Button type="submit" disabled={busy} className="mt-8 min-h-[52px] w-full text-lg">{busy ? "Saving…" : "Continue"}</Button>
               {/* Skippable: the storefront degrades gracefully without a
                   number, and the seller is reminded in My Shop and on
                   the Products page. A number that IS entered is still
                   fully validated by saveWhatsapp above. */}
-              <button type="button" onClick={() => setStep(2)} className="mt-3 min-h-[44px] w-full text-base font-medium text-primary">Skip for now</button>
-              <button type="button" onClick={() => setStep(0)} className="mt-1 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
+              <button type="button" onClick={() => setScreen(4)} className="mt-3 min-h-[44px] w-full text-base font-medium text-primary">Skip for now</button>
+              <button type="button" onClick={() => setScreen(2)} className="mt-1 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 2 && (
+          {screen === 4 && (
             <form onSubmit={saveUsername}>
               <h1 className="text-2xl font-bold">Create your shop link</h1>
               <p className="mt-1 text-base leading-relaxed text-muted-foreground">
@@ -399,11 +454,11 @@ function OnboardingPage() {
               <Button type="submit" disabled={!u || !!uErr || availability !== "available" || busy} className="mt-6 min-h-[52px] w-full text-lg">
                 {busy ? "Creating…" : "Confirm my shop link"}
               </Button>
-              <button type="button" onClick={() => setStep(1)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
+              <button type="button" onClick={() => setScreen(3)} className="mt-3 min-h-[44px] w-full text-base font-medium text-muted-foreground">Back</button>
             </form>
           )}
 
-          {step === 3 && (
+          {screen === 5 && (
             <div className="text-center">
               <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-primary">
                 <PartyPopper className="h-7 w-7" />
@@ -434,7 +489,7 @@ function OnboardingPage() {
           )}
         </div>
 
-        {step < 3 && (
+        {screen < 5 && (
           <p className="mt-4 text-center text-sm text-muted-foreground">Your answers save as you go — you can leave and pick up where you left off.</p>
         )}
       </div>

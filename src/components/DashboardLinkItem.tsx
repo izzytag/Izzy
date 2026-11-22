@@ -116,7 +116,7 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
       className={`flex items-start gap-2 rounded-2xl border bg-background p-4 ${isDragging ? "z-10 shadow-soft" : ""}`}>
-      <button {...attributes} {...listeners} className="mt-2 cursor-grab touch-none text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
+      <button {...attributes} {...listeners} className="flex min-h-[44px] min-w-[44px] shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
       <div className="min-w-0 flex-1">
         {editing ? (
           <div className="space-y-2">
@@ -141,11 +141,15 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
         )}
       </div>
       <div className="flex flex-col items-center gap-3">
-        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show product" />
+        {/* The switch itself is only 20px tall, so it sits inside a
+            44px hit area — a thumb can toggle it without precision. */}
+        <span className="flex min-h-[44px] min-w-[44px] items-center justify-center">
+          <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show product" />
+        </span>
         {confirmingDelete ? (
-          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="whitespace-nowrap rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold text-destructive-foreground" aria-label="Confirm delete product">Confirm delete?</button>
+          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-destructive px-3 text-sm font-semibold text-destructive-foreground" aria-label="Confirm delete product">Confirm delete?</button>
         ) : (
-          <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive" aria-label="Delete product"><Trash2 className="h-4 w-4" /></button>
+          <button onClick={handleDelete} className="flex min-h-[44px] min-w-[44px] items-center justify-center text-muted-foreground hover:text-destructive" aria-label="Delete product"><Trash2 className="h-4 w-4" /></button>
         )}
       </div>
     </li>

@@ -159,7 +159,7 @@ function ProductsPage() {
             <div className="flex gap-2" role="group" aria-label="Filter by availability">
               {([["all", `All (${itemCount})`], ["live", `Live (${liveCount})`], ["drafts", `Drafts (${itemCount - liveCount})`]] as const).map(([key, label]) => (
                 <button key={key} type="button" onClick={() => setStatusFilter(key)} aria-pressed={statusFilter === key}
-                  className={`min-h-[40px] rounded-full border px-4 text-sm font-semibold transition ${statusFilter === key ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
+                  className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${statusFilter === key ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
                   {label}
                 </button>
               ))}

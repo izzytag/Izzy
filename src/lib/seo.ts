@@ -60,8 +60,6 @@ export const STATIC_SITEMAP_PATHS: readonly string[] = [
   "/pricing",
   "/guides",
   "/guides/sell-on-whatsapp",
-  "/guides/instagram-bio-link",
-  "/guides/sell-on-whatsapp-without-website",
   "/guides/instagram-bio-shop-link-setup",
   "/guides/free-online-catalogue-india",
   "/contact",

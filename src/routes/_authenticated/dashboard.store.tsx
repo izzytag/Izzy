@@ -214,7 +214,7 @@ function MyShopPage() {
                   <Label htmlFor="shop-category">Business category</Label>
                   <div className="relative">
                     <select id="shop-category" value={category} onChange={(e) => editField(setCategory)(e.target.value)} onBlur={() => void saveProfile()}
-                      className="h-10 w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-base text-foreground">
+                      className="h-12 w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-base text-foreground">
                       <option value="">Choose a category…</option>
                       {BUSINESS_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>

@@ -117,3 +117,55 @@
 @utility bg-hero { background-image: var(--gradient-hero); }
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
 @utility shadow-pin { box-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 10px 28px -14px rgb(0 0 0 / 0.14); }
+
+/* ---------- Homepage motion: calm Apple-style entrances ---------- */
+/* Hero elements enter in sequence (fade + small rise); sections reveal
+   gently as they scroll into view; the hero phone mockup floats
+   softly; buttons give a soft press. Only opacity and transform are
+   animated, so the page stays fast on phones. All of it is disabled
+   under prefers-reduced-motion. */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.anim-hero-1,
+.anim-hero-2,
+.anim-hero-3,
+.anim-hero-4,
+.anim-hero-5 {
+  animation: hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-hero-2 { animation-delay: 0.08s; }
+.anim-hero-3 { animation-delay: 0.16s; }
+.anim-hero-4 { animation-delay: 0.24s; }
+.anim-hero-5 { animation-delay: 0.32s; }
+.anim-float { animation: float-soft 7s ease-in-out infinite; }
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-visible { opacity: 1; transform: translateY(0); }
+.anim-press { transition: transform 0.15s ease; }
+.anim-press:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-hero-1,
+  .anim-hero-2,
+  .anim-hero-3,
+  .anim-hero-4,
+  .anim-hero-5,
+  .anim-float,
+  .reveal {
+    animation: none !important;
+    transition: none !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .anim-press:active { transform: none; }
+}
