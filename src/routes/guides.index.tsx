@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Instagram, LayoutGrid, Link2, MessageCircle, Store } from "lucide-react";
+import { ArrowRight, LayoutGrid, Link2, MessageCircle } from "lucide-react";
 import { Section, SectionHeading } from "@/components/Section";
 import { seoHead } from "@/lib/seo";
 
@@ -24,22 +24,6 @@ export const GUIDES = [
     title: "How to sell on WhatsApp with a shop link",
     summary:
       "Set up your shop once, share one link, and let customers browse your products and prices before they message you — no more sending the same photos and price lists again and again.",
-  },
-  {
-    to: "/guides/instagram-bio-link" as const,
-    icon: Instagram,
-    label: "Instagram",
-    title: "Your Instagram bio link: turn followers into enquiries",
-    summary:
-      "Your bio gets one link. Make it a shop page that shows your products and prices and ends in a WhatsApp conversation — instead of another list of links or a “DM to order” dead end.",
-  },
-  {
-    to: "/guides/sell-on-whatsapp-without-website" as const,
-    icon: Store,
-    label: "Getting started",
-    title: "How to sell on WhatsApp without a website",
-    summary:
-      "You do not need a website to sell online. Compare the no-website options honestly, and set up a shop page that shows your products and prices and brings enquiries to your WhatsApp.",
   },
   {
     to: "/guides/instagram-bio-shop-link-setup" as const,

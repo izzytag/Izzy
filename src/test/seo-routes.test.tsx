@@ -8,8 +8,6 @@ import { Route as IndexRoute } from "@/routes/index";
 import { Route as PricingRoute } from "@/routes/pricing";
 import { Route as GuidesIndexRoute, GUIDES } from "@/routes/guides.index";
 import { Route as SellOnWhatsAppRoute } from "@/routes/guides.sell-on-whatsapp";
-import { Route as InstagramBioLinkRoute } from "@/routes/guides.instagram-bio-link";
-import { Route as WithoutWebsiteRoute } from "@/routes/guides.sell-on-whatsapp-without-website";
 import { Route as BioSetupRoute } from "@/routes/guides.instagram-bio-shop-link-setup";
 import { Route as CatalogueIndiaRoute } from "@/routes/guides.free-online-catalogue-india";
 import { Route as ContactRoute } from "@/routes/contact";
@@ -48,8 +46,6 @@ const STATIC_ROUTES: { path: string; route: unknown }[] = [
   { path: "/pricing", route: PricingRoute },
   { path: "/guides", route: GuidesIndexRoute },
   { path: "/guides/sell-on-whatsapp", route: SellOnWhatsAppRoute },
-  { path: "/guides/instagram-bio-link", route: InstagramBioLinkRoute },
-  { path: "/guides/sell-on-whatsapp-without-website", route: WithoutWebsiteRoute },
   { path: "/guides/instagram-bio-shop-link-setup", route: BioSetupRoute },
   { path: "/guides/free-online-catalogue-india", route: CatalogueIndiaRoute },
   { path: "/contact", route: ContactRoute },
@@ -97,9 +93,12 @@ describe("public route head tags", () => {
     const parsed = JSON.parse(faqScript!.children!) as {
       mainEntity: { name: string; acceptedAnswer: { text: string } }[];
     };
-    expect(parsed.mainEntity).toHaveLength(7);
+    expect(parsed.mainEntity).toHaveLength(4);
     expect(parsed.mainEntity.map((q) => q.name)).toContain("What is izzy?");
     expect(parsed.mainEntity.map((q) => q.name)).toContain("Does izzy process payments?");
+    expect(parsed.mainEntity.map((q) => q.name)).not.toContain("Can customers order through WhatsApp?");
+    expect(parsed.mainEntity.map((q) => q.name)).not.toContain("Can I share my shop on Instagram?");
+    expect(parsed.mainEntity.map((q) => q.name)).not.toContain("Do I need technical knowledge?");
     for (const q of parsed.mainEntity) {
       expect(q.acceptedAnswer.text.length).toBeGreaterThan(0);
     }
@@ -168,9 +167,9 @@ describe("shop page head tags", () => {
 describe("new guide routes", () => {
   const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
 
-  it("matches the three new guide pages, not the shop route", () => {
+  it("matches the three guide pages, not the shop route", () => {
     const cases: [string, string][] = [
-      ["/guides/sell-on-whatsapp-without-website", "/guides/sell-on-whatsapp-without-website"],
+      ["/guides/sell-on-whatsapp", "/guides/sell-on-whatsapp"],
       ["/guides/instagram-bio-shop-link-setup", "/guides/instagram-bio-shop-link-setup"],
       ["/guides/free-online-catalogue-india", "/guides/free-online-catalogue-india"],
     ];
@@ -179,11 +178,9 @@ describe("new guide routes", () => {
     }
   });
 
-  it("lists all five guides in the guides index", () => {
+  it("lists all three guides in the guides index", () => {
     expect(GUIDES.map((g) => g.to)).toEqual([
       "/guides/sell-on-whatsapp",
-      "/guides/instagram-bio-link",
-      "/guides/sell-on-whatsapp-without-website",
       "/guides/instagram-bio-shop-link-setup",
       "/guides/free-online-catalogue-india",
     ]);
