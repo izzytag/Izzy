@@ -6,6 +6,7 @@ import {
   createRouter,
   Outlet,
   RouterProvider,
+  type AnyRoute,
 } from "@tanstack/react-router";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -45,7 +46,8 @@ describe("Demo shop", () => {
 
     const matches = router.matchRoutes("/demo");
 
-    expect(matches.at(-1)?.routeId).toBe("/demo");
+    // /demo is served by the demo.index child of the /demo layout route.
+    expect(matches.at(-1)?.routeId).toBe("/demo/");
   });
 
   it("renders the demo banner and the example shop", async () => {
@@ -167,5 +169,64 @@ describe("Homepage showcase demo links", () => {
     expect(byName.get("Thread Studio")).toBe("/demo/thread-studio");
     expect(byName.get("Priya's Kitchen")).toBe("/demo");
     expect(byName.get("Glow Lab")).toBe("/demo/glow-lab");
+  });
+});
+
+// Regression tests for the demo-route nesting bug: /demo is the parent
+// route of /demo/thread-studio and /demo/glow-lab, so if its component
+// renders a shop instead of an <Outlet/>, the child shops never mount
+// and both URLs show Priya's Kitchen. These tests render the real demo
+// branch — taken from the generated route tree — under a minimal test
+// root, instead of rendering DemoShopPage with a shop prop directly.
+function findRouteById(node: AnyRoute, id: string): AnyRoute | undefined {
+  if (node.id === id) return node;
+  for (const child of (node.children ?? []) as AnyRoute[]) {
+    const found = findRouteById(child, id);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function renderRealDemoBranch(path: string) {
+  const demoBranch = findRouteById(routeTree, "/demo");
+  if (!demoBranch) throw new Error("demo branch not found in route tree");
+  const rootRoute = createRootRoute({ component: () => <Outlet /> });
+  const authRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/auth",
+    component: () => null,
+  });
+  const testTree = rootRoute.addChildren([demoBranch, authRoute]);
+  const router = createRouter({
+    routeTree: testTree,
+    history: createMemoryHistory({ initialEntries: [path] }),
+  });
+  return render(<RouterProvider router={router} />);
+}
+
+describe("Demo route branch (real route tree)", () => {
+  it("renders Thread Studio's shop at /demo/thread-studio, not Priya's", async () => {
+    renderRealDemoBranch("/demo/thread-studio");
+
+    expect(await screen.findByRole("heading", { name: "Thread Studio" })).toBeInTheDocument();
+    expect(screen.getByText("Canvas sling bag")).toBeInTheDocument();
+    expect(screen.getByText("₹499")).toBeInTheDocument();
+    expect(screen.queryByText("Chocolate cake")).not.toBeInTheDocument();
+  });
+
+  it("renders Glow Lab's shop at /demo/glow-lab, not Priya's", async () => {
+    renderRealDemoBranch("/demo/glow-lab");
+
+    expect(await screen.findByRole("heading", { name: "Glow Lab" })).toBeInTheDocument();
+    expect(screen.getByText("Face serum (50 ml)")).toBeInTheDocument();
+    expect(screen.getByText("₹899")).toBeInTheDocument();
+    expect(screen.queryByText("Chocolate cake")).not.toBeInTheDocument();
+  });
+
+  it("still renders Priya's Kitchen at /demo", async () => {
+    renderRealDemoBranch("/demo");
+
+    expect(await screen.findByRole("heading", { name: "Priya's Kitchen" })).toBeInTheDocument();
+    expect(screen.getByText("Chocolate cake")).toBeInTheDocument();
   });
 });

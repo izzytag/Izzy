@@ -1,23 +1,20 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { PublicProfile, type PublicData } from "@/components/PublicProfile";
 import { Button } from "@/components/ui/button";
 import { DEMO_PRIYA } from "@/lib/demo-shops";
 
+// Layout route for the demo shops: /demo itself is served by the
+// demo.index child, and /demo/thread-studio and /demo/glow-lab by
+// their own child routes. This route renders only an <Outlet/> —
+// rendering a shop here would swallow the children, since a parent
+// route's component renders for every child match.
 export const Route = createFileRoute("/demo")({
-  head: () => ({
-    meta: [
-      { title: "Demo shop — izzy" },
-      {
-        name: "description",
-        content:
-          "Try an example izzy shop: browse the catalogue, open a product, and see how ordering on WhatsApp works.",
-      },
-      // An example shop is not a real business — keep it out of search results.
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: DemoShopPage,
+  component: DemoLayout,
 });
+
+function DemoLayout() {
+  return <Outlet />;
+}
 
 /* ---------- Demo shop: fixed example content rendered by the real
    storefront component (see src/lib/demo-shops.ts). No database reads
