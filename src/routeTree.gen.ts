@@ -32,6 +32,8 @@ import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
+import { Route as DemoGlowLabRouteImport } from './routes/demo.glow-lab'
+import { Route as DemoThreadStudioRouteImport } from './routes/demo.thread-studio'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesFreeOnlineCatalogueIndiaRouteImport } from './routes/guides.free-online-catalogue-india'
 import { Route as GuidesInstagramBioLinkRouteImport } from './routes/guides.instagram-bio-link'
@@ -163,6 +165,16 @@ const AdminSupportRoute = AdminSupportRouteImport.update({
   path: '/support',
   getParentRoute: () => AdminRoute,
 } as any)
+const DemoGlowLabRoute = DemoGlowLabRouteImport.update({
+  id: '/glow-lab',
+  path: '/glow-lab',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoThreadStudioRoute = DemoThreadStudioRouteImport.update({
+  id: '/thread-studio',
+  path: '/thread-studio',
+  getParentRoute: () => DemoRoute,
+} as any)
 const GuidesIndexRoute = GuidesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -262,7 +274,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/demo': typeof DemoRoute
+  '/demo': typeof DemoRouteWithChildren
   '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -278,6 +290,8 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/demo/glow-lab': typeof DemoGlowLabRoute
+  '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -301,7 +315,7 @@ export interface FileRoutesByTo {
   '/$username': typeof UsernameRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/demo': typeof DemoRoute
+  '/demo': typeof DemoRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -315,6 +329,8 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/demo/glow-lab': typeof DemoGlowLabRoute
+  '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -341,7 +357,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/demo': typeof DemoRoute
+  '/demo': typeof DemoRouteWithChildren
   '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -357,6 +373,8 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
+  '/demo/glow-lab': typeof DemoGlowLabRoute
+  '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -399,6 +417,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/demo/glow-lab'
+    | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
     | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
@@ -436,6 +456,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/demo/glow-lab'
+    | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
     | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
@@ -477,6 +499,8 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/subscriptions'
     | '/admin/support'
+    | '/demo/glow-lab'
+    | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
     | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
@@ -503,7 +527,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
-  DemoRoute: typeof DemoRoute
+  DemoRoute: typeof DemoRouteWithChildren
   GuidesRoute: typeof GuidesRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -673,6 +697,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/support'
       preLoaderRoute: typeof AdminSupportRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/demo/glow-lab': {
+      id: '/demo/glow-lab'
+      path: '/glow-lab'
+      fullPath: '/demo/glow-lab'
+      preLoaderRoute: typeof DemoGlowLabRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/thread-studio': {
+      id: '/demo/thread-studio'
+      path: '/thread-studio'
+      fullPath: '/demo/thread-studio'
+      preLoaderRoute: typeof DemoThreadStudioRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/guides/': {
       id: '/guides/'
@@ -861,6 +899,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DemoRouteChildren {
+  DemoGlowLabRoute: typeof DemoGlowLabRoute
+  DemoThreadStudioRoute: typeof DemoThreadStudioRoute
+}
+
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoGlowLabRoute: DemoGlowLabRoute,
+  DemoThreadStudioRoute: DemoThreadStudioRoute,
+}
+
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
+
 interface GuidesRouteChildren {
   GuidesFreeOnlineCatalogueIndiaRoute: typeof GuidesFreeOnlineCatalogueIndiaRoute
   GuidesInstagramBioLinkRoute: typeof GuidesInstagramBioLinkRoute
@@ -890,7 +940,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
-  DemoRoute: DemoRoute,
+  DemoRoute: DemoRouteWithChildren,
   GuidesRoute: GuidesRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
