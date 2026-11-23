@@ -2,18 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ShoppingBag, Search } from "lucide-react";
+import { ShoppingBag, Briefcase, Images, Search } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, FREE_LINK_LIMIT } from "@/lib/themes";
-import { isCatalogueProduct } from "@/lib/catalogue";
 import { proPriceLine } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardLinkItem, reorderSubset, type LinkRow } from "@/components/DashboardLinkItem";
+import { BulkCatalogue } from "@/components/BulkCatalogue";
 
 import { DashboardLoading } from "@/components/DashboardLoading";
 
@@ -27,11 +27,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/products")({
 });
 
 /**
- * Products — the catalogue manager. This is the product half
+ * Products — the catalogue manager. This is the product/service half
  * of the old combined Store tab, relocated unchanged: new items start
  * as drafts (switched off), photos are processed on upload, ordering
- * is drag-and-drop, and the free-plan item limit counts product rows
- * only (legacy link rows are never shown here).
+ * is drag-and-drop, and the free-plan item limit counts product and
+ * service rows only (legacy link rows are never shown here).
  */
 function ProductsPage() {
   const region = useRegion();
@@ -42,11 +42,12 @@ function ProductsPage() {
   const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "live" | "drafts">("all");
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
 
   const setLinks = (fn: (l: LinkRow[]) => LinkRow[]) => qc.setQueryData(linksQuery(acc.user.id).queryKey, (old) => fn(old ?? []));
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }));
 
-  const storeRows = links.filter(isCatalogueProduct);
+  const storeRows = links.filter((l) => l.kind !== "link");
   const itemCount = storeRows.length;
   const liveCount = storeRows.filter((l) => l.enabled).length;
   // Search (by title) and the Live/Drafts filter combine; both run over
@@ -57,13 +58,13 @@ function ProductsPage() {
     (!q || l.title.toLowerCase().includes(q)),
   );
 
-  async function addItem() {
+  async function addItem(kind: "product" | "service") {
     // The free-item limit is enforced by this UI check (the database
     // trigger currently enforces no limit). If a server-side limit is
     // ever added, its error is still translated below — the raw
     // database message is never shown to the seller.
     if (!canAddLink(itemCount, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
-    const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind: "product", title: "New product", url: "", position: links.length, enabled: false }).select().single();
+    const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind, title: kind === "product" ? "New product" : "New service", url: "", position: links.length, enabled: false }).select().single();
     if (error) {
       const hitLimit = /limit|maximum|free plan/i.test(error.message);
       return void toast.error(hitLimit
@@ -119,10 +120,28 @@ function ProductsPage() {
       </div>
 
       <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <Button variant="outline" onClick={() => addItem()} className="min-h-[48px] w-full text-base"><ShoppingBag className="h-4 w-4" /> Add product</Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="outline" onClick={() => addItem("product")} className="min-h-[48px] text-base"><ShoppingBag className="h-4 w-4" /> Shop product</Button>
+          <Button variant="outline" onClick={() => addItem("service")} className="min-h-[48px] text-base"><Briefcase className="h-4 w-4" /> Service</Button>
+        </div>
+        <Button variant="outline" onClick={() => setShowBulkUpload((v) => !v)} className="mt-2 min-h-[48px] w-full text-base" aria-expanded={showBulkUpload}>
+          <Images className="h-4 w-4" /> {showBulkUpload ? "Hide bulk photo upload" : "Upload photos in bulk"}
+        </Button>
+        <p className="mt-2 text-sm text-muted-foreground">Add many photos at once, group them into products, then publish — faster than adding one product at a time.</p>
+        {showBulkUpload && (
+          <div className="mt-4">
+            <BulkCatalogue
+              userId={acc.user.id}
+              existingItemCount={itemCount}
+              totalLinksCount={links.length}
+              isPro={acc.isPro}
+              onPublished={() => { void qc.invalidateQueries({ queryKey: linksQuery(acc.user.id).queryKey }); }}
+            />
+          </div>
+        )}
         {!p.whatsapp && storeRows.some((l) => l.enabled) && (
           <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
-            Add your WhatsApp number in <Link to="/dashboard/store" className="font-semibold underline">My Shop</Link>, so visitors can order on WhatsApp.
+            Add your WhatsApp number in <Link to="/dashboard/store" className="font-semibold underline">My Shop</Link>, so visitors can order or book on WhatsApp.
           </p>
         )}
         {!canAddLink(itemCount, acc.isPro) && (
@@ -154,7 +173,7 @@ function ProductsPage() {
           <div className="mt-5 space-y-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products" aria-label="Search products" className="pl-9" />
+              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products and services" aria-label="Search products and services" className="pl-9" />
             </div>
             <div className="flex gap-2" role="group" aria-label="Filter by availability">
               {([["all", `All (${itemCount})`], ["live", `Live (${liveCount})`], ["drafts", `Drafts (${itemCount - liveCount})`]] as const).map(([key, label]) => (
@@ -182,7 +201,7 @@ function ProductsPage() {
         )}
         {storeRows.length === 0 && (
           <div className="mt-6 text-center">
-            <p className="text-base text-muted-foreground">No products yet.</p>
+            <p className="text-base text-muted-foreground">No products or services yet.</p>
             <p className="mx-auto mt-1 max-w-md text-base text-muted-foreground">Add your first product above — it starts switched off, so you can add its photo and price before anyone sees it.</p>
           </div>
         )}
