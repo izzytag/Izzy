@@ -26,7 +26,7 @@ function product(
 }
 
 export const DEMO_PRIYA: PublicData = {
-  display_name: "Priya's Kitchen",
+  display_name: "Cake Factory",
   username: "demo",
   bio: "Homemade cakes and tiffins in Pune. Order by 10am for lunch.",
   avatar_url: "/examples/priya-logo.webp",

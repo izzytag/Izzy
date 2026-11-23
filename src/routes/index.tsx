@@ -60,7 +60,7 @@ function demoShop(name: string, username: string, bio: string, avatar: string, i
   };
 }
 
-export const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/priya-logo.webp", [
+export const HERO_SHOP = demoShop("Cake Factory", "priya", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/priya-logo.webp", [
   ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
   ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
   ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/priya-cake-1kg.webp"],
@@ -247,15 +247,15 @@ export function Landing() {
           />
           <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="WhatsApp conversation">
           <div className="flex items-center gap-3 border-b border-border pb-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">P</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">C</span>
             <div>
-              <p className="text-base font-semibold leading-tight">Priya's Kitchen</p>
+              <p className="text-base font-semibold leading-tight">Cake Factory</p>
               <p className="text-sm text-muted-foreground">WhatsApp</p>
             </div>
           </div>
           <div className="space-y-3 pt-4">
             <p className="max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3.5 leading-relaxed shadow-none">
-              Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on Priya&apos;s Kitchen&apos;s izzy shop. Could you please share more details?
+              Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on Cake Factory&apos;s izzy shop. Could you please share more details?
               <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
             </p>
             <p className="ml-auto max-w-[85%] rounded-xl rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">

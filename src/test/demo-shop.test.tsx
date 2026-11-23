@@ -55,7 +55,7 @@ describe("Demo shop", () => {
 
     expect(await screen.findByText("Demo shop")).toBeInTheDocument();
     expect(screen.getByText(/This is an example shop built with izzy/)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Priya's Kitchen" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Cake Factory" })).toBeInTheDocument();
     expect(screen.getByText("Chocolate cake")).toBeInTheDocument();
     expect(screen.getByText("₹499")).toBeInTheDocument();
   });
@@ -167,7 +167,7 @@ describe("Homepage showcase demo links", () => {
     const byName = new Map(SHOWCASE.map((s) => [s.data.display_name, s.demoPath]));
 
     expect(byName.get("Thread Studio")).toBe("/demo/thread-studio");
-    expect(byName.get("Priya's Kitchen")).toBe("/demo");
+    expect(byName.get("Cake Factory")).toBe("/demo");
     expect(byName.get("Glow Lab")).toBe("/demo/glow-lab");
   });
 });
@@ -175,7 +175,7 @@ describe("Homepage showcase demo links", () => {
 // Regression tests for the demo-route nesting bug: /demo is the parent
 // route of /demo/thread-studio and /demo/glow-lab, so if its component
 // renders a shop instead of an <Outlet/>, the child shops never mount
-// and both URLs show Priya's Kitchen. These tests render the real demo
+// and both URLs show Cake Factory. These tests render the real demo
 // branch — taken from the generated route tree — under a minimal test
 // root, instead of rendering DemoShopPage with a shop prop directly.
 function findRouteById(node: AnyRoute, id: string): AnyRoute | undefined {
@@ -205,7 +205,7 @@ function renderRealDemoBranch(path: string) {
 }
 
 describe("Demo route branch (real route tree)", () => {
-  it("renders Thread Studio's shop at /demo/thread-studio, not Priya's", async () => {
+  it("renders Thread Studio's shop at /demo/thread-studio, not Cake Factory's", async () => {
     renderRealDemoBranch("/demo/thread-studio");
 
     expect(await screen.findByRole("heading", { name: "Thread Studio" })).toBeInTheDocument();
@@ -214,7 +214,7 @@ describe("Demo route branch (real route tree)", () => {
     expect(screen.queryByText("Chocolate cake")).not.toBeInTheDocument();
   });
 
-  it("renders Glow Lab's shop at /demo/glow-lab, not Priya's", async () => {
+  it("renders Glow Lab's shop at /demo/glow-lab, not Cake Factory's", async () => {
     renderRealDemoBranch("/demo/glow-lab");
 
     expect(await screen.findByRole("heading", { name: "Glow Lab" })).toBeInTheDocument();
@@ -223,10 +223,10 @@ describe("Demo route branch (real route tree)", () => {
     expect(screen.queryByText("Chocolate cake")).not.toBeInTheDocument();
   });
 
-  it("still renders Priya's Kitchen at /demo", async () => {
+  it("still renders Cake Factory at /demo", async () => {
     renderRealDemoBranch("/demo");
 
-    expect(await screen.findByRole("heading", { name: "Priya's Kitchen" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Cake Factory" })).toBeInTheDocument();
     expect(screen.getByText("Chocolate cake")).toBeInTheDocument();
   });
 });

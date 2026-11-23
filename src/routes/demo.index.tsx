@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DemoShopPage } from "@/routes/demo";
 
-// Priya's Kitchen, the default demo shop at /demo. The parent
+// Cake Factory, the default demo shop at /demo. The parent
 // /demo route is a layout that only renders an <Outlet/>, so this
 // index child is what actually serves /demo.
 export const Route = createFileRoute("/demo/")({
