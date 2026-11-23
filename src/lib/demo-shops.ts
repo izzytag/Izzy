@@ -4,8 +4,7 @@ import type { PublicData } from "@/components/PublicProfile";
    storefront component, using the site's own example photos. No
    database reads or writes, no tracking, no WhatsApp number — the
    order actions route to signup instead. Thread Studio and Glow Lab
-   have no logo file: PublicProfile falls back to an initial-letter
-   circle rather than a fake logo. ---------- */
+   Thread Studio and Glow Lab use generated logo files in /examples. ---------- */
 
 function product(
   id: string,
@@ -70,7 +69,7 @@ export const DEMO_THREAD_STUDIO: PublicData = {
   display_name: "Thread Studio",
   username: "threadstudio",
   bio: "Handmade totes, gifts & everyday fashion",
-  avatar_url: null,
+  avatar_url: "/examples/thread-studio-logo.webp",
   socials: {},
   whatsapp: null,
   upi_id: null,
@@ -110,7 +109,7 @@ export const DEMO_GLOW_LAB: PublicData = {
   display_name: "Glow Lab",
   username: "glowlab",
   bio: "Clean skincare & self-care essentials",
-  avatar_url: null,
+  avatar_url: "/examples/glow-lab-logo.webp",
   socials: {},
   whatsapp: null,
   upi_id: null,
