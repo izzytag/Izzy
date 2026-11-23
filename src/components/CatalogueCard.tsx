@@ -6,8 +6,8 @@ import { waCardLink } from "@/lib/themes";
 
 export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null };
 
-export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode }: {
-  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; demoMode?: boolean | undefined;
+export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode, hideCardOrder }: {
+  item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; demoMode?: boolean | undefined; hideCardOrder?: boolean | undefined;
 }) {
   const [selected, setSelected] = useState(0);
   const [pinImgFailed, setPinImgFailed] = useState(false);
@@ -46,8 +46,19 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
         {item.description && <p className="line-clamp-2 break-words pt-0.5 text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
       </div>
     </Button>
-    {/* No order button on the pin itself: tapping the pin opens the
-        details below, and ordering happens from there only. */}
+    {/* The order action sits on the pin itself, not only inside the
+        details sheet: a buyer on a phone should be able to order the
+        moment they see a product, without a blind tap into a sheet
+        first — that is what the homepage promises ("Customers tap
+        Order on a product"). It is a sibling of the view button, not
+        nested inside it, so the two actions stay separate. Demo
+        shops have no WhatsApp number, so no order button appears
+        there — the sheet keeps the signup call to action instead. */}
+    {href && !hideCardOrder ? (
+      <div className="px-3.5 pb-3.5 sm:px-4 sm:pb-4">
+        <Button asChild className="min-h-[44px] w-full rounded-full bg-whatsapp text-[15px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)} aria-label={`Order ${item.title} on WhatsApp`}><MessageCircle />{"Order on WhatsApp"}</a></Button>
+      </div>
+    ) : null}
     {/* Product details open as a bottom sheet on phones (the buyer
         is almost always on a phone) and as the usual centered dialog
         on wider screens. The sticky action block below keeps the

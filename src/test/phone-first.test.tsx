@@ -137,8 +137,35 @@ describe("Phone-first product bottom sheet", () => {
     // Grabber bar at the top of the sheet.
     expect(dialog?.querySelector('[aria-hidden="true"].mx-auto')).not.toBeNull();
     // The Order button is still pinned at the bottom of the sheet.
-    const order = screen.getByRole("link", { name: /Order on WhatsApp/ });
+    const order = within(dialog as HTMLElement).getByRole("link", { name: /Order on WhatsApp/ });
     expect(order.closest("div.sticky")?.classList.contains("bottom-0")).toBe(true);
+  });
+
+  it("puts an Order on WhatsApp button on the product card itself, so a buyer can order without opening the sheet", () => {
+    render(<CatalogueCard item={ITEM} whatsapp="919999999999" shopName="Test Shop" pageUrl="/testshop" />);
+
+    // The card-level button is visible before any tap, and the sheet
+    // stays closed until the buyer taps the card itself.
+    const order = screen.getByRole("link", { name: "Order Chocolate cake on WhatsApp" });
+    expect(order.classList.contains("min-h-[44px]")).toBe(true);
+    expect(order).toHaveAttribute("href", expect.stringContaining("wa.me/919999999999"));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+
+    // Tapping the order button does not open the details sheet.
+    fireEvent.click(order);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it("shows no card-level order button when the shop has no WhatsApp number", () => {
+    render(<CatalogueCard item={ITEM} whatsapp={null} pageUrl="/testshop" />);
+
+    expect(screen.queryByRole("link", { name: /Order .* on WhatsApp/ })).toBeNull();
+  });
+
+  it("hides the card-level order button in the dashboard preview, which stays WhatsApp-free", () => {
+    render(<CatalogueCard item={ITEM} whatsapp="919999999999" shopName="Test Shop" pageUrl="/testshop" hideCardOrder />);
+
+    expect(screen.queryByRole("link", { name: /Order .* on WhatsApp/ })).toBeNull();
   });
 });
 

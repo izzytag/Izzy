@@ -112,7 +112,8 @@ describe("Mobile shop fixes", () => {
     render(<CatalogueCard item={ITEM} whatsapp={SHOP.whatsapp} shopName="Test Shop" pageUrl="/testshop" />);
 
     fireEvent.click(screen.getByRole("button", { name: "View Chocolate cake" }));
-    const order = screen.getByRole("link", { name: /Order on WhatsApp/ });
+    const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+    const order = within(dialog).getByRole("link", { name: /Order on WhatsApp/ });
     const actionBlock = order.closest("div.sticky");
 
     expect(actionBlock?.classList.contains("bottom-0")).toBe(true);

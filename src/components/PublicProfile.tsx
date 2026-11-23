@@ -110,15 +110,18 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             </p>
           </div>
         ) : (
-          // Pinterest-style pins: masonry, image-first. Tapping a pin
-          // opens its details (all photos, full description, WhatsApp
-          // order) — there is no order button on the pin itself.
-          // In the compact dashboard preview the frame is only 300px
-          // wide, so it always stays 2 columns like a real phone;
-          // the live page widens to 3/4 columns on bigger screens.
+          // Pinterest-style pins: masonry, image-first. Each pin
+          // carries its own Order button, and tapping a pin opens
+          // its details (all photos, full description, WhatsApp
+          // order). In the compact dashboard preview the frame is
+          // only 300px wide, so it always stays 2 columns like a
+          // real phone; the live page widens to 3/4 columns on
+          // bigger screens. The preview is a static illustration,
+          // so its pins show no order button (like the floating
+          // WhatsApp button, which is also suppressed there).
           <div className={`mt-8 w-full columns-2 gap-4 ${compact ? "" : "sm:columns-3 lg:columns-4"}`}>
             {items.map((l) => (
-              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} onProductView={onProductView} demoMode={demoMode} />
+              <CatalogueCard key={l.id} item={l} whatsapp={data.whatsapp} shopName={name} pageUrl={origin ? `${origin}/${data.username ?? ""}` : `/${data.username ?? ""}`} onLinkClick={onLinkClick} onProductView={onProductView} demoMode={demoMode} hideCardOrder={compact} />
             ))}
           </div>
         )}
