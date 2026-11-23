@@ -14,6 +14,7 @@ import { describe, expect, it, vi } from "vitest";
 import { accountQuery } from "@/lib/account";
 import { CatalogueCard } from "@/components/CatalogueCard";
 import { DashboardLinkItem, type LinkRow } from "@/components/DashboardLinkItem";
+import { Route as AuthRoute } from "@/routes/auth";
 import { OnboardingPage } from "@/routes/_authenticated/onboarding";
 
 // Supabase is a network client — in tests every call resolves
@@ -35,7 +36,11 @@ vi.mock("@/integrations/supabase/client", () => ({
         createSignedUrl: () => Promise.resolve({ data: null }),
       }),
     },
-    auth: { signOut: () => Promise.resolve({}) },
+    auth: {
+      signOut: () => Promise.resolve({}),
+      getSession: () => Promise.resolve({ data: { session: null } }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+    },
   },
 }));
 
@@ -203,5 +208,64 @@ describe("Phone-first dashboard tap targets", () => {
     const toggle = screen.getByRole("switch", { name: "Show product" });
     expect(toggle.parentElement?.classList.contains("min-h-[44px]")).toBe(true);
     expect(toggle.parentElement?.classList.contains("min-w-[44px]")).toBe(true);
+  });
+});
+
+async function renderAuth() {
+  const AuthPage = AuthRoute.options.component;
+  if (!AuthPage) throw new Error("Auth route has no component");
+  const rootRoute = createRootRoute({
+    component: () => <Outlet />,
+  });
+  const authRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/auth",
+    component: AuthPage,
+  });
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([authRoute]),
+    history: createMemoryHistory({ initialEntries: ["/auth"] }),
+  });
+  // The router matches and loads its routes asynchronously — wait
+  // for it before rendering, or the page is an empty div.
+  await router.load();
+  return render(<RouterProvider router={router} />);
+}
+
+describe("Phone-first auth tap targets", () => {
+  it("gives the show-password eye a 44px hit area on the sign-up form", async () => {
+    await renderAuth();
+
+    const eye = screen.getByRole("button", { name: "Show password" });
+    expect(eye.classList.contains("min-h-[44px]")).toBe(true);
+    expect(eye.classList.contains("min-w-[44px]")).toBe(true);
+  });
+
+  it("gives Forgot password and the show-password eye a 44px hit area on the log-in form", async () => {
+    await renderAuth();
+
+    fireEvent.click(screen.getByRole("button", { name: "Log in" }));
+
+    const forgot = screen.getByRole("button", { name: "Forgot password?" });
+    expect(forgot.classList.contains("min-h-[44px]")).toBe(true);
+    const eye = screen.getByRole("button", { name: "Show password" });
+    expect(eye.classList.contains("min-h-[44px]")).toBe(true);
+    expect(eye.classList.contains("min-w-[44px]")).toBe(true);
+  });
+
+  it("gives both show-password eyes a 44px hit area on the set-a-new-password form", async () => {
+    window.location.hash = "#type=recovery";
+    try {
+      await renderAuth();
+
+      const eyes = screen.getAllByRole("button", { name: "Show password" });
+      expect(eyes).toHaveLength(2);
+      for (const eye of eyes) {
+        expect(eye.classList.contains("min-h-[44px]")).toBe(true);
+        expect(eye.classList.contains("min-w-[44px]")).toBe(true);
+      }
+    } finally {
+      window.location.hash = "";
+    }
   });
 });

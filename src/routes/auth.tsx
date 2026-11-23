@@ -180,8 +180,8 @@ function AuthPage() {
                     <Label htmlFor="recovery-new-password" className="text-base font-medium">New password</Label>
                     <div className="relative">
                       <Input id="recovery-new-password" type={showRecoveryPassword ? "text" : "password"} autoComplete="new-password" value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)} placeholder="At least 8 characters" className="pr-11" />
-                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                        onChange={(e) => setNewPassword(e.target.value)} placeholder="At least 8 characters" className="pr-12" />
+                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
                         {showRecoveryPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
@@ -190,8 +190,8 @@ function AuthPage() {
                     <Label htmlFor="recovery-confirm-password" className="text-base font-medium">Type it again</Label>
                     <div className="relative">
                       <Input id="recovery-confirm-password" type={showRecoveryPassword ? "text" : "password"} autoComplete="new-password" value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)} className="pr-11" />
-                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                        onChange={(e) => setConfirmPassword(e.target.value)} className="pr-12" />
+                      <button type="button" onClick={() => setShowRecoveryPassword((v) => !v)} aria-label={showRecoveryPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
                         {showRecoveryPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
@@ -233,12 +233,12 @@ function AuthPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pw" className="text-base font-medium">Password</Label>
                   {mode === "signin" && (
-                    <button type="button" onClick={forgotPassword} className="text-sm font-semibold text-primary">Forgot password?</button>
+                    <button type="button" onClick={forgotPassword} className="-mr-2 flex min-h-[44px] items-center px-2 text-sm font-semibold text-primary">Forgot password?</button>
                   )}
                 </div>
                 <div className="relative">
-                  <Input id="pw" type={showPassword ? "text" : "password"} minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="pr-11" />
-                  <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
+                  <Input id="pw" type={showPassword ? "text" : "password"} minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="pr-12" />
+                  <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-1 top-1/2 flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground">
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
