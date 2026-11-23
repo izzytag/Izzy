@@ -37,10 +37,8 @@ import { Route as DemoGlowLabRouteImport } from './routes/demo.glow-lab'
 import { Route as DemoThreadStudioRouteImport } from './routes/demo.thread-studio'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesFreeOnlineCatalogueIndiaRouteImport } from './routes/guides.free-online-catalogue-india'
-import { Route as GuidesInstagramBioLinkRouteImport } from './routes/guides.instagram-bio-link'
 import { Route as GuidesInstagramBioShopLinkSetupRouteImport } from './routes/guides.instagram-bio-shop-link-setup'
 import { Route as GuidesSellOnWhatsappRouteImport } from './routes/guides.sell-on-whatsapp'
-import { Route as GuidesSellOnWhatsappWithoutWebsiteRouteImport } from './routes/guides.sell-on-whatsapp-without-website'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
@@ -192,11 +190,6 @@ const GuidesFreeOnlineCatalogueIndiaRoute =
     path: '/free-online-catalogue-india',
     getParentRoute: () => GuidesRoute,
   } as any)
-const GuidesInstagramBioLinkRoute = GuidesInstagramBioLinkRouteImport.update({
-  id: '/instagram-bio-link',
-  path: '/instagram-bio-link',
-  getParentRoute: () => GuidesRoute,
-} as any)
 const GuidesInstagramBioShopLinkSetupRoute =
   GuidesInstagramBioShopLinkSetupRouteImport.update({
     id: '/instagram-bio-shop-link-setup',
@@ -208,12 +201,6 @@ const GuidesSellOnWhatsappRoute = GuidesSellOnWhatsappRouteImport.update({
   path: '/sell-on-whatsapp',
   getParentRoute: () => GuidesRoute,
 } as any)
-const GuidesSellOnWhatsappWithoutWebsiteRoute =
-  GuidesSellOnWhatsappWithoutWebsiteRouteImport.update({
-    id: '/sell-on-whatsapp-without-website',
-    path: '/sell-on-whatsapp-without-website',
-    getParentRoute: () => GuidesRoute,
-  } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
@@ -299,10 +286,8 @@ export interface FileRoutesByFullPath {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
-  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
-  '/guides/sell-on-whatsapp-without-website': typeof GuidesSellOnWhatsappWithoutWebsiteRoute
   '/admin/': typeof AdminIndexRoute
   '/demo/': typeof DemoIndexRoute
   '/guides/': typeof GuidesIndexRoute
@@ -338,10 +323,8 @@ export interface FileRoutesByTo {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
-  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
-  '/guides/sell-on-whatsapp-without-website': typeof GuidesSellOnWhatsappWithoutWebsiteRoute
   '/admin': typeof AdminIndexRoute
   '/demo': typeof DemoIndexRoute
   '/guides': typeof GuidesIndexRoute
@@ -383,10 +366,8 @@ export interface FileRoutesById {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
-  '/guides/instagram-bio-link': typeof GuidesInstagramBioLinkRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
-  '/guides/sell-on-whatsapp-without-website': typeof GuidesSellOnWhatsappWithoutWebsiteRoute
   '/admin/': typeof AdminIndexRoute
   '/demo/': typeof DemoIndexRoute
   '/guides/': typeof GuidesIndexRoute
@@ -428,10 +409,8 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
-    | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
-    | '/guides/sell-on-whatsapp-without-website'
     | '/admin/'
     | '/demo/'
     | '/guides/'
@@ -467,10 +446,8 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
-    | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
-    | '/guides/sell-on-whatsapp-without-website'
     | '/admin'
     | '/demo'
     | '/guides'
@@ -511,10 +488,8 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
-    | '/guides/instagram-bio-link'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
-    | '/guides/sell-on-whatsapp-without-website'
     | '/admin/'
     | '/demo/'
     | '/guides/'
@@ -743,13 +718,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesFreeOnlineCatalogueIndiaRouteImport
       parentRoute: typeof GuidesRoute
     }
-    '/guides/instagram-bio-link': {
-      id: '/guides/instagram-bio-link'
-      path: '/instagram-bio-link'
-      fullPath: '/guides/instagram-bio-link'
-      preLoaderRoute: typeof GuidesInstagramBioLinkRouteImport
-      parentRoute: typeof GuidesRoute
-    }
     '/guides/instagram-bio-shop-link-setup': {
       id: '/guides/instagram-bio-shop-link-setup'
       path: '/instagram-bio-shop-link-setup'
@@ -762,13 +730,6 @@ declare module '@tanstack/react-router' {
       path: '/sell-on-whatsapp'
       fullPath: '/guides/sell-on-whatsapp'
       preLoaderRoute: typeof GuidesSellOnWhatsappRouteImport
-      parentRoute: typeof GuidesRoute
-    }
-    '/guides/sell-on-whatsapp-without-website': {
-      id: '/guides/sell-on-whatsapp-without-website'
-      path: '/sell-on-whatsapp-without-website'
-      fullPath: '/guides/sell-on-whatsapp-without-website'
-      preLoaderRoute: typeof GuidesSellOnWhatsappWithoutWebsiteRouteImport
       parentRoute: typeof GuidesRoute
     }
     '/_authenticated/dashboard/': {
@@ -932,20 +893,15 @@ const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
 interface GuidesRouteChildren {
   GuidesFreeOnlineCatalogueIndiaRoute: typeof GuidesFreeOnlineCatalogueIndiaRoute
-  GuidesInstagramBioLinkRoute: typeof GuidesInstagramBioLinkRoute
   GuidesInstagramBioShopLinkSetupRoute: typeof GuidesInstagramBioShopLinkSetupRoute
   GuidesSellOnWhatsappRoute: typeof GuidesSellOnWhatsappRoute
-  GuidesSellOnWhatsappWithoutWebsiteRoute: typeof GuidesSellOnWhatsappWithoutWebsiteRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
 }
 
 const GuidesRouteChildren: GuidesRouteChildren = {
   GuidesFreeOnlineCatalogueIndiaRoute: GuidesFreeOnlineCatalogueIndiaRoute,
-  GuidesInstagramBioLinkRoute: GuidesInstagramBioLinkRoute,
   GuidesInstagramBioShopLinkSetupRoute: GuidesInstagramBioShopLinkSetupRoute,
   GuidesSellOnWhatsappRoute: GuidesSellOnWhatsappRoute,
-  GuidesSellOnWhatsappWithoutWebsiteRoute:
-    GuidesSellOnWhatsappWithoutWebsiteRoute,
   GuidesIndexRoute: GuidesIndexRoute,
 }
 
