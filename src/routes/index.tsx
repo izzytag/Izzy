@@ -12,6 +12,7 @@ import { Reveal } from "@/components/Reveal";
 import { Section, SectionHeading } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { DEMO_GLOW_LAB, DEMO_PRIYA, DEMO_THREAD_STUDIO } from "@/lib/demo-shops";
 import { captureReferralFromSearch } from "@/lib/referral";
 import { faqPageJsonLd, seoHead } from "@/lib/seo";
 import { useRegion } from "@/lib/useRegion";
@@ -66,30 +67,21 @@ export const HERO_SHOP = demoShop("Priya's Kitchen", "priya", "Homemade cakes an
   ["Sourdough loaf (pack of 2)", "₹349", "Two slow-fermented loaves, baked fresh every morning.", "/examples/priya-sourdough-two.webp"],
 ]);
 
-export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData }[] = [
+export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData; demoPath: string }[] = [
   {
     label: "Fashion boutique", theme: "rose",
-    data: demoShop("Thread Studio", "threadstudio", "Handmade totes, gifts & everyday fashion", "/examples/tote-bag.webp", [
-      ["Canvas tote bag", "₹349", "Sturdy everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
-      ["Canvas tote bag, large", "₹449", "A larger everyday tote with an inner pocket.", "/examples/tote-bag.webp"],
-      ["Canvas tote bag, mini", "₹249", "A compact tote for everyday essentials.", "/examples/tote-bag.webp"],
-    ]),
+    data: DEMO_THREAD_STUDIO,
+    demoPath: "/demo/thread-studio",
   },
   {
     label: "Food & bakery", theme: "marigold",
-    data: demoShop("Priya's Kitchen", "priyaskitchen", "Homemade cakes and tiffins in Pune. Order by 10am for lunch.", "/examples/priya-logo.webp", [
-      ["Chocolate cake", "₹499", "Rich Belgian chocolate, baked fresh to order.", "/examples/chocolate-cake.webp"],
-      ["Sourdough loaf", "₹199", "Slow-fermented, crusty and fresh every morning.", "/examples/sourdough-loaf.webp"],
-      ["Chocolate cake (1 kg)", "₹899", "The same Belgian chocolate cake, baked as a 1 kg celebration cake.", "/examples/priya-cake-1kg.webp"],
-    ]),
+    data: DEMO_PRIYA,
+    demoPath: "/demo",
   },
   {
     label: "Beauty & lifestyle", theme: "mint",
-    data: demoShop("Glow Lab", "glowlab", "Clean skincare & self-care essentials", "/examples/face-serum.webp", [
-      ["Face serum", "₹599", "Vitamin C serum for a daily glow.", "/examples/face-serum.webp"],
-      ["Soy candle", "₹299", "Lavender and vanilla soy candle, hand-poured.", "/examples/handmade-candle.webp"],
-      ["Face serum (50 ml)", "₹899", "Vitamin C serum for a daily glow, in a larger bottle.", "/examples/face-serum.webp"],
-    ]),
+    data: DEMO_GLOW_LAB,
+    demoPath: "/demo/glow-lab",
   },
 ];
 
@@ -209,7 +201,7 @@ export function Landing() {
               const photoAlt = s.data.links[0]?.title ?? s.data.display_name ?? "";
               return (
                 <Reveal key={s.label} delay={i * 90} className="h-full">
-                  <Link to="/demo" className="block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
+                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
                     <img src={photo} alt={photoAlt} className="aspect-[4/3] w-full object-cover" />
                     <div className="p-6">
                       <h3 className="text-xl font-semibold">{s.data.display_name}</h3>
