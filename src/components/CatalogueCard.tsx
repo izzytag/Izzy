@@ -38,8 +38,11 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
           no stretching, and no routine cropping of faces. The
           masonry columns absorb the varied heights. The wrapper
           reserves a minimum height while the photo loads, so pins
-          below don't jump down the page. */}
-      {photos[0] && !pinImgFailed ? <div className="min-h-[120px] bg-page-bg"><img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /></div> : <div className="flex aspect-[4/5] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
+          below don't jump down the page. A product with no photo
+          gets a short 4/3 placeholder, not a tall one, so the Order
+          button below it stays close on a phone instead of sitting
+          under a long empty block. */}
+      {photos[0] && !pinImgFailed ? <div className="min-h-[120px] bg-page-bg"><img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /></div> : <div className="flex aspect-[4/3] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1 p-3.5 sm:p-4">
         <h3 className="break-words text-[15px] font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-[17px] font-bold tracking-tight">{item.price}</p>}

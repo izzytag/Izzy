@@ -161,6 +161,17 @@ describe("Phone-first product bottom sheet", () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
+  it("keeps the no-photo placeholder short, so the Order button stays close on a phone", () => {
+    const { container } = render(<CatalogueCard item={{ ...ITEM, image_urls: [] }} whatsapp="919999999999" shopName="Test Shop" pageUrl="/testshop" />);
+
+    // A photo-less product used to render a tall 4/5 empty block
+    // (about 440px on a 350px phone column), burying the Order
+    // button under empty space. The placeholder is now 4/3.
+    expect(container.querySelector('[class*="aspect-[4/3]"]')).not.toBeNull();
+    expect(container.querySelector('[class*="aspect-[4/5]"]')).toBeNull();
+    expect(screen.getByRole("link", { name: "Order Chocolate cake on WhatsApp" })).toBeInTheDocument();
+  });
+
   it("shows no card-level order button when the shop has no WhatsApp number", () => {
     render(<CatalogueCard item={ITEM} whatsapp={null} pageUrl="/testshop" />);
 
