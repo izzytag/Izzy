@@ -97,7 +97,7 @@ function ShopLoading() {
         </div>
         <div className="mt-8 columns-2 gap-4 sm:columns-3 lg:columns-4">
           {[176, 220, 150, 200, 168, 232].map((h) => (
-            <div key={h} className="mb-4 break-inside-avoid rounded-[24px] bg-muted" style={{ height: h }} />
+            <div key={h} className="mb-4 break-inside-avoid rounded-xl bg-muted" style={{ height: h }} />
           ))}
         </div>
       </div>

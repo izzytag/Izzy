@@ -31,7 +31,7 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   // page-* theme variables do not resolve there. WhatsApp green is
   // the designated colour for WhatsApp actions.
   const action = demoMode ? demoAction : href ? <Button asChild className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{"Order on WhatsApp"}</a></Button> : null;
-  return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
+  return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-xl border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
       {/* Pins show the photo at its natural ratio (capped, so an
           extreme panorama or portrait can't dominate the column) —
@@ -49,7 +49,7 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
     {/* No order button on the pin itself: tapping the pin opens the
         details below, and ordering happens from there only. */}
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] gap-5 overflow-y-auto rounded-2xl sm:max-w-lg sm:rounded-2xl">
+      <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] gap-5 overflow-y-auto rounded-xl sm:max-w-lg sm:rounded-xl">
         <DialogHeader className="text-left"><DialogTitle className="break-words pr-8 text-left text-[22px] font-bold leading-tight tracking-tight">{item.title}</DialogTitle></DialogHeader>
         {photos.length > 0 ? <div className="space-y-2.5">
           {detailImgFailed ? (

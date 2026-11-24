@@ -17,7 +17,7 @@ export function Section({ id, className, children }: { id?: string; className?: 
 export function SectionHeading({ title, sub, className }: { title: string; sub?: string; className?: string }) {
   return (
     <div className={cn("mx-auto max-w-2xl text-center", className)}>
-      <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{title}</h2>
+      <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{title}</h2>
       {sub && <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{sub}</p>}
     </div>
   );

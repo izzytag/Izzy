@@ -144,7 +144,7 @@ export function Landing() {
             <span className="anim-hero-1 inline-flex items-center rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
               For small businesses, creators &amp; local shops
             </span>
-            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
+            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-[2.75rem] font-extrabold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
             <p className="anim-hero-3 mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">Create your own online shop, showcase your products and get orders directly on WhatsApp.</p>
             <div className="anim-hero-4 mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild size="lg" className="anim-press min-h-[52px] text-base">
@@ -201,7 +201,7 @@ export function Landing() {
               const photoAlt = s.data.links[0]?.title ?? s.data.display_name ?? "";
               return (
                 <Reveal key={s.label} delay={i * 90} className="h-full">
-                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
+                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
                     <img src={photo} alt={photoAlt} className="aspect-[4/3] w-full object-cover" />
                     <div className="p-6">
                       <h3 className="text-xl font-semibold">{s.data.display_name}</h3>
