@@ -75,9 +75,9 @@ export const Route = createFileRoute("/$username")({
   },
   notFoundComponent: () => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <h1 className="text-3xl font-bold">This shop isn't here yet</h1>
+      <h1 className="text-3xl font-semibold">This shop isn't here yet</h1>
       <p className="text-muted-foreground">Grab this username for your own izzy shop.</p>
-      <Link to="/auth" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your shop</Link>
+      <Link to="/auth" className="flex min-h-[52px] items-center rounded-md bg-primary px-8 text-lg font-semibold text-primary-foreground">Create your shop</Link>
     </div>
   ),
   component: PublicPage,
@@ -88,7 +88,7 @@ function ShopLoading() {
     <div className="min-h-screen bg-background px-4 pt-10 pb-28 text-foreground sm:px-5" aria-busy="true" aria-label="Loading shop">
       <div className="mx-auto w-full max-w-5xl animate-pulse">
         <div className="flex items-start gap-4 sm:gap-5">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-muted sm:h-20 sm:w-20" />
+          <div className="h-16 w-16 shrink-0 rounded-md bg-muted sm:h-20 sm:w-20" />
           <div className="min-w-0 flex-1 space-y-2.5 pt-1">
             <div className="h-7 w-48 max-w-full rounded-lg bg-muted" />
             <div className="h-4 w-32 rounded-lg bg-muted" />
@@ -97,7 +97,7 @@ function ShopLoading() {
         </div>
         <div className="mt-8 columns-2 gap-4 sm:columns-3 lg:columns-4">
           {[176, 220, 150, 200, 168, 232].map((h) => (
-            <div key={h} className="mb-4 break-inside-avoid rounded-[24px] bg-muted" style={{ height: h }} />
+            <div key={h} className="mb-4 break-inside-avoid rounded-md bg-muted" style={{ height: h }} />
           ))}
         </div>
       </div>
@@ -112,11 +112,11 @@ function PublicPage() {
   if (data.suspended) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <h1 className="text-3xl font-bold">This shop is temporarily unavailable</h1>
+        <h1 className="text-3xl font-semibold">This shop is temporarily unavailable</h1>
         <p className="max-w-md text-muted-foreground">
           {data.displayName ? `${data.displayName} can't take orders right now. ` : ""}Please check back later.
         </p>
-        <Link to="/" className="flex min-h-[52px] items-center rounded-full bg-primary px-8 text-lg font-semibold text-primary-foreground">Go to izzy</Link>
+        <Link to="/" className="flex min-h-[52px] items-center rounded-md bg-primary px-8 text-lg font-semibold text-primary-foreground">Go to izzy</Link>
       </div>
     );
   }

@@ -10,19 +10,19 @@ const PRO = ["Unlimited products", "Your shop at izzytag.shop/yourname", "All 8 
 export function PricingCards({ freeCta, proCta, region }: { freeCta: ReactNode; proCta: ReactNode; region: Region | "loading" }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <div className="rounded-xl border bg-card p-6 sm:p-8">
+      <div className="rounded-md border bg-card p-6 sm:p-8">
         <h3 className="text-xl font-bold">Free</h3>
         <p className="mt-2 font-display text-4xl font-bold">$0</p>
         <p className="text-base text-muted-foreground">forever</p>
-        <ul className="my-6 space-y-3 text-base">{FREE.map((f) => <li key={f} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-primary" />{f}</li>)}</ul>
+        <ul className="my-6 space-y-3 text-base">{FREE.map((f) => <li key={f} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-foreground" />{f}</li>)}</ul>
         {freeCta}
       </div>
-      <div className="relative rounded-xl border-2 border-primary bg-card p-6 sm:p-8">
-        <span className="absolute -top-3 right-5 rounded-full bg-highlight px-3 py-1 text-xs font-bold text-primary">Best value</span>
+      <div className="relative rounded-md border-2 border-foreground bg-card p-6 sm:p-8">
+        <span className="absolute -top-3 right-5 rounded-md bg-highlight px-3 py-1 text-xs font-bold text-foreground">Best value</span>
         <h3 className="text-xl font-bold">Pro</h3>
         <p className="mt-2 font-display text-3xl font-bold">{proPriceLine(region)}</p>
         <p className="text-base text-muted-foreground">Cancel anytime</p>
-        <ul className="my-6 space-y-3 text-base">{PRO.map((f) => <li key={f} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-primary" />{f}</li>)}</ul>
+        <ul className="my-6 space-y-3 text-base">{PRO.map((f) => <li key={f} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-foreground" />{f}</li>)}</ul>
         {proCta}
       </div>
     </div>

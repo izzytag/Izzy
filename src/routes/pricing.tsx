@@ -28,7 +28,7 @@ export const Route = createFileRoute("/pricing")({
 });
 
 const cta = (label: string, primary = false) => (
-  <Link to="/auth" className={`flex min-h-[52px] items-center justify-center rounded-xl text-lg font-semibold ${primary ? "bg-primary text-primary-foreground" : "border"}`}>{label}</Link>
+  <Link to="/auth" className={`flex min-h-[52px] items-center justify-center rounded-md text-lg font-semibold ${primary ? "bg-primary text-primary-foreground" : "border"}`}>{label}</Link>
 );
 
 const BILLING_FAQ = [
@@ -64,11 +64,11 @@ export function Pricing() {
     <div className="min-h-screen bg-hero">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 py-10">
-        <h1 className="text-4xl font-extrabold sm:text-center">Simple pricing</h1>
+        <h1 className="text-4xl font-semibold sm:text-center">Simple pricing</h1>
         <p className="mt-3 text-base text-muted-foreground sm:text-center">{`${proPriceLine(region)} for Pro. No surprises.`}</p>
         <div className="mt-10"><PricingCards region={region} freeCta={cta("Start free")} proCta={cta("Go Pro", true)} /></div>
         <section className="mt-14">
-          <h2 className="text-2xl font-bold sm:text-center">Billing questions</h2>
+          <h2 className="text-2xl font-semibold sm:text-center">Billing questions</h2>
           <Accordion type="single" collapsible className="mt-6">
             {BILLING_FAQ.map((f) => (
               <AccordionItem key={f.q} value={f.q} className="border-border">
@@ -78,8 +78,8 @@ export function Pricing() {
             ))}
           </Accordion>
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground sm:text-center">
-            The full terms are in our <Link to="/terms" className="font-semibold text-primary underline">Terms</Link>.
-            Still stuck? <Link to="/contact" className="font-semibold text-primary underline">Contact us</Link> and we&apos;ll help.
+            The full terms are in our <Link to="/terms" className="font-semibold text-foreground underline">Terms</Link>.
+            Still stuck? <Link to="/contact" className="font-semibold text-foreground underline">Contact us</Link> and we&apos;ll help.
           </p>
         </section>
       </main>

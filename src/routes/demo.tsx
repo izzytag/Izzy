@@ -32,7 +32,7 @@ export function DemoBanner() {
     // phones, and sits in the row on wider screens.
     <div className="border-b border-border bg-card/95 backdrop-blur sm:sticky sm:top-0 sm:z-40">
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-5">
-        <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground">
+        <span className="inline-flex items-center rounded-md bg-foreground px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground">
           Demo shop
         </span>
         <p className="min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">

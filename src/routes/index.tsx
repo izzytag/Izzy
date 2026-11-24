@@ -141,10 +141,10 @@ export function Landing() {
       <section className="overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-2 lg:px-8 lg:pb-28">
           <div className="text-center lg:text-left">
-            <span className="anim-hero-1 inline-flex items-center rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
+            <span className="anim-hero-1 inline-flex items-center rounded-md border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
               For small businesses, creators &amp; local shops
             </span>
-            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
+            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
             <p className="anim-hero-3 mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">Create your own online shop, showcase your products and get orders directly on WhatsApp.</p>
             <div className="anim-hero-4 mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild size="lg" className="anim-press min-h-[52px] text-base">
@@ -169,12 +169,12 @@ export function Landing() {
           <div className="mt-12 grid gap-5 sm:grid-cols-3">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 90} className="h-full">
-                <div className="h-full rounded-xl border border-border bg-card p-7">
+                <div className="h-full rounded-md border border-border bg-card p-7">
                   <div className="flex items-center justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-md bg-primary-soft text-foreground">
                       <s.icon className="h-5 w-5" />
                     </span>
-                    <span className="font-display text-lg font-bold text-muted-foreground">{s.n}</span>
+                    <span className="font-display text-lg font-semibold text-muted-foreground">{s.n}</span>
                   </div>
                   <h3 className="mt-5 text-xl font-semibold">{s.t}</h3>
                   <p className="mt-2 leading-relaxed text-muted-foreground">{s.d}</p>
@@ -201,13 +201,13 @@ export function Landing() {
               const photoAlt = s.data.links[0]?.title ?? s.data.display_name ?? "";
               return (
                 <Reveal key={s.label} delay={i * 90} className="h-full">
-                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
+                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-md border border-border bg-card shadow-pin">
                     <img src={photo} alt={photoAlt} className="aspect-[4/3] w-full object-cover" />
                     <div className="p-6">
                       <h3 className="text-xl font-semibold">{s.data.display_name}</h3>
                       <p className="mt-1 text-sm font-medium text-muted-foreground">{s.label}</p>
                       <p className="mt-2 leading-relaxed text-muted-foreground">{s.data.bio}</p>
-                      <span className="mt-4 inline-flex items-center gap-1 font-semibold text-primary">
+                      <span className="mt-4 inline-flex items-center gap-1 font-semibold text-foreground">
                         View demo shop <span aria-hidden>→</span>
                       </span>
                     </div>
@@ -226,8 +226,8 @@ export function Landing() {
           <div className="mt-12 grid gap-5 sm:grid-cols-2">
             {FEATURES.map((f, i) => (
               <Reveal key={f.t} delay={i * 90} className="h-full">
-                <div className="h-full rounded-xl border border-border bg-card p-7">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                <div className="h-full rounded-md border border-border bg-card p-7">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-md bg-primary-soft text-foreground">
                     <f.icon className="h-5 w-5" />
                   </span>
                   <h3 className="mt-5 text-xl font-semibold">{f.t}</h3>
@@ -245,20 +245,20 @@ export function Landing() {
           <SectionHeading
             title="Your customers are already on WhatsApp. Meet them there."
           />
-          <div className="mx-auto mt-12 max-w-md rounded-xl border border-border bg-background p-5" aria-label="WhatsApp conversation">
+          <div className="mx-auto mt-12 max-w-md rounded-md border border-border bg-background p-5" aria-label="WhatsApp conversation">
           <div className="flex items-center gap-3 border-b border-border pb-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">C</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-base font-bold text-background">C</span>
             <div>
               <p className="text-base font-semibold leading-tight">Cake Factory</p>
               <p className="text-sm text-muted-foreground">WhatsApp</p>
             </div>
           </div>
           <div className="space-y-3 pt-4">
-            <p className="max-w-[85%] rounded-xl rounded-tl-sm bg-card p-3.5 leading-relaxed shadow-none">
+            <p className="max-w-[85%] rounded-md rounded-tl-sm bg-card p-3.5 leading-relaxed shadow-none">
               Hi! I&apos;m interested in &quot;Chocolate cake&quot; (₹499) listed on Cake Factory&apos;s izzy shop. Could you please share more details?
               <span className="mt-1 block text-sm text-muted-foreground">This message is written for the customer — they just tap send.</span>
             </p>
-            <p className="ml-auto max-w-[85%] rounded-xl rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">
+            <p className="ml-auto max-w-[85%] rounded-md rounded-tr-sm bg-whatsapp/10 p-3.5 leading-relaxed">
               Hi, thank you! When would you like it delivered?
             </p>
           </div>
@@ -303,8 +303,8 @@ export function Landing() {
       {/* ---------- Final CTA ---------- */}
       <Section className="py-20 sm:py-28">
         <Reveal>
-          <div className="rounded-xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
-            <h2 className="mx-auto max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Your products deserve their own space.</h2>
+          <div className="rounded-md bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
+            <h2 className="mx-auto max-w-2xl text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">Your products deserve their own space.</h2>
             <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-primary-foreground/85">Create your shop and start sharing your products with the world.</p>
             <Button asChild size="lg" className="anim-press mt-9 min-h-[52px] bg-white text-primary hover:bg-white/90">
               <Link to="/auth">Create your free shop</Link>
