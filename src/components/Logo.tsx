@@ -2,8 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-1.5 font-display text-xl font-bold tracking-tight">
-      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">i</span>
+    <Link to="/" className="flex items-center font-display text-xl font-semibold tracking-tight">
       izzy<span className="text-primary">.</span>
     </Link>
   );

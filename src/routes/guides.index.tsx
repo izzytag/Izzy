@@ -55,13 +55,13 @@ function GuidesIndex() {
           <Link
             key={g.to}
             to={g.to}
-            className="group rounded-xl border bg-card p-6 transition hover:border-primary/40"
+            className="group rounded-md border bg-card p-6 transition hover:border-foreground/30"
           >
-            <g.icon className="h-7 w-7 text-primary" />
+            <g.icon className="h-7 w-7 text-foreground" />
             <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{g.label}</p>
             <h2 className="mt-1.5 text-xl font-bold leading-snug">{g.title}</h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">{g.summary}</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 font-semibold text-primary">
+            <span className="mt-4 inline-flex items-center gap-1.5 font-semibold text-foreground">
               Read the guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </span>
           </Link>
