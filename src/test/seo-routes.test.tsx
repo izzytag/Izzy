@@ -190,3 +190,76 @@ describe("new guide routes", () => {
     }
   });
 });
+
+describe("SEO work 2026-11-24", () => {
+  it("homepage title and description target the searches sellers type", () => {
+    const head = getHead(IndexRoute);
+
+    expect(titleOf(head)).toBe("Create your online shop in India — sell on WhatsApp | izzy");
+    expect(metaContent(head, "name", "description") as string).toContain("home bakery");
+    expect(metaContent(head, "name", "description") as string).toContain("WhatsApp");
+  });
+
+  it("every guide carries Article JSON-LD matching its own H1 and URL", () => {
+    const guides: { route: unknown; headline: string; path: string }[] = [
+      { route: SellOnWhatsAppRoute, headline: "How to sell on WhatsApp with a shop link", path: "/guides/sell-on-whatsapp" },
+      { route: BioSetupRoute, headline: "How to set up a shop link for your Instagram bio", path: "/guides/instagram-bio-shop-link-setup" },
+      { route: CatalogueIndiaRoute, headline: "How to create a free online catalogue for your small business in India", path: "/guides/free-online-catalogue-india" },
+    ];
+    for (const g of guides) {
+      const head = getHead(g.route);
+      const article = head.scripts
+        ?.map((s) => {
+          try {
+            return JSON.parse(s.children ?? "") as { "@type"?: string };
+          } catch {
+            return null;
+          }
+        })
+        .find((p) => p?.["@type"] === "Article") as
+        | { headline: string; mainEntityOfPage: string; description: string }
+        | undefined;
+      expect(article, g.path).toBeDefined();
+      expect(article!.headline).toBe(g.headline);
+      expect(article!.mainEntityOfPage).toBe(`${SITE_URL}${g.path}`);
+      expect(article!.description.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("shop head emits one Product node per catalogue item, with an Offer only for parsed prices", () => {
+    const shopWithProducts = {
+      suspended: false as const,
+      profile: {
+        id: "user-1",
+        username: "priya",
+        display_name: "Priya's Kitchen",
+        bio: "Homemade cakes in Pune",
+        category: null,
+        avatar_url: "https://example.com/avatar.png",
+        theme: "light",
+        socials: {},
+        whatsapp: null,
+        upi_id: null,
+        suspended: false,
+      },
+      links: [
+        { id: "p1", title: "Chocolate cake", url: "#", kind: "product", price: "₹499", description: "Rich Belgian chocolate.", image_urls: ["https://example.com/cake.webp"], category: null },
+        { id: "p2", title: "Sourdough loaf", url: "#", kind: "product", price: "Price on request", description: "Slow-fermented.", image_urls: [], category: null },
+      ],
+      isPro: false,
+    };
+    const head = getHead(UsernameRoute, { loaderData: shopWithProducts });
+    const script = head.scripts?.find((s) => s.type === "application/ld+json");
+    expect(script).toBeDefined();
+    const parsed = JSON.parse(script!.children!) as {
+      "@graph": { "@type": string; name?: string; offers?: { price: number; priceCurrency: string } }[];
+    };
+    expect(parsed["@graph"][0]).toMatchObject({ "@type": "Store", name: "Priya's Kitchen" });
+    const products = parsed["@graph"].filter((n) => n["@type"] === "Product");
+    expect(products).toHaveLength(2);
+    expect(products[0]).toMatchObject({ name: "Chocolate cake" });
+    expect(products[0]!.offers).toMatchObject({ price: 499, priceCurrency: "INR" });
+    expect(products[1]).toMatchObject({ name: "Sourdough loaf" });
+    expect(products[1]!.offers).toBeUndefined();
+  });
+});

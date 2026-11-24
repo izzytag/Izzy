@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, LayoutGrid, Link2, MessageCircle } from "lucide-react";
-import { Section, SectionHeading } from "@/components/Section";
+import { Section } from "@/components/Section";
 import { seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/")({
@@ -46,10 +46,12 @@ export const GUIDES = [
 function GuidesIndex() {
   return (
     <Section className="py-14 sm:py-20">
-      <SectionHeading
-        title="Guides for selling online"
-        sub="Practical, no-jargon help for small businesses, creators and local shops — written around how your customers already buy: through WhatsApp."
-      />
+      {/* The page had no H1 — SectionHeading renders an H2. Same
+          look, but a real H1 so the page has one top-level heading. */}
+      <div className="mx-auto max-w-2xl text-center">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Guides for selling online</h1>
+        <p className="mt-4 text-lg leading-relaxed text-muted-foreground">Practical, no-jargon help for small businesses, creators and local shops — written around how your customers already buy: through WhatsApp.</p>
+      </div>
       <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
         {GUIDES.map((g) => (
           <Link

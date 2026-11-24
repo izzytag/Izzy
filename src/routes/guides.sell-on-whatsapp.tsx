@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GuideArticle, GuideH2, GuideList, GuideP } from "@/components/GuideArticle";
-import { seoHead } from "@/lib/seo";
+import { articleJsonLd, seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/sell-on-whatsapp")({
   head: () => ({
@@ -11,6 +11,16 @@ export const Route = createFileRoute("/guides/sell-on-whatsapp")({
       ogTitle: "How to sell on WhatsApp with a shop link",
       ogDescription: "One link with your products and prices — and enquiries that arrive on WhatsApp, ready to answer.",
     }),
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: articleJsonLd({
+          title: "How to sell on WhatsApp with a shop link",
+          description: "Set up a simple online shop, share one link, and receive product enquiries directly on WhatsApp. A practical guide for small businesses, home bakers, boutiques and resellers.",
+          path: "/guides/sell-on-whatsapp",
+        }),
+      },
+    ],
   }),
   component: SellOnWhatsApp,
 });

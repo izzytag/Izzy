@@ -52,6 +52,93 @@ export function faqPageJsonLd(faqs: readonly FaqEntry[]): string {
   );
 }
 
+/**
+ * Guide URLs deleted in the Nov 2026 slim-down, and where each one
+ * moved to. The old slugs 404 live with no redirect; server.ts
+ * 301s them so old links, shares and any indexed copies land on
+ * the live guide instead of a dead page.
+ */
+export const LEGACY_GUIDE_REDIRECTS: Readonly<Record<string, string>> = {
+  "/guides/sell-on-whatsapp-without-website": "/guides/sell-on-whatsapp",
+  "/guides/instagram-bio-link": "/guides/instagram-bio-shop-link-setup",
+};
+
+/**
+ * Article JSON-LD for a guide: headline + description must match the
+ * article's own rendered H1 and intro — search engines require the
+ * visible content to match. Author/publisher are the platform
+ * itself; no author person, date or rating is claimed.
+ */
+export function articleJsonLd(opts: { title: string; description: string; path: string }): string {
+  return escapeJsonLd(
+    JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: opts.title,
+      description: opts.description,
+      mainEntityOfPage: `${SITE_URL}${opts.path}`,
+      author: { "@type": "Organization", name: "izzy", url: `${SITE_URL}/` },
+      publisher: {
+        "@type": "Organization",
+        name: "izzy",
+        url: `${SITE_URL}/`,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.png` },
+      },
+    }),
+  );
+}
+
+/**
+ * Parse a seller-typed price tag such as "₹499" or "$12.50" into a
+ * numeric amount + ISO currency. Only the currency the symbol
+ * actually states is claimed; anything else returns null and the
+ * product simply gets no Offer in its structured data.
+ */
+export function parsePriceTag(price: string | null | undefined): { amount: number; currency: string } | null {
+  if (!price) return null;
+  const trimmed = price.trim();
+  const match = /^([₹$])\s*([\d,]+(?:\.\d{1,2})?)$/.exec(trimmed);
+  if (!match) return null;
+  const amount = Number(match[2].replace(/,/g, ""));
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  return { amount, currency: match[1] === "₹" ? "INR" : "USD" };
+}
+
+export type ProductJsonLdInput = {
+  name: string;
+  description?: string | null;
+  image?: string | null;
+  /** Seller-typed price tag, e.g. "₹499". */
+  price?: string | null;
+};
+
+/**
+ * Product JSON-LD for one catalogue item, built only from the
+ * seller's own saved fields. An Offer is included only when the
+ * price tag parses to a real amount + currency (see parsePriceTag).
+ */
+export function productJsonLd(product: ProductJsonLdInput, shopUrl: string) {
+  const item: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    url: shopUrl,
+  };
+  if (product.description) item.description = product.description;
+  if (product.image?.startsWith("https://")) item.image = product.image;
+  const parsed = parsePriceTag(product.price);
+  if (parsed) {
+    item.offers = {
+      "@type": "Offer",
+      price: parsed.amount,
+      priceCurrency: parsed.currency,
+      availability: "https://schema.org/InStock",
+      url: shopUrl,
+    };
+  }
+  return item;
+}
+
 /** Public static routes that belong in the sitemap. Update this list
  *  when adding or removing a public route. Deliberately excludes
  *  /auth (noindex) and /dashboard, /admin, /onboarding (private). */

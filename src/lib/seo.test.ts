@@ -2,13 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_OG_IMAGE,
+  LEGACY_GUIDE_REDIRECTS,
   STATIC_SITEMAP_PATHS,
   SITE_URL,
+  articleJsonLd,
   buildSitemapXml,
   escapeJsonLd,
   escapeXml,
   faqPageJsonLd,
   isSitemapEligibleUsername,
+  parsePriceTag,
+  productJsonLd,
   seoHead,
 } from "./seo";
 
@@ -182,5 +186,84 @@ describe("seoHead", () => {
 
     expect(head.links).toEqual([{ rel: "canonical", href: `${SITE_URL}/` }]);
     expect(head.meta).toContainEqual({ property: "og:url", content: `${SITE_URL}/` });
+  });
+});
+
+describe("LEGACY_GUIDE_REDIRECTS", () => {
+  it("maps both deleted guide slugs to their live replacements", () => {
+    expect(LEGACY_GUIDE_REDIRECTS["/guides/sell-on-whatsapp-without-website"]).toBe("/guides/sell-on-whatsapp");
+    expect(LEGACY_GUIDE_REDIRECTS["/guides/instagram-bio-link"]).toBe("/guides/instagram-bio-shop-link-setup");
+  });
+
+  it("only redirects to routes that are in the sitemap", () => {
+    for (const target of Object.values(LEGACY_GUIDE_REDIRECTS)) {
+      expect(STATIC_SITEMAP_PATHS).toContain(target);
+    }
+    for (const source of Object.keys(LEGACY_GUIDE_REDIRECTS)) {
+      expect(STATIC_SITEMAP_PATHS).not.toContain(source);
+    }
+  });
+});
+
+describe("articleJsonLd", () => {
+  it("builds an Article whose headline and URL match the live guide", () => {
+    const parsed = JSON.parse(
+      articleJsonLd({
+        title: "How to sell on WhatsApp with a shop link",
+        description: "A practical guide.",
+        path: "/guides/sell-on-whatsapp",
+      }),
+    ) as { "@type": string; headline: string; mainEntityOfPage: string };
+
+    expect(parsed["@type"]).toBe("Article");
+    expect(parsed.headline).toBe("How to sell on WhatsApp with a shop link");
+    expect(parsed.mainEntityOfPage).toBe(`${SITE_URL}/guides/sell-on-whatsapp`);
+  });
+
+  it("never emits a literal closing script tag", () => {
+    const jsonLd = articleJsonLd({ title: "T</script>", description: "D & <b>", path: "/guides/sell-on-whatsapp" });
+
+    expect(jsonLd).not.toContain("</script>");
+    expect(jsonLd).not.toContain("<");
+  });
+});
+
+describe("parsePriceTag", () => {
+  it("parses rupee and dollar tags", () => {
+    expect(parsePriceTag("₹499")).toEqual({ amount: 499, currency: "INR" });
+    expect(parsePriceTag("₹1,299")).toEqual({ amount: 1299, currency: "INR" });
+    expect(parsePriceTag("$12.50")).toEqual({ amount: 12.5, currency: "USD" });
+  });
+
+  it("returns null for missing, bare or non-numeric prices", () => {
+    expect(parsePriceTag(null)).toBeNull();
+    expect(parsePriceTag(undefined)).toBeNull();
+    expect(parsePriceTag("")).toBeNull();
+    expect(parsePriceTag("499")).toBeNull();
+    expect(parsePriceTag("Price on request")).toBeNull();
+    expect(parsePriceTag("₹0")).toBeNull();
+  });
+});
+
+describe("productJsonLd", () => {
+  it("includes an Offer only when the price tag parses", () => {
+    const withPrice = productJsonLd(
+      { name: "Chocolate cake", description: "Rich Belgian chocolate.", image: "https://example.com/cake.webp", price: "₹499" },
+      `${SITE_URL}/hetvi`,
+    ) as { offers: { price: number; priceCurrency: string } };
+
+    expect(withPrice.offers).toEqual({
+      "@type": "Offer",
+      price: 499,
+      priceCurrency: "INR",
+      availability: "https://schema.org/InStock",
+      url: `${SITE_URL}/hetvi`,
+    });
+
+    const withoutPrice = productJsonLd({ name: "Cake", price: "Price on request" }, `${SITE_URL}/hetvi`) as {
+      offers?: unknown;
+    };
+
+    expect(withoutPrice.offers).toBeUndefined();
   });
 });
