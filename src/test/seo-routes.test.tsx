@@ -7,6 +7,7 @@ import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 import { Route as IndexRoute } from "@/routes/index";
 import { Route as PricingRoute } from "@/routes/pricing";
 import { Route as GuidesIndexRoute, GUIDES } from "@/routes/guides.index";
+import { Route as SellOnlineIndiaRoute } from "@/routes/guides.how-to-sell-online-in-india";
 import { Route as SellOnWhatsAppRoute } from "@/routes/guides.sell-on-whatsapp";
 import { Route as BioSetupRoute } from "@/routes/guides.instagram-bio-shop-link-setup";
 import { Route as CatalogueIndiaRoute } from "@/routes/guides.free-online-catalogue-india";
@@ -45,6 +46,7 @@ const STATIC_ROUTES: { path: string; route: unknown }[] = [
   { path: "/", route: IndexRoute },
   { path: "/pricing", route: PricingRoute },
   { path: "/guides", route: GuidesIndexRoute },
+  { path: "/guides/how-to-sell-online-in-india", route: SellOnlineIndiaRoute },
   { path: "/guides/sell-on-whatsapp", route: SellOnWhatsAppRoute },
   { path: "/guides/instagram-bio-shop-link-setup", route: BioSetupRoute },
   { path: "/guides/free-online-catalogue-india", route: CatalogueIndiaRoute },
@@ -167,8 +169,9 @@ describe("shop page head tags", () => {
 describe("new guide routes", () => {
   const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
 
-  it("matches the three guide pages, not the shop route", () => {
+  it("matches the four guide pages, not the shop route", () => {
     const cases: [string, string][] = [
+      ["/guides/how-to-sell-online-in-india", "/guides/how-to-sell-online-in-india"],
       ["/guides/sell-on-whatsapp", "/guides/sell-on-whatsapp"],
       ["/guides/instagram-bio-shop-link-setup", "/guides/instagram-bio-shop-link-setup"],
       ["/guides/free-online-catalogue-india", "/guides/free-online-catalogue-india"],
@@ -178,8 +181,9 @@ describe("new guide routes", () => {
     }
   });
 
-  it("lists all three guides in the guides index", () => {
+  it("lists all four guides in the guides index", () => {
     expect(GUIDES.map((g) => g.to)).toEqual([
+      "/guides/how-to-sell-online-in-india",
       "/guides/sell-on-whatsapp",
       "/guides/instagram-bio-shop-link-setup",
       "/guides/free-online-catalogue-india",
@@ -202,6 +206,11 @@ describe("SEO work 2026-11-24", () => {
 
   it("every guide carries Article JSON-LD matching its own H1 and URL", () => {
     const guides: { route: unknown; headline: string; path: string }[] = [
+      {
+        route: SellOnlineIndiaRoute,
+        headline: "How to Sell Online in India: A Simple Guide for Small Business Owners",
+        path: "/guides/how-to-sell-online-in-india",
+      },
       { route: SellOnWhatsAppRoute, headline: "How to sell on WhatsApp with a shop link", path: "/guides/sell-on-whatsapp" },
       { route: BioSetupRoute, headline: "How to set up a shop link for your Instagram bio", path: "/guides/instagram-bio-shop-link-setup" },
       { route: CatalogueIndiaRoute, headline: "How to create a free online catalogue for your small business in India", path: "/guides/free-online-catalogue-india" },
