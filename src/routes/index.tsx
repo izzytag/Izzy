@@ -20,9 +20,13 @@ import type { ThemeId } from "@/lib/themes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    // SEO title/description target the searches sellers actually
+    // type — "online shop India", "sell on WhatsApp", home bakers
+    // and handmade sellers. The visible H1 and page copy are
+    // unchanged; only the search-facing title/description move.
     ...seoHead({
-      title: "izzy — Your business. Your products. One shop link.",
-      description: "Create your online shop, showcase your products and receive orders directly through WhatsApp. No technical skills required.",
+      title: "Create your online shop in India — sell on WhatsApp | izzy",
+      description: "Create a free online shop for your home bakery, handmade products or local store. Add photos and prices, share one link, and take orders on WhatsApp — no website needed.",
       path: "/",
     }),
     // Structured data: only facts — the platform's name, URL and

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GuideArticle, GuideH2, GuideList, GuideP } from "@/components/GuideArticle";
-import { seoHead } from "@/lib/seo";
+import { articleJsonLd, seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/instagram-bio-shop-link-setup")({
   head: () => ({
@@ -11,6 +11,16 @@ export const Route = createFileRoute("/guides/instagram-bio-shop-link-setup")({
       ogTitle: "How to set up a shop link for your Instagram bio",
       ogDescription: "Create the shop page, put the link in your bio, and check it works — step by step.",
     }),
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: articleJsonLd({
+          title: "How to set up a shop link for your Instagram bio",
+          description: "A step-by-step setup: create your shop page, add products and prices, connect WhatsApp, and put the link in your Instagram bio — then check it works before you tell anyone about it.",
+          path: "/guides/instagram-bio-shop-link-setup",
+        }),
+      },
+    ],
   }),
   component: InstagramBioShopLinkSetup,
 });

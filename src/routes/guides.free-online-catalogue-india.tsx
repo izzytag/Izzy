@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GuideArticle, GuideH2, GuideList, GuideP } from "@/components/GuideArticle";
-import { seoHead } from "@/lib/seo";
+import { articleJsonLd, seoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/free-online-catalogue-india")({
   head: () => ({
@@ -11,6 +11,16 @@ export const Route = createFileRoute("/guides/free-online-catalogue-india")({
       ogTitle: "How to create a free online catalogue for your small business in India",
       ogDescription: "Your products, photos and prices in one shareable catalogue — free to start, with orders on WhatsApp.",
     }),
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: articleJsonLd({
+          title: "How to create a free online catalogue for your small business in India",
+          description: "What a good catalogue contains, how to photograph products with a phone, and what “free” honestly includes — prices in rupees, UPI payments, and orders on WhatsApp.",
+          path: "/guides/free-online-catalogue-india",
+        }),
+      },
+    ],
   }),
   component: FreeOnlineCatalogueIndia,
 });

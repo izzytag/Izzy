@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { handleRazorpayWebhookRequest } from "./lib/razorpay-webhook-route.server";
 import { handleSitemapRequest } from "./lib/sitemap-route.server";
+import { LEGACY_GUIDE_REDIRECTS } from "./lib/seo";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -59,6 +60,18 @@ export default {
           return new Response(null, { status: 405, headers: { Allow: "POST" } });
         }
         return await handleRazorpayWebhookRequest(request);
+      }
+      // Deleted guide URLs: same interception pattern as the webhook —
+      // the old slugs 404 since the slim-down, so 301 them to the
+      // live guide (query string preserved). Only GET/HEAD redirect;
+      // anything else falls through to the app handler.
+      const redirectTarget = LEGACY_GUIDE_REDIRECTS[new URL(request.url).pathname];
+      if (redirectTarget && (request.method === "GET" || request.method === "HEAD")) {
+        const url = new URL(request.url);
+        return new Response(null, {
+          status: 301,
+          headers: { Location: `${redirectTarget}${url.search}` },
+        });
       }
       // Dynamic sitemap: same interception pattern as the webhook —
       // this TanStack Start version has no API file routes. The

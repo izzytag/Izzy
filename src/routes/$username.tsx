@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { trackProductView, trackShopView, trackWhatsappClick } from "@/lib/track";
 import { getPublicPage } from "@/lib/public-page.functions";
 import { PublicProfile } from "@/components/PublicProfile";
-import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_URL, escapeJsonLd, productJsonLd } from "@/lib/seo";
 import { effectiveTheme } from "@/lib/themes";
 import { effectiveIsPro } from "@/lib/billing";
 
@@ -43,14 +43,12 @@ export const Route = createFileRoute("/$username")({
     // Structured data for the shop itself — built only from the
     // business's own saved fields (name, link, description, photo).
     const store: {
-      "@context": string;
       "@type": string;
       name: string;
       url: string;
       description?: string;
       image?: string;
     } = {
-      "@context": "https://schema.org",
       "@type": "Store",
       // A loaded shop always has a username (the loader fetches by
       // it); the final fallback only satisfies the nullable types.
@@ -60,17 +58,29 @@ export const Route = createFileRoute("/$username")({
     if (p.bio) store.description = p.bio;
     const avatar = p.avatar_url;
     if (avatar?.startsWith("https://")) store.image = avatar;
-    // Escape the serialized JSON: the store fields come from the seller,
+    // One Product node per catalogue item, from the seller's own
+    // saved fields (name, description, photo, price tag). An Offer
+    // is included only when the price tag parses to a real amount
+    // + currency — see parsePriceTag in lib/seo.
+    const productItems = (loaderData.links ?? []).map((link) =>
+      productJsonLd(
+        {
+          name: link.title,
+          description: link.description,
+          image: link.image_urls?.[0] ?? null,
+          price: link.price,
+        },
+        shopUrl,
+      ),
+    );
+    // Escape the serialized JSON: the fields come from the seller,
     // and JSON.stringify does not escape < > &, so a bio containing
     // </script> could otherwise break out of this script block and run
     // code in every visitor's browser. \uXXXX escapes are valid JSON
     // and keep the HTML parser from ever seeing a closing tag.
-    const jsonLd = JSON.stringify(store)
-      .replace(/</g, "\\u003c")
-      .replace(/>/g, "\\u003e")
-      .replace(/&/g, "\\u0026")
-      .replace(/\u2028/g, "\\u2028")
-      .replace(/\u2029/g, "\\u2029");
+    const jsonLd = escapeJsonLd(
+      JSON.stringify({ "@context": "https://schema.org", "@graph": [store, ...productItems] }),
+    );
     return { meta, links: [{ rel: "canonical", href: shopUrl }], scripts: [{ type: "application/ld+json", children: jsonLd }] };
   },
   notFoundComponent: () => (
