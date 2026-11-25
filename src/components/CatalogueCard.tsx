@@ -3,6 +3,7 @@ import { MessageCircle, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { waCardLink } from "@/lib/themes";
+import { OrderForm } from "@/components/OrderForm";
 
 export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null };
 
@@ -16,6 +17,12 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   const Icon = ShoppingBag;
   const href = whatsapp && /\d{6,}/.test(whatsapp.replace(/\D/g, "")) ? waCardLink(whatsapp, item.kind ?? "product", item.title, `${pageUrl}#item-${item.id}`, { price: item.price, shopName }) : null;
   const [open, setOpen] = useState(false);
+  // Ordering happens in two steps: the buyer first completes the
+  // short order form (quantity, date, pickup/delivery, note), and
+  // only then does WhatsApp open — with the complete order message.
+  // The form is cleared whenever the dialog closes, so reopening a
+  // product always starts from the product details.
+  const [ordering, setOrdering] = useState(false);
   // Demo mode (the /demo example shop): there is no seller and no
   // WhatsApp number, so the order action is replaced by a signup
   // call to action — a visitor can never message a wrong number or
@@ -29,8 +36,10 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   // The dialog renders in a portal outside the `.theme-*` wrapper, so
   // it must use the app-level tokens (defined on :root) — the
   // page-* theme variables do not resolve there. WhatsApp green is
-  // the designated colour for WhatsApp actions.
-  const action = demoMode ? demoAction : href ? <Button asChild className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90"><a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onLinkClick?.(item.id)}><MessageCircle />{"Order on WhatsApp"}</a></Button> : null;
+  // the designated colour for WhatsApp actions. The order button
+  // opens the order form instead of WhatsApp directly; the form's
+  // send button is what opens WhatsApp (and records the click).
+  const action = demoMode ? demoAction : href ? <Button className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90" onClick={() => setOrdering(true)}><MessageCircle />{"Order on WhatsApp"}</Button> : null;
   return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
     <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
       {/* Pins show the photo at its natural ratio (capped, so an
@@ -48,9 +57,13 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the
         details below, and ordering happens from there only. */}
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setOrdering(false); }}>
       <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] gap-5 overflow-y-auto rounded-2xl sm:max-w-lg sm:rounded-2xl">
         <DialogHeader className="text-left"><DialogTitle className="break-words pr-8 text-left text-[22px] font-bold leading-tight tracking-tight">{item.title}</DialogTitle></DialogHeader>
+        {ordering && !demoMode && href ? (
+          <OrderForm item={item} whatsapp={whatsapp ?? ""} shopName={shopName} pageUrl={pageUrl} onLinkClick={onLinkClick} onBack={() => setOrdering(false)} />
+        ) : (
+          <>
         {photos.length > 0 ? <div className="space-y-2.5">
           {detailImgFailed ? (
             <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-muted"><Icon className="h-12 w-12 text-muted-foreground" /></div>
@@ -70,7 +83,9 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
             dialog, so ordering never requires scrolling past a long
             description or photo list. It bleeds to the dialog edges
             with a solid background and top border, and its bottom
-            padding respects the phone's safe area. */}
+            padding respects the phone's safe area. While the order
+            form is open the form carries its own send/back actions,
+            so this block is hidden. */}
         <div className="sticky bottom-0 z-10 -mx-6 flex flex-col gap-2 border-t border-border bg-background px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
           {action ?? (
             <p className="flex min-h-[52px] items-center justify-center rounded-2xl bg-muted px-4 py-3 text-center text-sm leading-relaxed text-muted-foreground">
@@ -79,6 +94,8 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
           )}
           <Button variant="outline" className="min-h-[52px] w-full rounded-full text-base" onClick={() => setOpen(false)}>Close</Button>
         </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   </article>;
