@@ -112,7 +112,9 @@ describe("Mobile shop fixes", () => {
     render(<CatalogueCard item={ITEM} whatsapp={SHOP.whatsapp} shopName="Test Shop" pageUrl="/testshop" />);
 
     fireEvent.click(screen.getByRole("button", { name: "View Chocolate cake" }));
-    const order = screen.getByRole("link", { name: /Order on WhatsApp/ });
+    // The order action opens the order form first; WhatsApp opens
+    // from the form's send button, so it is a button, not a link.
+    const order = screen.getByRole("button", { name: "Order on WhatsApp" });
     const actionBlock = order.closest("div.sticky");
 
     expect(actionBlock?.classList.contains("bottom-0")).toBe(true);
