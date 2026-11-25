@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Instagram, Youtube, Twitter, Linkedin, MessageCircle, IndianRupee, Link as LinkIcon, ShoppingBag } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { isCompleteSocial, socialUrl, upiLink, type ThemeId } from "@/lib/themes";
@@ -36,6 +36,21 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
+  // Sticky mini-header: once the store header (logo + name) scrolls
+  // out of view, a compact bar with the logo and name slides in at
+  // the top-left so the buyer always knows whose shop they are in.
+  // Live pages only — in compact previews/mockups a viewport-fixed
+  // bar would stick to the page, not the frame.
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [showMiniHeader, setShowMiniHeader] = useState(false);
+  useEffect(() => {
+    if (compact) return;
+    const el = headerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => { if (entry) setShowMiniHeader(!entry.isIntersecting); }, { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [compact]);
   const name = data.display_name || data.username || "";
   const socials = Object.entries(data.socials || {}).filter(([k, v]) => isCompleteSocial(k, v));
   const items = data.links.filter(isCatalogueProduct);
@@ -43,6 +58,29 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
 
   return (
     <div className={`theme-${theme} bg-page-bg text-page-fg ${compact ? "min-h-full" : "min-h-screen"}`}>
+      {/* Sticky mini-header (live pages only): slides in at the top
+          once the store header scrolls away — small logo + shop name
+          at the top-left. z-40 keeps it below the product dialog
+          portal (z-50); safe-area padding for notched phones;
+          motion-reduce removes the slide. */}
+      {!compact && (
+        <div
+          aria-hidden={!showMiniHeader}
+          data-testid="sticky-shop-header"
+          className={`fixed inset-x-0 top-0 z-40 border-b border-page-border bg-page-bg/95 backdrop-blur transition-all duration-300 motion-reduce:transition-none ${showMiniHeader ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-full opacity-0"}`}
+        >
+          <div className="mx-auto flex w-full max-w-5xl items-center gap-2.5 px-4 pt-[env(safe-area-inset-top)] sm:px-5">
+            <div className="flex min-h-[52px] items-center gap-2.5">
+              {data.avatar_url && !avatarFailed ? (
+                <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white/70" />
+              ) : (
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-page-btn text-sm font-bold text-page-btn-fg ring-2 ring-white/70">{name.charAt(0).toUpperCase() || "?"}</div>
+              )}
+              <span className="min-w-0 truncate text-[15px] font-bold tracking-tight">{name}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Non-compact pages leave room at the bottom so the fixed
           WhatsApp button never covers the footer on small screens. */}
       <div className={`mx-auto flex w-full max-w-5xl flex-col px-4 ${compact ? "py-8" : "pt-10 pb-28 sm:px-5"}`}>
@@ -54,7 +92,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             frames) always uses the centered layout — viewport
             breakpoints can't be trusted there, since the frame is
             narrow even on a desktop-width viewport. */}
-        <div className={compact ? "flex w-full flex-col items-center gap-3 text-center" : "flex w-full flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left"}>
+        <div ref={headerRef} className={compact ? "flex w-full flex-col items-center gap-3 text-center" : "flex w-full flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left"}>
           {data.avatar_url && !avatarFailed ? (
             <img src={data.avatar_url} alt={name} onError={() => setAvatarFailed(true)} className="h-16 w-16 shrink-0 rounded-full object-cover shadow-pin ring-4 ring-white/70 sm:h-20 sm:w-20" />
           ) : (
