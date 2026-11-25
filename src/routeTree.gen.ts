@@ -37,6 +37,7 @@ import { Route as DemoGlowLabRouteImport } from './routes/demo.glow-lab'
 import { Route as DemoThreadStudioRouteImport } from './routes/demo.thread-studio'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesFreeOnlineCatalogueIndiaRouteImport } from './routes/guides.free-online-catalogue-india'
+import { Route as GuidesHowToSellOnlineInIndiaRouteImport } from './routes/guides.how-to-sell-online-in-india'
 import { Route as GuidesInstagramBioShopLinkSetupRouteImport } from './routes/guides.instagram-bio-shop-link-setup'
 import { Route as GuidesSellOnWhatsappRouteImport } from './routes/guides.sell-on-whatsapp'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -190,6 +191,12 @@ const GuidesFreeOnlineCatalogueIndiaRoute =
     path: '/free-online-catalogue-india',
     getParentRoute: () => GuidesRoute,
   } as any)
+const GuidesHowToSellOnlineInIndiaRoute =
+  GuidesHowToSellOnlineInIndiaRouteImport.update({
+    id: '/how-to-sell-online-in-india',
+    path: '/how-to-sell-online-in-india',
+    getParentRoute: () => GuidesRoute,
+  } as any)
 const GuidesInstagramBioShopLinkSetupRoute =
   GuidesInstagramBioShopLinkSetupRouteImport.update({
     id: '/instagram-bio-shop-link-setup',
@@ -286,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
+  '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin/': typeof AdminIndexRoute
@@ -323,6 +331,7 @@ export interface FileRoutesByTo {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
+  '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin': typeof AdminIndexRoute
@@ -366,6 +375,7 @@ export interface FileRoutesById {
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
+  '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
   '/guides/sell-on-whatsapp': typeof GuidesSellOnWhatsappRoute
   '/admin/': typeof AdminIndexRoute
@@ -409,6 +419,7 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
+    | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
     | '/admin/'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
+    | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
     | '/admin'
@@ -488,6 +500,7 @@ export interface FileRouteTypes {
     | '/demo/glow-lab'
     | '/demo/thread-studio'
     | '/guides/free-online-catalogue-india'
+    | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
     | '/guides/sell-on-whatsapp'
     | '/admin/'
@@ -718,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesFreeOnlineCatalogueIndiaRouteImport
       parentRoute: typeof GuidesRoute
     }
+    '/guides/how-to-sell-online-in-india': {
+      id: '/guides/how-to-sell-online-in-india'
+      path: '/how-to-sell-online-in-india'
+      fullPath: '/guides/how-to-sell-online-in-india'
+      preLoaderRoute: typeof GuidesHowToSellOnlineInIndiaRouteImport
+      parentRoute: typeof GuidesRoute
+    }
     '/guides/instagram-bio-shop-link-setup': {
       id: '/guides/instagram-bio-shop-link-setup'
       path: '/instagram-bio-shop-link-setup'
@@ -893,6 +913,7 @@ const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
 interface GuidesRouteChildren {
   GuidesFreeOnlineCatalogueIndiaRoute: typeof GuidesFreeOnlineCatalogueIndiaRoute
+  GuidesHowToSellOnlineInIndiaRoute: typeof GuidesHowToSellOnlineInIndiaRoute
   GuidesInstagramBioShopLinkSetupRoute: typeof GuidesInstagramBioShopLinkSetupRoute
   GuidesSellOnWhatsappRoute: typeof GuidesSellOnWhatsappRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
@@ -900,6 +921,7 @@ interface GuidesRouteChildren {
 
 const GuidesRouteChildren: GuidesRouteChildren = {
   GuidesFreeOnlineCatalogueIndiaRoute: GuidesFreeOnlineCatalogueIndiaRoute,
+  GuidesHowToSellOnlineInIndiaRoute: GuidesHowToSellOnlineInIndiaRoute,
   GuidesInstagramBioShopLinkSetupRoute: GuidesInstagramBioShopLinkSetupRoute,
   GuidesSellOnWhatsappRoute: GuidesSellOnWhatsappRoute,
   GuidesIndexRoute: GuidesIndexRoute,
