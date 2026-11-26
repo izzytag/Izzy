@@ -46,6 +46,17 @@ function MyShopPage() {
   const [whatsapp, setWhatsapp] = useState(p.whatsapp ?? "");
   const [avatar, setAvatar] = useState(p.avatar_url);
   const [showPreview, setShowPreview] = useState(false);
+  // Desktop side preview only mounts on large screens. Mounting it
+  // hidden on phones made My Shop load every product photo twice
+  // (once hidden, once in the mobile preview) and felt slow.
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [saveNote, setSaveNote] = useState("");
   const [whatsappError, setWhatsappError] = useState<string | null>(null);
@@ -217,7 +228,7 @@ function MyShopPage() {
             <h2 className="text-xl font-bold">Business details</h2>
             <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row">
               <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload shop logo">
-                {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
+                {avatar ? <img src={avatar} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
                 <span className="absolute inset-x-0 bottom-0 flex justify-center bg-foreground/60 py-1 text-background"><Camera className="h-4 w-4" /></span>
               </button>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
@@ -271,7 +282,7 @@ function MyShopPage() {
           </section>
         </div>
         <aside className="hidden lg:block lg:sticky lg:top-6 lg:self-start">
-          <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
+          {isDesktop && <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />}
         </aside>
       </div>
     </div>

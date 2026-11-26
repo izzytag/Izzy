@@ -7,8 +7,10 @@ import { OrderForm } from "@/components/OrderForm";
 
 export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null; option_label?: string | null; options?: string[] };
 
-export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode }: {
+export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode, interactive = true }: {
   item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; demoMode?: boolean | undefined;
+  /** Dashboard preview frames are static illustrations: pins do not open the full-screen product dialog (which would zoom over the dashboard and hide its bottom navigation). Live shops keep the dialog + order form exactly as before. */
+  interactive?: boolean;
 }) {
   const [selected, setSelected] = useState(0);
   const [pinImgFailed, setPinImgFailed] = useState(false);
@@ -43,20 +45,20 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   // opens the order form instead of WhatsApp directly; the form's
   // send button is what opens WhatsApp (and records the click).
   const action = demoMode ? demoAction : href ? <Button className="min-h-[52px] w-full rounded-full bg-whatsapp text-[17px] font-semibold text-whatsapp-foreground shadow-sm hover:bg-whatsapp/90" onClick={() => setOrdering(true)}><MessageCircle />{"Order on WhatsApp"}</Button> : null;
-  return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
-    <Button variant="ghost" className="block h-auto w-full whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
-      {/* Pins show the photo at its natural ratio (capped, so an
-          extreme panorama or portrait can't dominate the column) —
-          no stretching, and no routine cropping of faces. The
-          masonry columns absorb the varied heights. The wrapper
-          reserves a minimum height while the photo loads, so pins
-          below don't jump down the page. */}
-      {photos[0] && !pinImgFailed ? <div className="min-h-[120px] bg-page-bg"><img src={photos[0]} alt={item.title} loading="lazy" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /></div> : <div className="flex aspect-[4/5] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
+  const pinBody = (<>
+      {photos[0] && !pinImgFailed ? <div className="min-h-[120px] bg-page-bg"><img src={photos[0]} alt={item.title} loading="lazy" decoding="async" onError={() => setPinImgFailed(true)} className="h-auto max-h-[480px] w-full bg-page-bg object-cover" /></div> : <div className="flex aspect-[4/5] items-center justify-center bg-page-bg"><Icon className="h-12 w-12 text-page-muted" /></div>}
       <div className="space-y-1 p-3.5 sm:p-4">
         <h3 className="break-words text-[15px] font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-[17px] font-bold tracking-tight">{item.price}</p>}
         {item.description && <p className="line-clamp-2 break-words pt-0.5 text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
       </div>
+    </>);
+  if (!interactive) {
+    return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">{pinBody}</article>;
+  }
+  return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
+    <Button variant="ghost" className="block h-auto w-full touch-manipulation whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
+      {pinBody}
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the
         details below, and ordering happens from there only. */}

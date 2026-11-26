@@ -138,7 +138,7 @@ function HomePage() {
             {liveProducts.map((l) => (
               <Link key={l.id} to="/dashboard/products" className="overflow-hidden rounded-xl border bg-card transition hover:border-primary/40">
                 {l.image_urls?.[0]
-                  ? <img src={l.image_urls[0]} alt="" className="aspect-square w-full object-cover" loading="lazy" />
+                  ? <img src={l.image_urls[0]} alt="" className="aspect-square w-full object-cover" loading="lazy" decoding="async" />
                   : <span className="flex aspect-square w-full items-center justify-center bg-muted text-2xl font-bold text-muted-foreground">{(l.title || "?")[0]?.toUpperCase()}</span>}
                 <span className="block p-3">
                   <span className="block truncate font-semibold">{l.title}</span>

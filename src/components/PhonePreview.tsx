@@ -16,7 +16,7 @@ export function PhonePreview(props: { data: PublicData; theme: ThemeId; showBran
         Preview
       </p>
       <div className="relative h-[560px] overflow-hidden rounded-[2.5rem] border-8 border-foreground shadow-soft">
-        <div className="h-full overflow-y-auto">
+        <div className="h-full touch-manipulation overflow-y-auto overscroll-contain">
           <PublicProfile
             data={data}
             theme={theme}
