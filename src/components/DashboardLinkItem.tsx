@@ -38,11 +38,15 @@ export function reorderSubset<T extends { id: string; position: number }>(
     .map((l, i) => ({ ...l, position: i }));
 }
 
-/** One editable dashboard row: a shop product.
+/** One editable dashboard card: a shop product.
+ *  Cards match the Home tab product look — big square photo,
+ *  name and price — with a Live/Hidden toggle on each card.
+ *  Tapping the photo/name opens the edit form, which spans the
+ *  full grid width so the photo editor has room on a phone.
  *  The edit view includes the product photo editor (CatalogueEditor):
  *  photos upload to the "catalogue" bucket when picked, and Save
  *  persists the resulting URLs plus the category to the row.
- *  Rows open in edit mode only when they were just created
+ *  Cards open in edit mode only when they were just created
  *  (justCreated); hasWhatsApp only steers the summary copy below. */
 export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreated = false, hasWhatsApp = false }: {
   link: LinkRow;
@@ -128,48 +132,70 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
     onDelete(link.id);
   }
 
-  const summary = `Product${link.price ? ` · ${link.price}` : " · No price yet"}${link.image_urls?.length ? ` · ${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}` : " · No photo yet"}${hasWhatsApp ? " · WhatsApp button" : ""}`;
+  const photoNote = link.image_urls?.length
+    ? `${link.image_urls.length} photo${link.image_urls.length === 1 ? "" : "s"}`
+    : "No photo yet";
+  const summary = `Product · ${photoNote}${hasWhatsApp ? " · WhatsApp button" : ""}`;
+
+  const toggleRow = (
+    <div className="flex min-h-[44px] items-center justify-between gap-2">
+      <span className="text-sm font-semibold">{link.enabled ? "Live" : "Hidden"}</span>
+      <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show product" />
+    </div>
+  );
+
+  const deleteButton = confirmingDelete ? (
+    <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="flex min-h-[44px] items-center whitespace-nowrap rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-destructive-foreground touch-manipulation" aria-label="Confirm delete product">Confirm delete?</button>
+  ) : (
+    <button onClick={handleDelete} className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground touch-manipulation hover:text-destructive" aria-label="Delete product"><Trash2 className="h-4 w-4" /></button>
+  );
+
+  if (editing) {
+    return (
+      <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
+        className={`col-span-2 rounded-2xl border bg-background p-4 md:col-span-3 ${isDragging ? "z-10 shadow-soft" : ""}`}>
+        <div className="mb-3 flex items-center gap-2">
+          <button {...attributes} {...listeners} className="flex h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
+          <span className="min-w-0 flex-1 truncate font-semibold">{link.title}</span>
+          {deleteButton}
+        </div>
+        <div className="space-y-2">
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
+          <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price, e.g. ₹499" maxLength={30} />
+          {!price.trim() && (
+            <p className="text-sm text-muted-foreground">{"Add a price — products without a price get fewer orders."}</p>
+          )}
+          <p className="pt-1 text-sm font-medium">Product photos</p>
+          <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
+          <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} optionLabel={optionLabel} onOptionLabel={setOptionLabel} options={options} onOptions={setOptions} description={desc} onDescription={setDesc} onUploadingChange={setPhotosUploading} />
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button className="min-h-[44px]" onClick={save} disabled={photosUploading}><Check className="h-4 w-4" /> {photosUploading ? "Uploading photos…" : "Save"}</Button>
+            <Button variant="outline" className="min-h-[44px]" onClick={cancel}><X className="h-4 w-4" /> Cancel</Button>
+          </div>
+          <div className="border-t pt-2">{toggleRow}</div>
+        </div>
+      </li>
+    );
+  }
 
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-start gap-2 rounded-2xl border bg-background p-4 ${isDragging ? "z-10 shadow-soft" : ""}`}>
-      <button {...attributes} {...listeners} className="mt-2 cursor-grab touch-none text-muted-foreground" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
-      <div className="min-w-0 flex-1">
-        {editing ? (
-          <div className="space-y-2">
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-            <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price, e.g. ₹499" maxLength={30} />
-            {!price.trim() && (
-              <p className="text-sm text-muted-foreground">{"Add a price — products without a price get fewer orders."}</p>
-            )}
-            <p className="pt-1 text-sm font-medium">Product photos</p>
-            <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
-            <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} optionLabel={optionLabel} onOptionLabel={setOptionLabel} options={options} onOptions={setOptions} description={desc} onDescription={setDesc} onUploadingChange={setPhotosUploading} />
-            <div className="flex gap-2">
-              <Button size="sm" onClick={save} disabled={photosUploading}><Check className="h-4 w-4" /> {photosUploading ? "Uploading photos…" : "Save"}</Button>
-              <Button size="sm" variant="outline" onClick={cancel}><X className="h-4 w-4" /> Cancel</Button>
-            </div>
-          </div>
-        ) : (
-          <button className="flex min-h-[44px] w-full items-center gap-3 text-left" onClick={startEditing}>
-            {link.image_urls?.[0]
-              ? <img src={link.image_urls[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
-              : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-bold text-muted-foreground">{(link.title || "?")[0]?.toUpperCase()}</span>}
-            <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-1.5 truncate font-semibold">{link.title} <Pencil className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /></span>
-              <span className="block truncate text-sm text-muted-foreground">{summary} · {link.enabled ? "Live" : "Hidden"}</span>
-            </span>
-          </button>
-        )}
-      </div>
-      <div className="flex flex-col items-center gap-3">
-        <Switch checked={link.enabled} onCheckedChange={(v) => onUpdate(link.id, { enabled: v })} aria-label="Show product" />
-        {confirmingDelete ? (
-          <button onClick={handleDelete} onBlur={() => setConfirmingDelete(false)} className="whitespace-nowrap rounded-full bg-destructive px-2.5 py-1 text-xs font-semibold text-destructive-foreground" aria-label="Confirm delete product">Confirm delete?</button>
-        ) : (
-          <button onClick={handleDelete} className="text-muted-foreground hover:text-destructive" aria-label="Delete product"><Trash2 className="h-4 w-4" /></button>
-        )}
-      </div>
+      className={`relative flex flex-col overflow-hidden rounded-2xl border bg-background ${isDragging ? "z-10 shadow-soft" : ""}`}>
+      <button {...attributes} {...listeners} className="absolute left-1 top-1 z-10 flex h-11 w-11 cursor-grab touch-none items-center justify-center rounded-full bg-background/90 text-muted-foreground shadow-sm" aria-label="Drag to reorder"><GripVertical className="h-5 w-5" /></button>
+      <div className="absolute right-1 top-1 z-10">{deleteButton}</div>
+      <button className="block w-full touch-manipulation text-left" onClick={startEditing} aria-label={`Edit ${link.title}`}>
+        {link.image_urls?.[0]
+          ? <img src={link.image_urls[0]} alt="" loading="lazy" decoding="async" className="aspect-square w-full object-cover" />
+          : <span className="flex aspect-square w-full items-center justify-center bg-muted text-2xl font-bold text-muted-foreground">{(link.title || "?")[0]?.toUpperCase()}</span>}
+        <span className="block p-3 pb-1">
+          <span className="flex items-center gap-1.5 truncate font-semibold">{link.title} <Pencil className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /></span>
+          {link.price
+            ? <span className="block truncate text-base font-bold">{link.price}</span>
+            : <span className="block truncate text-sm text-muted-foreground">No price yet</span>}
+          <span className="block truncate text-sm text-muted-foreground">{summary}</span>
+        </span>
+      </button>
+      <div className="mt-auto border-t px-3 py-1">{toggleRow}</div>
     </li>
   );
 }

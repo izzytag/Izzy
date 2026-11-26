@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ShoppingBag, Search } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { canAddLink, FREE_LINK_LIMIT } from "@/lib/themes";
@@ -28,11 +28,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/products")({
 });
 
 /**
- * Products — the catalogue manager. This is the product half
- * of the old combined Store tab, relocated unchanged: new items start
- * as drafts (switched off), photos are processed on upload, ordering
- * is drag-and-drop, and the free-plan item limit counts product rows
- * only (legacy link rows are never shown here).
+ * Products — the catalogue manager. Products show as Home-style
+ * photo cards (2-column grid on phone, name + price) with a
+ * Live/Hidden toggle on each card; tapping a card opens its edit
+ * form full-width. New items start as drafts (switched off),
+ * photos are processed on upload, ordering is drag-and-drop, and
+ * the free-plan item limit counts product rows only (legacy link
+ * rows are never shown here).
  */
 function ProductsPage() {
   const region = useRegion();
@@ -182,8 +184,8 @@ function ProductsPage() {
           </div>
         )}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={visibleRows.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-            <ul className="mt-4 space-y-3">
+          <SortableContext items={visibleRows.map((l) => l.id)} strategy={rectSortingStrategy}>
+            <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
               {visibleRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} justCreated={l.id === justCreatedId} hasWhatsApp={Boolean(p.whatsapp)} />)}
             </ul>
           </SortableContext>

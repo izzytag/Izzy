@@ -63,7 +63,7 @@ function DashboardLayout() {
   const businessName = p.display_name || p.username || "Your shop";
 
   return (
-    <div className="min-h-dvh bg-background lg:flex">
+    <div className="min-h-dvh touch-manipulation bg-background lg:flex">
       {/* ---------- Desktop sidebar ---------- */}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r bg-card lg:flex">
         <div className="flex items-center gap-2 px-5 pb-2 pt-5">
@@ -155,7 +155,7 @@ function DashboardLayout() {
         <div className="grid grid-cols-4">
           {NAV_MAIN.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }}
-              className={cn("flex min-h-[60px] flex-col items-center justify-center gap-1 px-1 text-[11px] font-medium text-muted-foreground transition")}
+              className={cn("flex min-h-[60px] touch-manipulation flex-col items-center justify-center gap-1 px-1 text-[11px] font-medium text-muted-foreground transition")}
               activeProps={{ className: "text-primary" }}>
               <n.icon className="h-6 w-6" />
               <span className="max-w-full truncate">{n.label}</span>
