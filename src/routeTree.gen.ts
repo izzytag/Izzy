@@ -36,6 +36,7 @@ import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as DemoGlowLabRouteImport } from './routes/demo.glow-lab'
 import { Route as DemoThreadStudioRouteImport } from './routes/demo.thread-studio'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesCreateOnlineShopIn5MinutesRouteImport } from './routes/guides.create-online-shop-in-5-minutes'
 import { Route as GuidesFreeOnlineCatalogueIndiaRouteImport } from './routes/guides.free-online-catalogue-india'
 import { Route as GuidesHowToSellOnlineInIndiaRouteImport } from './routes/guides.how-to-sell-online-in-india'
 import { Route as GuidesInstagramBioShopLinkSetupRouteImport } from './routes/guides.instagram-bio-shop-link-setup'
@@ -185,6 +186,12 @@ const GuidesIndexRoute = GuidesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GuidesRoute,
 } as any)
+const GuidesCreateOnlineShopIn5MinutesRoute =
+  GuidesCreateOnlineShopIn5MinutesRouteImport.update({
+    id: '/create-online-shop-in-5-minutes',
+    path: '/create-online-shop-in-5-minutes',
+    getParentRoute: () => GuidesRoute,
+  } as any)
 const GuidesFreeOnlineCatalogueIndiaRoute =
   GuidesFreeOnlineCatalogueIndiaRouteImport.update({
     id: '/free-online-catalogue-india',
@@ -292,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/admin/support': typeof AdminSupportRoute
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
+  '/guides/create-online-shop-in-5-minutes': typeof GuidesCreateOnlineShopIn5MinutesRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -330,6 +338,7 @@ export interface FileRoutesByTo {
   '/admin/support': typeof AdminSupportRoute
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
+  '/guides/create-online-shop-in-5-minutes': typeof GuidesCreateOnlineShopIn5MinutesRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -374,6 +383,7 @@ export interface FileRoutesById {
   '/admin/support': typeof AdminSupportRoute
   '/demo/glow-lab': typeof DemoGlowLabRoute
   '/demo/thread-studio': typeof DemoThreadStudioRoute
+  '/guides/create-online-shop-in-5-minutes': typeof GuidesCreateOnlineShopIn5MinutesRoute
   '/guides/free-online-catalogue-india': typeof GuidesFreeOnlineCatalogueIndiaRoute
   '/guides/how-to-sell-online-in-india': typeof GuidesHowToSellOnlineInIndiaRoute
   '/guides/instagram-bio-shop-link-setup': typeof GuidesInstagramBioShopLinkSetupRoute
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/demo/glow-lab'
     | '/demo/thread-studio'
+    | '/guides/create-online-shop-in-5-minutes'
     | '/guides/free-online-catalogue-india'
     | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/demo/glow-lab'
     | '/demo/thread-studio'
+    | '/guides/create-online-shop-in-5-minutes'
     | '/guides/free-online-catalogue-india'
     | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
@@ -499,6 +511,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/demo/glow-lab'
     | '/demo/thread-studio'
+    | '/guides/create-online-shop-in-5-minutes'
     | '/guides/free-online-catalogue-india'
     | '/guides/how-to-sell-online-in-india'
     | '/guides/instagram-bio-shop-link-setup'
@@ -724,6 +737,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesIndexRouteImport
       parentRoute: typeof GuidesRoute
     }
+    '/guides/create-online-shop-in-5-minutes': {
+      id: '/guides/create-online-shop-in-5-minutes'
+      path: '/create-online-shop-in-5-minutes'
+      fullPath: '/guides/create-online-shop-in-5-minutes'
+      preLoaderRoute: typeof GuidesCreateOnlineShopIn5MinutesRouteImport
+      parentRoute: typeof GuidesRoute
+    }
     '/guides/free-online-catalogue-india': {
       id: '/guides/free-online-catalogue-india'
       path: '/free-online-catalogue-india'
@@ -912,6 +932,7 @@ const DemoRouteChildren: DemoRouteChildren = {
 const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
 interface GuidesRouteChildren {
+  GuidesCreateOnlineShopIn5MinutesRoute: typeof GuidesCreateOnlineShopIn5MinutesRoute
   GuidesFreeOnlineCatalogueIndiaRoute: typeof GuidesFreeOnlineCatalogueIndiaRoute
   GuidesHowToSellOnlineInIndiaRoute: typeof GuidesHowToSellOnlineInIndiaRoute
   GuidesInstagramBioShopLinkSetupRoute: typeof GuidesInstagramBioShopLinkSetupRoute
@@ -920,6 +941,7 @@ interface GuidesRouteChildren {
 }
 
 const GuidesRouteChildren: GuidesRouteChildren = {
+  GuidesCreateOnlineShopIn5MinutesRoute: GuidesCreateOnlineShopIn5MinutesRoute,
   GuidesFreeOnlineCatalogueIndiaRoute: GuidesFreeOnlineCatalogueIndiaRoute,
   GuidesHowToSellOnlineInIndiaRoute: GuidesHowToSellOnlineInIndiaRoute,
   GuidesInstagramBioShopLinkSetupRoute: GuidesInstagramBioShopLinkSetupRoute,

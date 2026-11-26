@@ -56,11 +56,12 @@ describe("escapeXml", () => {
 });
 
 describe("STATIC_SITEMAP_PATHS", () => {
-  it("covers every public static route including all four guides", () => {
+  it("covers every public static route including all five guides", () => {
     expect([...STATIC_SITEMAP_PATHS]).toEqual([
       "/",
       "/pricing",
       "/guides",
+      "/guides/create-online-shop-in-5-minutes",
       "/guides/how-to-sell-online-in-india",
       "/guides/sell-on-whatsapp",
       "/guides/instagram-bio-shop-link-setup",

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Globe, LayoutGrid, Link2, MessageCircle } from "lucide-react";
+import { ArrowRight, Clock, Globe, LayoutGrid, Link2, MessageCircle } from "lucide-react";
 import { Section } from "@/components/Section";
 import { seoHead } from "@/lib/seo";
 
@@ -19,6 +19,14 @@ export const Route = createFileRoute("/guides/")({
 });
 
 export const GUIDES = [
+  {
+    to: "/guides/create-online-shop-in-5-minutes" as const,
+    icon: Clock,
+    label: "Online shop",
+    title: "Create Your Online Shop in 5 Minutes — Free, Without a Website",
+    summary:
+      "Create your online shop in India in 5 minutes: sign up free, add products with photos and prices, connect WhatsApp, and share one link. No website, no card needed.",
+  },
   {
     to: "/guides/how-to-sell-online-in-india" as const,
     icon: Globe,

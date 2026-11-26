@@ -78,9 +78,10 @@ describe("slimmed homepage", () => {
 });
 
 describe("slimmed guides index", () => {
-  it("lists exactly four guides", () => {
-    expect(GUIDES).toHaveLength(4);
+  it("lists exactly five guides", () => {
+    expect(GUIDES).toHaveLength(5);
     expect(GUIDES.map((g) => g.to)).toEqual([
+      "/guides/create-online-shop-in-5-minutes",
       "/guides/how-to-sell-online-in-india",
       "/guides/sell-on-whatsapp",
       "/guides/instagram-bio-shop-link-setup",

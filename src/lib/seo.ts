@@ -146,6 +146,7 @@ export const STATIC_SITEMAP_PATHS: readonly string[] = [
   "/",
   "/pricing",
   "/guides",
+  "/guides/create-online-shop-in-5-minutes",
   "/guides/how-to-sell-online-in-india",
   "/guides/sell-on-whatsapp",
   "/guides/instagram-bio-shop-link-setup",
