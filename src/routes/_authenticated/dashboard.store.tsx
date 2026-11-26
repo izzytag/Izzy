@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
 import { processCataloguePhoto } from "@/lib/catalogue";
-import { effectiveTheme, waCardLink } from "@/lib/themes";
+import { effectiveTheme, THEMES, waCardLink } from "@/lib/themes";
 import { TESTING_FREE, testingBanner, effectiveIsPro } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
@@ -191,9 +191,25 @@ function MyShopPage() {
               Your shop link is permanent — it never changes, so links you've already shared keep working.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="outline" asChild className="min-h-[44px]"><a href={pageUrl} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> View my shop</a></Button>
+              <Button variant="outline" asChild className="min-h-[44px]"><a href={pageUrl} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> See my shop</a></Button>
               <Button variant="outline" onClick={() => { navigator.clipboard.writeText(pageUrl); toast.success("Shop link copied"); }} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy shop link</Button>
             </div>
+          </section>
+
+          {/* Shop look — one row into the existing appearance page */}
+          <section className="rounded-xl border bg-card">
+            <Link to="/dashboard/appearance" className="flex min-h-[56px] items-center gap-3 px-5 py-3 transition hover:bg-muted/60">
+              <span className="flex gap-1.5" aria-hidden="true">
+                <span className="h-5 w-5 rounded-full border bg-foreground" />
+                <span className="h-5 w-5 rounded-full border bg-background" />
+                <span className="h-5 w-5 rounded-full border bg-muted" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">Shop look</span>
+                <span className="block truncate text-sm text-muted-foreground">Theme: {THEMES.find((t) => t.id === (p.theme ?? "light"))?.name ?? "Light"} · Social links · UPI</span>
+              </span>
+              <span className="text-sm font-semibold text-primary">Change</span>
+            </Link>
           </section>
 
           {/* Business details */}

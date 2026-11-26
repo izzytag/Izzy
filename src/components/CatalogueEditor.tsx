@@ -7,10 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { CATALOGUE_PHOTO_LIMIT, processCataloguePhoto, validateCataloguePhoto } from "@/lib/catalogue";
+import {
+  PRODUCT_CATEGORIES, presetForCategory, addOptionChoice, removeOptionChoice, sanitizeOptions,
+} from "@/lib/product-categories";
 
-export function CatalogueEditor({ userId, images, onImages, category, onCategory, description, onDescription, onUploadingChange }: {
+export function CatalogueEditor({ userId, images, onImages, category, onCategory, optionLabel, onOptionLabel, options, onOptions, description, onDescription, onUploadingChange }: {
   userId: string; images: string[]; onImages: (v: string[]) => void;
   category: string; onCategory: (v: string) => void;
+  optionLabel: string; onOptionLabel: (v: string) => void;
+  options: string[]; onOptions: (v: string[]) => void;
   description: string; onDescription: (v: string) => void;
   /** Lets the parent disable Save while a photo upload is in flight,
       so a save can never land before its photos do. */
@@ -18,6 +23,7 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
 }) {
   const input = useRef<HTMLInputElement>(null);
   const uid = useId();
+  const [customChoice, setCustomChoice] = useState("");
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
@@ -81,10 +87,66 @@ export function CatalogueEditor({ userId, images, onImages, category, onCategory
       <p role="status" className="text-sm text-muted-foreground">Uploading photo {currentPhoto} of {progress.total}. Saving is paused until the upload completes.</p>
     )}
     <input ref={input} hidden type="file" accept="image/*" multiple aria-label="Upload item photos" onChange={(e) => { if (e.target.files) void uploadFiles(e.target.files); }} />
-    <div className="space-y-1.5">
-      <Label htmlFor={`${uid}-category`}>Category</Label>
-      <Input id={`${uid}-category`} value={category} onChange={(e) => onCategory(e.target.value)} placeholder="Category, e.g. Clothing or Consultation" maxLength={60} />
+    <div className="space-y-2">
+      <Label>Category <span className="font-normal text-muted-foreground">(optional)</span></Label>
+      <p className="text-sm text-muted-foreground">Tap one category. The right option appears below — for example, sizes for clothes or volume for liquids. Skip this and the product saves as before.</p>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Product category">
+        <button type="button" aria-pressed={!category} onClick={() => { onCategory(""); onOptionLabel(""); onOptions([]); }}
+          className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${!category ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
+          No category
+        </button>
+        {PRODUCT_CATEGORIES.map((c) => (
+          <button key={c} type="button" aria-pressed={category === c}
+            onClick={() => {
+              onCategory(c);
+              const preset = presetForCategory(c);
+              // Only replace the option when the seller has not built
+              // their own yet, or when switching category entirely.
+              if (category !== c) {
+                onOptionLabel(preset.optionLabel ?? "");
+                onOptions(preset.options);
+              }
+            }}
+            className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${category === c ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
+            {c}
+          </button>
+        ))}
+      </div>
+      {category && !PRODUCT_CATEGORIES.includes(category as (typeof PRODUCT_CATEGORIES)[number]) && (
+        <p className="text-sm text-muted-foreground">Saved category: {category}. Tap a category above to change it.</p>
+      )}
     </div>
+    {category && (
+      <div className="space-y-2 rounded-xl border bg-muted/40 p-3">
+        <div className="space-y-1.5">
+          <Label htmlFor={`${uid}-option-label`}>Option name</Label>
+          <Input id={`${uid}-option-label`} value={optionLabel} onChange={(e) => onOptionLabel(e.target.value)}
+            placeholder={category === "Other" ? "e.g. Colour, Phone model" : "e.g. Size, Volume, Weight"} maxLength={30} />
+          <p className="text-sm text-muted-foreground">Buyers pick one choice on your shop page. Leave the name empty for no option.</p>
+        </div>
+        {options.length > 0 && (
+          <div className="flex flex-wrap gap-2" aria-label="Option choices">
+            {options.map((choice) => (
+              <span key={choice} className="inline-flex min-h-[44px] items-center gap-1 rounded-full border bg-background py-1 pl-4 pr-1 text-sm font-semibold">
+                {choice}
+                <button type="button" aria-label={`Remove ${choice}`} onClick={() => onOptions(removeOptionChoice(options, choice))}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="flex gap-2">
+          <Input value={customChoice} onChange={(e) => setCustomChoice(e.target.value)} placeholder="Add your own choice"
+            aria-label="Add your own choice" maxLength={30} className="min-h-[44px]" />
+          <Button type="button" variant="outline" className="min-h-[44px] shrink-0"
+            onClick={() => { const next = addOptionChoice(options, customChoice); onOptions(next); if (next.length !== sanitizeOptions(options).length || next.includes(customChoice.trim())) setCustomChoice(""); }}>
+            + Add your own
+          </Button>
+        </div>
+      </div>
+    )}
     <div className="space-y-1.5">
       <Label htmlFor={`${uid}-description`}>Description</Label>
       <Textarea id={`${uid}-description`} value={description} onChange={(e) => onDescription(e.target.value)} placeholder="Full details: sizes, materials, specifications, or delivery" maxLength={4000} rows={5} />

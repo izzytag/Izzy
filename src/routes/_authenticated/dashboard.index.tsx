@@ -2,63 +2,41 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-  ArrowRight, BarChart3, Check, Copy, Eye, Package, Palette, QrCode, Share2, Store, TrendingUp,
-} from "lucide-react";
+import { ArrowRight, Copy, Eye, MessageCircle, Package } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
-import { statsQuery } from "@/lib/stats";
-import { ReferralCard } from "@/components/ReferralCard";
+import { getHomeNextStep } from "@/lib/dashboard-home";
 import { Button } from "@/components/ui/button";
-
-/**
- * Same shared stats query the Analytics tab reads (lib/stats.ts), so
- * Overview numbers always agree with Analytics. Plan gating matches
- * Analytics too: Free sees the last 7 days, Pro the last 30.
- */
-
 import { DashboardLoading } from "@/components/DashboardLoading";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   loader: async ({ context }) => {
     const acc = await context.queryClient.ensureQueryData(accountQuery);
-    await Promise.all([
-      context.queryClient.ensureQueryData(linksQuery(acc.user.id)),
-      context.queryClient.ensureQueryData(statsQuery(acc.user.id, acc.isPro)),
-    ]);
+    await context.queryClient.ensureQueryData(linksQuery(acc.user.id));
   },
   pendingComponent: DashboardLoading,
-  component: OverviewPage,
+  component: HomePage,
 });
 
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
-}
-
-function OverviewPage() {
+/**
+ * Home (Dashboard A) — less things, one next step.
+ * Shop name, photo and link at the top with See my shop. One
+ * next-step card. Then the products with photos. Nothing else:
+ * referrals, views and the rest live under More.
+ */
+function HomePage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
-  const { data: stats } = useSuspenseQuery(statsQuery(acc.user.id, acc.isPro));
   const p = acc.profile;
-  const businessName = p.display_name || p.username || "there";
+  const businessName = p.display_name || p.username || "Your shop";
 
   const [origin, setOrigin] = useState("https://izzytag.shop");
   useEffect(() => setOrigin(window.location.origin), []);
   const shopUrl = `${origin}/${p.username}`;
   const shopUrlDisplay = shopUrl.replace(/^https?:\/\//, "");
 
-  const storeRows = links.filter((l) => l.kind !== "link");
-  const liveCount = storeRows.filter((l) => l.enabled).length;
-
-  const days = acc.isPro ? 30 : 7;
-  const cutoff = Date.now() - days * 864e5;
-  const viewsInWindow = stats.views.filter((x) => +new Date(x.created_at) >= cutoff).length;
-  // The share nudge always uses a plain 7-day window, whatever the plan.
-  const viewsLast7 = stats.views.filter((x) => +new Date(x.created_at) >= Date.now() - 7 * 864e5).length;
-  const tapsInWindow = [...stats.productViews, ...stats.whatsappClicks].filter((x) => +new Date(x.created_at) >= cutoff).length;
-  const hasActivity = stats.totalViews > 0;
+  const products = links.filter((l) => l.kind !== "link");
+  const liveProducts = products.filter((l) => l.enabled);
+  const nextStep = getHomeNextStep({ totalProducts: products.length, liveProducts: liveProducts.length });
 
   async function copyLink() {
     try {
@@ -69,85 +47,27 @@ function OverviewPage() {
     }
   }
 
-  async function shareLink() {
-    if (typeof navigator !== "undefined" && "share" in navigator) {
-      try {
-        // The pitch text travels with the link into WhatsApp and
-        // Instagram DMs — a bare link with no context gets ignored.
-        await navigator.share({ title: businessName, text: `${businessName} on izzy — browse the catalogue and order on WhatsApp.`, url: shopUrl });
-        return;
-      } catch {
-        return; // user closed the share sheet — not an error
-      }
-    }
-    await copyLink();
+  async function shareOnWhatsApp() {
+    const text = `${businessName} on izzy — browse the catalogue and order on WhatsApp. ${shopUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
   }
-
-  // Drafts are invisible to visitors, so "first product" only counts
-  // once something is actually live. When drafts exist but nothing is
-  // live, the step becomes switching one on — not adding another.
-  const hasDraftsOnly = storeRows.length > 0 && liveCount === 0;
-
-  const checklist = [
-    {
-      done: !!(p.display_name?.trim() && p.bio?.trim()),
-      label: "Complete your business profile",
-      hint: "Name and a short description",
-      to: "/dashboard/store" as const,
-      ctaTo: "/dashboard/store" as const,
-    },
-    {
-      done: !!p.whatsapp,
-      label: "Add your WhatsApp number",
-      hint: "So customers can order from you",
-      to: "/dashboard/store" as const,
-      ctaTo: "/dashboard/store" as const,
-    },
-    {
-      done: !!p.username,
-      label: "Choose your shop username",
-      hint: "Your shareable shop link",
-      to: "/dashboard/store" as const,
-      // Claiming a username happens in onboarding. The dashboard is
-      // only reachable after a username exists, so in practice this
-      // step is always complete here — the link is just a fallback.
-      ctaTo: "/onboarding" as const,
-    },
-    {
-      done: liveCount > 0,
-      label: hasDraftsOnly ? "Switch your first product on" : "Add your first product",
-      hint: hasDraftsOnly ? "Your items are drafts. Switch one on to publish it to your shop." : "With a photo and a price",
-      to: "/dashboard/products" as const,
-      ctaTo: "/dashboard/products" as const,
-    },
-  ];
-  const setupDone = checklist.every((c) => c.done);
-  const nextStep = checklist.find((c) => !c.done);
-  const nextStepNumber = checklist.findIndex((c) => !c.done) + 1;
-  // Factual, from the same stats the rest of this page shows: the
-  // shop is set up with something live, but nobody has visited in a
-  // week — the one useful thing left to do is share the link.
-  const needsVisitors = setupDone && liveCount >= 1 && viewsLast7 === 0;
 
   return (
     <div className="space-y-6">
-      {/* ---------- Welcome ---------- */}
-      <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">{greeting()}, {businessName}</h1>
-        <p className="mt-1 text-base text-muted-foreground">Here's what's happening with your business.</p>
-      </div>
-
-      {/* ---------- Shop status ---------- */}
+      {/* Shop header — name, photo, link, See my shop (each action once) */}
       <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
+        <div className="flex items-start gap-4">
+          {p.avatar_url
+            ? <img src={p.avatar_url} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
+            : <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-muted text-2xl font-bold text-muted-foreground">{businessName[0]?.toUpperCase()}</span>}
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="truncate text-xl font-bold">{p.display_name || p.username}</h2>
+              <h1 className="truncate text-xl font-bold">{businessName}</h1>
               {p.suspended ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-sm font-semibold text-destructive">
                   <span className="h-2 w-2 rounded-full bg-destructive" /> Suspended
                 </span>
-              ) : liveCount === 0 ? (
+              ) : liveProducts.length === 0 ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
                 </span>
@@ -158,206 +78,76 @@ function OverviewPage() {
               )}
             </div>
             <p className="mt-1 break-all text-base font-medium text-primary">{shopUrlDisplay}</p>
-            {liveCount === 0 && (
-              <p className="mt-2 text-base text-muted-foreground">
-                No products live yet — <Link to="/dashboard/products" className="font-semibold text-primary underline">add your first product</Link> and it will appear on your shop.
-              </p>
-            )}
-            {liveCount > 0 && (
-              <p className="mt-2 text-base text-muted-foreground">{liveCount} {liveCount === 1 ? "product is" : "products are"} live on your shop.</p>
-            )}
+            <p className="mt-1 text-base text-muted-foreground">
+              {liveProducts.length > 0
+                ? `${liveProducts.length} ${liveProducts.length === 1 ? "product is" : "products are"} live on your shop.`
+                : "No products live yet."}
+            </p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="outline" asChild className="min-h-[44px]"><a href={`/${p.username}`} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> Preview</a></Button>
+          <Button variant="outline" asChild className="min-h-[44px]"><a href={`/${p.username}`} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> See my shop</a></Button>
           <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
-          <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share</Button>
         </div>
       </section>
 
-      {/* ---------- Referrals ---------- */}
-      <ReferralCard username={p.username} />
-
-      {/* ---------- Quick actions ---------- */}
-      <section>
-        <h2 className="text-lg font-bold">Quick actions</h2>
-        <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-5">
-          <Link to="/dashboard/products" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Package className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Add a product</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Photo, price, done</p>
-          </Link>
-          <Link to="/dashboard/store" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Store className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Edit shop details</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Name, logo, WhatsApp</p>
-          </Link>
-          <Link to="/dashboard/appearance" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <Palette className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Customize appearance</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Theme and socials</p>
-          </Link>
-          <button type="button" onClick={shareLink} className="rounded-xl border bg-card p-4 text-left transition hover:border-primary/40">
-            <Share2 className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Share shop link</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Put it in your bio</p>
-          </button>
-          <Link to="/dashboard/qr" className="rounded-xl border bg-card p-4 transition hover:border-primary/40">
-            <QrCode className="h-6 w-6 text-primary" />
-            <p className="mt-3 font-semibold">Shop QR code</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Print it for your counter</p>
-          </Link>
-        </div>
-      </section>
-
-      {/* ---------- Your next step ---------- */}
-      {nextStep ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-            Your next step · {nextStepNumber} of {checklist.length}
-          </p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">{nextStep.label}</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            {nextStep.hint} — finish your setup one step at a time, and your shop is ready to share.
-          </p>
-          <Button asChild className="mt-4 min-h-[44px]">
-            <Link to={nextStep.ctaTo}>{nextStep.label} <ArrowRight className="h-4 w-4" /></Link>
-          </Button>
-        </section>
-      ) : needsVisitors ? (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Your shop is ready — now it needs visitors</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            You have {liveCount} {liveCount === 1 ? "product" : "products"} live, but nobody has
-            visited your shop in the last 7 days. Share your link where your customers already are — Instagram bio,
-            WhatsApp status, or a printed QR code.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
-            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
-            <Button variant="outline" asChild className="min-h-[44px]">
-              <Link to="/dashboard/qr"><QrCode className="h-4 w-4" /> Get your QR code</Link>
-            </Button>
-          </div>
-        </section>
-      ) : (
-        <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
-          <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
-          <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">
-            Your setup is complete. Put your link where customers already are — Instagram bio, WhatsApp status,
-            or a printed QR code on your counter.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={shareLink} className="min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
-            <Button variant="outline" onClick={copyLink} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy link</Button>
-          </div>
-        </section>
-      )}
-
-      {/* ---------- Setup checklist ---------- */}
-      {setupDone ? (
-        <section className="flex flex-wrap items-center gap-3 rounded-xl border bg-primary-soft p-4 sm:p-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground"><Check className="h-5 w-5" /></span>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-accent-foreground">Setup complete</p>
-            <p className="text-sm text-accent-foreground/80">Your shop is ready — keep sharing your link so customers find it.</p>
-          </div>
-          <Button size="sm" onClick={shareLink} className="min-h-[40px]"><Share2 className="h-4 w-4" /> Share</Button>
-        </section>
-      ) : (
-        <section className="rounded-xl border bg-card p-5 sm:p-6">
-          <h2 className="text-lg font-bold">Finish setting up your shop</h2>
-          <p className="mt-1 text-base text-muted-foreground">A few steps and you're ready to take orders.</p>
-          <ul className="mt-4 divide-y">
-            {checklist.map((c) => (
-              <li key={c.label}>
-                <Link to={c.to} className="flex min-h-[56px] items-center gap-3 py-2">
-                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${c.done ? "bg-primary text-primary-foreground" : "border-2 border-border bg-card"}`}>
-                    {c.done && <Check className="h-4 w-4" />}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className={`block font-medium ${c.done ? "text-muted-foreground line-through" : ""}`}>{c.label}</span>
-                    <span className="block text-sm text-muted-foreground">{c.hint}</span>
-                  </span>
-                  {!c.done && <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />}
-                </Link>
-              </li>
-            ))}
-            <li>
-              <a href={`/${p.username}`} target="_blank" rel="noreferrer" className="flex min-h-[56px] items-center gap-3 py-2">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Eye className="h-4 w-4 text-muted-foreground" /></span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-medium">Preview your shop</span>
-                  <span className="block text-sm text-muted-foreground">See exactly what customers see</span>
-                </span>
-                <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />
-              </a>
-            </li>
-            {/* Sharing an empty shop sends visitors to nothing — the
-                share row only appears once something is live. */}
-            {liveCount > 0 && (
-              <li>
-                <button type="button" onClick={shareLink} className="flex min-h-[56px] w-full items-center gap-3 py-2 text-left">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card"><Share2 className="h-4 w-4 text-muted-foreground" /></span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-medium">Share your shop link</span>
-                    <span className="block text-sm text-muted-foreground">Instagram bio, WhatsApp status, anywhere</span>
-                  </span>
-                  <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground" />
-                </button>
-              </li>
-            )}
-          </ul>
-        </section>
-      )}
-
-      {/* ---------- Performance ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-lg font-bold"><TrendingUp className="h-5 w-5 text-primary" /> Shop performance</h2>
-          <Link to="/dashboard/analytics" className="flex items-center gap-1 text-sm font-semibold text-primary">Analytics <ArrowRight className="h-4 w-4" /></Link>
-        </div>
-        {hasActivity ? (
+      {/* One next step */}
+      <section className="rounded-xl border-2 border-primary/30 bg-primary-soft p-5 sm:p-6">
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">Your next step</p>
+        {nextStep.kind === "add-first-product" && (
           <>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-muted p-4">
-                <p className="text-sm text-muted-foreground">Shop views · last {days} days</p>
-                <p className="mt-1 font-display text-3xl font-bold">{viewsInWindow}</p>
-              </div>
-              <div className="rounded-xl bg-muted p-4">
-                <p className="text-sm text-muted-foreground">Product taps · last {days} days</p>
-                <p className="mt-1 font-display text-3xl font-bold">{tapsInWindow}</p>
-              </div>
-            </div>
-            <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground"><BarChart3 className="h-4 w-4" /> {stats.totalViews} total views since you opened your shop.</p>
+            <h2 className="mt-1 text-xl font-bold text-accent-foreground">Add your first product</h2>
+            <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">Add a photo and a price. It will appear on your shop straight away.</p>
+            <Button asChild className="mt-4 min-h-[48px] w-full text-base font-semibold sm:w-auto">
+              <Link to="/dashboard/products"><Package className="h-4 w-4" /> Add your first product <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
           </>
-        ) : (
-          <div className="mt-3">
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Your shop's performance will appear here once customers start visiting — views and product taps, counted as they happen.
-            </p>
-            {liveCount > 0 ? (
-              <Button variant="outline" onClick={shareLink} className="mt-4 min-h-[44px]"><Share2 className="h-4 w-4" /> Share your shop link</Button>
-            ) : (
-              <Button variant="outline" asChild className="mt-4 min-h-[44px]">
-                <Link to="/dashboard/products"><Package className="h-4 w-4" /> {hasDraftsOnly ? "Switch on your first product" : "Add your first product"}</Link>
-              </Button>
-            )}
-          </div>
+        )}
+        {nextStep.kind === "switch-on-first" && (
+          <>
+            <h2 className="mt-1 text-xl font-bold text-accent-foreground">Switch on your first product</h2>
+            <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">Your products are drafts. Switch one on to publish it to your shop.</p>
+            <Button asChild className="mt-4 min-h-[48px] w-full text-base font-semibold sm:w-auto">
+              <Link to="/dashboard/products"><Package className="h-4 w-4" /> Switch on your first product <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
+          </>
+        )}
+        {nextStep.kind === "share-shop" && (
+          <>
+            <h2 className="mt-1 text-xl font-bold text-accent-foreground">Share your shop link</h2>
+            <p className="mt-1 max-w-xl text-base leading-relaxed text-accent-foreground/80">Put your link where customers already are — Instagram bio or WhatsApp status.</p>
+            <Button onClick={shareOnWhatsApp} className="mt-4 min-h-[48px] w-full bg-whatsapp text-base font-semibold text-whatsapp-foreground hover:bg-whatsapp/90 sm:w-auto">
+              <MessageCircle className="h-4 w-4" /> Share on WhatsApp
+            </Button>
+          </>
         )}
       </section>
 
-      {/* ---------- Recent activity ---------- */}
-      <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 className="text-lg font-bold">Recent activity</h2>
-        <p className="mt-2 text-base leading-relaxed text-muted-foreground">
-          Nothing here yet. When customers view your shop and tap your products, you'll see the numbers in Analytics.
-        </p>
-        <Button variant="outline" asChild className="mt-4 min-h-[44px]">
-          <Link to="/dashboard/products"><Package className="h-4 w-4" /> Add a product</Link>
-        </Button>
+      {/* Products with photos */}
+      <section>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold">Your products</h2>
+          <Link to="/dashboard/products" className="flex min-h-[44px] items-center gap-1 text-sm font-semibold text-primary">Products <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+        {liveProducts.length === 0 ? (
+          <div className="mt-3 rounded-xl border bg-card p-5 text-center">
+            <p className="text-base text-muted-foreground">No live products yet. Your products will appear here with their photos.</p>
+          </div>
+        ) : (
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {liveProducts.map((l) => (
+              <Link key={l.id} to="/dashboard/products" className="overflow-hidden rounded-xl border bg-card transition hover:border-primary/40">
+                {l.image_urls?.[0]
+                  ? <img src={l.image_urls[0]} alt="" className="aspect-square w-full object-cover" loading="lazy" />
+                  : <span className="flex aspect-square w-full items-center justify-center bg-muted text-2xl font-bold text-muted-foreground">{(l.title || "?")[0]?.toUpperCase()}</span>}
+                <span className="block p-3">
+                  <span className="block truncate font-semibold">{l.title}</span>
+                  {l.price && <span className="block truncate text-base font-bold">{l.price}</span>}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

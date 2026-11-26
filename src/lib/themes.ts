@@ -94,6 +94,9 @@ export type OrderDetails = {
   fulfilment: OrderFulfilment;
   address?: string | null | undefined;
   note?: string | null | undefined;
+  /** Chosen product option, e.g. label "Size" + value "L". Omitted when the product has no options. */
+  optionLabel?: string | null | undefined;
+  option?: string | null | undefined;
 };
 
 /** Numeric amount + currency symbol parsed from a stored price string ("₹499", "$10", "499"). Null when there is no usable amount. */
@@ -141,8 +144,13 @@ export function waOrderLink(num: string, title: string, pageUrl: string, order: 
     shop ? `Hi! I'd like to place an order from ${shop}'s izzy shop.` : `Hi! I'd like to place an order. Found you on ${pageUrl}`,
     "",
     `Product: "${title}"`,
-    `Quantity: ${quantity}`,
   ];
+  const optionValue = order.option?.trim();
+  if (optionValue) {
+    const optionLabel = order.optionLabel?.trim() || "Option";
+    lines.push(`${optionLabel}: ${optionValue}`);
+  }
+  lines.push(`Quantity: ${quantity}`);
   const total = formatOrderTotal(opts?.price, quantity);
   if (total) lines.push(`Total: ${total}`);
   if (order.dateNeeded.trim()) lines.push(`Date needed: ${formatOrderDate(order.dateNeeded.trim())}`);

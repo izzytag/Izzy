@@ -22,13 +22,15 @@ const inputClass = "min-h-[44px] w-full rounded-xl border border-input bg-backgr
  * Rendered only on real shop pages — the demo shop never reaches
  * this component (its order action routes to signup instead).
  */
-export function OrderForm({ item, whatsapp, shopName, pageUrl, onLinkClick, onBack }: {
+export function OrderForm({ item, whatsapp, shopName, pageUrl, onLinkClick, onBack, selectedOption, onSelectedOption }: {
   item: CatalogueItem;
   whatsapp: string;
   shopName?: string | null | undefined;
   pageUrl: string;
   onLinkClick?: ((id: string) => void) | undefined;
   onBack: () => void;
+  selectedOption?: string | undefined;
+  onSelectedOption?: ((v: string) => void) | undefined;
 }) {
   const [quantity, setQuantity] = useState(1);
   const [dateNeeded, setDateNeeded] = useState("");
@@ -37,10 +39,15 @@ export function OrderForm({ item, whatsapp, shopName, pageUrl, onLinkClick, onBa
   const [note, setNote] = useState("");
 
   const needsAddress = fulfilment === "delivery";
-  const missing = !dateNeeded ? "Add the date you need it by." : needsAddress && !address.trim() ? "Add the delivery address." : null;
+  const productOptions = (item.options ?? []).filter((o) => o.trim());
+  const optionLabel = item.option_label?.trim() || "Option";
+  const chosenOption = selectedOption?.trim() ?? "";
+  const missing = productOptions.length > 0 && !chosenOption
+    ? `Choose a ${optionLabel.toLowerCase()} first.`
+    : !dateNeeded ? "Add the date you need it by." : needsAddress && !address.trim() ? "Add the delivery address." : null;
   const total = formatOrderTotal(item.price, quantity);
   const href = !missing
-    ? waOrderLink(whatsapp, item.title, pageUrl, { quantity, dateNeeded, fulfilment, address, note }, { price: item.price, shopName })
+    ? waOrderLink(whatsapp, item.title, pageUrl, { quantity, dateNeeded, fulfilment, address, note, optionLabel, option: chosenOption || null }, { price: item.price, shopName })
     : null;
 
   const fulfilmentButton = (value: OrderFulfilment, label: string) => (
@@ -67,6 +74,20 @@ export function OrderForm({ item, whatsapp, shopName, pageUrl, onLinkClick, onBa
         <span className="font-semibold">{item.title}</span>
         {item.price && <span className="text-muted-foreground"> · {item.price} each</span>}
       </p>
+
+      {productOptions.length > 0 && (
+        <div className="space-y-2">
+          <span className="block text-sm font-semibold">{optionLabel}</span>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={optionLabel}>
+            {productOptions.map((choice) => (
+              <button key={choice} type="button" aria-pressed={chosenOption === choice} onClick={() => onSelectedOption?.(choice)}
+                className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${chosenOption === choice ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
+                {choice}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <span id="order-quantity-label" className="block text-sm font-semibold">Quantity</span>

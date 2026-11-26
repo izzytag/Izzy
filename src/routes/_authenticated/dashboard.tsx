@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import {
-  BarChart3, ChevronUp, LayoutDashboard, LifeBuoy, LogOut, Menu, Package, Palette, QrCode, Settings, Store,
+  BarChart3, ChevronUp, CreditCard, Ellipsis, House, LifeBuoy, LogOut, Menu, Package, QrCode, Settings, Store,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery } from "@/lib/account";
@@ -28,19 +28,21 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardLayout,
 });
 
-/** Main sections — shown in the desktop sidebar and the mobile tab bar. */
+/** Dashboard A: exactly four main tabs — Home, Products, My Shop, More. */
 const NAV_MAIN = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/dashboard/store", label: "My Shop", icon: Store, exact: false },
+  { to: "/dashboard", label: "Home", icon: House, exact: true },
   { to: "/dashboard/products", label: "Products", icon: Package, exact: false },
-  { to: "/dashboard/appearance", label: "Store Appearance", icon: Palette, exact: false },
-  { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, exact: false },
+  { to: "/dashboard/store", label: "My Shop", icon: Store, exact: false },
+  { to: "/dashboard/more", label: "More", icon: Ellipsis, exact: false },
 ] as const;
 
-/** Secondary destinations — sidebar lower section / mobile header menu. */
-const NAV_SECONDARY = [
+/** Everything inside More — also listed in the desktop sidebar. Existing routes stay live. */
+const NAV_MORE = [
+  { to: "/dashboard/analytics", label: "Views & taps", icon: BarChart3 },
+  { to: "/dashboard/qr", label: "QR code", icon: QrCode },
+  { to: "/dashboard/upgrade", label: "Plan", icon: CreditCard },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
-  { to: "/dashboard/support", label: "Help / Support", icon: LifeBuoy },
+  { to: "/dashboard/support", label: "Help", icon: LifeBuoy },
 ] as const;
 
 function useSignOut() {
@@ -76,16 +78,8 @@ function DashboardLayout() {
               <n.icon className="h-5 w-5 shrink-0" /> {n.label}
             </Link>
           ))}
-          {/* QR Code lives in the sidebar only: the mobile bottom bar
-              keeps its five slots, and on mobile the page is reached
-              from the header menu and the Overview quick action. */}
-          <Link to="/dashboard/qr"
-            className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            activeProps={{ className: "bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary" }}>
-            <QrCode className="h-5 w-5 shrink-0" /> QR Code
-          </Link>
           <div className="my-3 border-t" />
-          {NAV_SECONDARY.map((n) => (
+          {NAV_MORE.map((n) => (
             <Link key={n.to} to={n.to}
               className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
               activeProps={{ className: "bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary" }}>
@@ -158,13 +152,13 @@ function DashboardLayout() {
 
       {/* ---------- Mobile bottom navigation ---------- */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-card lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} aria-label="Dashboard">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-4">
           {NAV_MAIN.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }}
               className={cn("flex min-h-[60px] flex-col items-center justify-center gap-1 px-1 text-[11px] font-medium text-muted-foreground transition")}
               activeProps={{ className: "text-primary" }}>
               <n.icon className="h-6 w-6" />
-              <span className="max-w-full truncate">{n.label === "Store Appearance" ? "Appearance" : n.label}</span>
+              <span className="max-w-full truncate">{n.label}</span>
             </Link>
           ))}
         </div>
