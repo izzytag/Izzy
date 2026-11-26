@@ -18,7 +18,7 @@ export type PublicData = {
   socials: Record<string, string>;
   whatsapp: string | null;
   upi_id: string | null;
-  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null }[];
+  links: { id: string; title: string; url: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null; option_label?: string | null; options?: string[] }[];
 };
 
 /**

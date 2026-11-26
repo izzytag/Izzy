@@ -57,9 +57,22 @@ export const getPublicPage = createServerFn({ method: "GET" })
     if (profile.suspended) {
       return { suspended: true as const, username: profile.username, displayName: profile.display_name };
     }
-    const [{ data: links }, { data: isPro }] = await Promise.all([
-      sb.from("links").select("id, title, url, kind, price, description, image_urls, category").eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position"),
-      sb.rpc("is_pro", { _uid: profile.id }),
-    ]);
+    // Product options (migration 0011) may not exist yet. Try the
+    // full select first; on error retry without the option columns
+    // and treat every product as having no option. A missing
+    // optional column must never take a storefront down.
+    const fullLinks = await sb
+      .from("links")
+      .select("id, title, url, kind, price, description, image_urls, category, option_label, options")
+      .eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position");
+    let links = fullLinks.data;
+    if (fullLinks.error) {
+      const bareLinks = await sb
+        .from("links")
+        .select("id, title, url, kind, price, description, image_urls, category")
+        .eq("user_id", profile.id).eq("enabled", true).eq("kind", "product").order("position");
+      links = (bareLinks.data ?? []).map((l) => ({ ...l, option_label: null, options: [] as string[] }));
+    }
+    const { data: isPro } = await sb.rpc("is_pro", { _uid: profile.id });
     return { suspended: false as const, profile, links: links ?? [], isPro: !!isPro };
   });

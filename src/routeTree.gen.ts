@@ -43,6 +43,7 @@ import { Route as GuidesSellOnWhatsappRouteImport } from './routes/guides.sell-o
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAppearanceRouteImport } from './routes/_authenticated/dashboard.appearance'
+import { Route as AuthenticatedDashboardMoreRouteImport } from './routes/_authenticated/dashboard.more'
 import { Route as AuthenticatedDashboardProductsRouteImport } from './routes/_authenticated/dashboard.products'
 import { Route as AuthenticatedDashboardQrRouteImport } from './routes/_authenticated/dashboard.qr'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -226,6 +227,12 @@ const AuthenticatedDashboardAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardMoreRoute =
+  AuthenticatedDashboardMoreRouteImport.update({
+    id: '/more',
+    path: '/more',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardProductsRoute =
   AuthenticatedDashboardProductsRouteImport.update({
     id: '/products',
@@ -301,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/guides/': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/more': typeof AuthenticatedDashboardMoreRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/guides': typeof GuidesIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/dashboard/more': typeof AuthenticatedDashboardMoreRoute
   '/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -383,6 +392,7 @@ export interface FileRoutesById {
   '/guides/': typeof GuidesIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/appearance': typeof AuthenticatedDashboardAppearanceRoute
+  '/_authenticated/dashboard/more': typeof AuthenticatedDashboardMoreRoute
   '/_authenticated/dashboard/products': typeof AuthenticatedDashboardProductsRoute
   '/_authenticated/dashboard/qr': typeof AuthenticatedDashboardQrRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/guides/'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/more'
     | '/dashboard/products'
     | '/dashboard/qr'
     | '/dashboard/settings'
@@ -465,6 +476,7 @@ export interface FileRouteTypes {
     | '/guides'
     | '/dashboard/analytics'
     | '/dashboard/appearance'
+    | '/dashboard/more'
     | '/dashboard/products'
     | '/dashboard/qr'
     | '/dashboard/settings'
@@ -508,6 +520,7 @@ export interface FileRouteTypes {
     | '/guides/'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/appearance'
+    | '/_authenticated/dashboard/more'
     | '/_authenticated/dashboard/products'
     | '/_authenticated/dashboard/qr'
     | '/_authenticated/dashboard/settings'
@@ -773,6 +786,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAppearanceRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/more': {
+      id: '/_authenticated/dashboard/more'
+      path: '/more'
+      fullPath: '/dashboard/more'
+      preLoaderRoute: typeof AuthenticatedDashboardMoreRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/products': {
       id: '/_authenticated/dashboard/products'
       path: '/products'
@@ -828,6 +848,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAppearanceRoute: typeof AuthenticatedDashboardAppearanceRoute
+  AuthenticatedDashboardMoreRoute: typeof AuthenticatedDashboardMoreRoute
   AuthenticatedDashboardProductsRoute: typeof AuthenticatedDashboardProductsRoute
   AuthenticatedDashboardQrRoute: typeof AuthenticatedDashboardQrRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
@@ -842,6 +863,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
     AuthenticatedDashboardAppearanceRoute:
       AuthenticatedDashboardAppearanceRoute,
+    AuthenticatedDashboardMoreRoute: AuthenticatedDashboardMoreRoute,
     AuthenticatedDashboardProductsRoute: AuthenticatedDashboardProductsRoute,
     AuthenticatedDashboardQrRoute: AuthenticatedDashboardQrRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,

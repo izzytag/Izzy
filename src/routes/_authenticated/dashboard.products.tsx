@@ -14,6 +14,7 @@ import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardLinkItem, reorderSubset, type LinkRow } from "@/components/DashboardLinkItem";
+import { hasOptionFields, isMissingOptionColumnError, withoutOptionFields } from "@/lib/product-categories";
 
 import { DashboardLoading } from "@/components/DashboardLoading";
 
@@ -80,7 +81,21 @@ function ProductsPage() {
   async function updateLink(id: string, patch: Partial<LinkRow>) {
     setLinks((l) => l.map((x) => (x.id === id ? { ...x, ...patch } : x)));
     const { error } = await supabase.from("links").update(patch).eq("id", id);
-    if (error) toast.error(error.message);
+    if (!error) return;
+    // Before migration 0011 is applied, option_label/options do not
+    // exist yet. Retry without them so the rest of the product still
+    // saves, and tell the seller plainly what did not save.
+    if (hasOptionFields(patch as Record<string, unknown>) && isMissingOptionColumnError(error)) {
+      const fallback = withoutOptionFields(patch as Record<string, unknown>) as Partial<LinkRow>;
+      const retry = await supabase.from("links").update(fallback).eq("id", id);
+      if (!retry.error) {
+        toast.error("Product saved. Options need a database update before they can save — ask for migration 0011 to be applied.");
+        return;
+      }
+      toast.error(retry.error.message);
+      return;
+    }
+    toast.error(error.message);
   }
 
   async function deleteLink(id: string) {
@@ -119,7 +134,7 @@ function ProductsPage() {
       </div>
 
       <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <Button variant="outline" onClick={() => addItem()} className="min-h-[48px] w-full text-base"><ShoppingBag className="h-4 w-4" /> Add product</Button>
+        <Button onClick={() => addItem()} className="min-h-[52px] w-full text-base font-semibold"><ShoppingBag className="h-4 w-4" /> Add product</Button>
         {!p.whatsapp && storeRows.some((l) => l.enabled) && (
           <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
             Add your WhatsApp number in <Link to="/dashboard/store" className="font-semibold underline">My Shop</Link>, so visitors can order on WhatsApp.

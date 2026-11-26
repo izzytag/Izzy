@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { waCardLink } from "@/lib/themes";
 import { OrderForm } from "@/components/OrderForm";
 
-export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null };
+export type CatalogueItem = { id: string; title: string; kind?: string; price?: string | null; description?: string | null; image_urls?: string[]; category?: string | null; option_label?: string | null; options?: string[] };
 
 export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, onProductView, demoMode }: {
   item: CatalogueItem; whatsapp: string | null; shopName?: string | null; pageUrl: string; onLinkClick?: (id: string) => void; onProductView?: ((id: string) => void) | undefined; demoMode?: boolean | undefined;
@@ -17,6 +17,9 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
   const Icon = ShoppingBag;
   const href = whatsapp && /\d{6,}/.test(whatsapp.replace(/\D/g, "")) ? waCardLink(whatsapp, item.kind ?? "product", item.title, `${pageUrl}#item-${item.id}`, { price: item.price, shopName }) : null;
   const [open, setOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const productOptions = (item.options ?? []).filter((o) => o.trim());
+  const optionLabel = item.option_label?.trim() || "Option";
   // Ordering happens in two steps: the buyer first completes the
   // short order form (quantity, date, pickup/delivery, note), and
   // only then does WhatsApp open — with the complete order message.
@@ -57,11 +60,11 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the
         details below, and ordering happens from there only. */}
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setOrdering(false); }}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setOrdering(false); setSelectedOption(""); } }}>
       <DialogContent className="max-h-[90dvh] max-w-[calc(100vw-2rem)] gap-5 overflow-y-auto rounded-2xl sm:max-w-lg sm:rounded-2xl">
         <DialogHeader className="text-left"><DialogTitle className="break-words pr-8 text-left text-[22px] font-bold leading-tight tracking-tight">{item.title}</DialogTitle></DialogHeader>
         {ordering && !demoMode && href ? (
-          <OrderForm item={item} whatsapp={whatsapp ?? ""} shopName={shopName} pageUrl={pageUrl} onLinkClick={onLinkClick} onBack={() => setOrdering(false)} />
+          <OrderForm item={item} whatsapp={whatsapp ?? ""} shopName={shopName} pageUrl={pageUrl} onLinkClick={onLinkClick} onBack={() => setOrdering(false)} selectedOption={selectedOption} onSelectedOption={setSelectedOption} />
         ) : (
           <>
         {photos.length > 0 ? <div className="space-y-2.5">
@@ -79,6 +82,19 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
           {item.price && <p className="break-words text-[22px] font-bold tracking-tight">{item.price}</p>}
           {item.description && <p className="whitespace-pre-wrap break-words text-pretty text-base leading-relaxed">{item.description}</p>}
         </div>
+        {productOptions.length > 0 && !demoMode && (
+          <div className="space-y-2">
+            <span className="block text-sm font-semibold">{optionLabel}</span>
+            <div className="flex flex-wrap gap-2" role="group" aria-label={optionLabel}>
+              {productOptions.map((choice) => (
+                <button key={choice} type="button" aria-pressed={selectedOption === choice} onClick={() => setSelectedOption(choice)}
+                  className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${selectedOption === choice ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}>
+                  {choice}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {/* The action block sticks to the bottom of the scrolling
             dialog, so ordering never requires scrolling past a long
             description or photo list. It bleeds to the dialog edges

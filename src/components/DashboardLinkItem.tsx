@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { CatalogueEditor } from "@/components/CatalogueEditor";
+import { sanitizeOptionLabel, sanitizeOptions } from "@/lib/product-categories";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type LinkRow = Tables<"links">;
@@ -58,6 +59,8 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
   const [desc, setDesc] = useState(link.description ?? "");
   const [images, setImages] = useState<string[]>(link.image_urls ?? []);
   const [category, setCategory] = useState(link.category ?? "");
+  const [optionLabel, setOptionLabel] = useState(link.option_label ?? "");
+  const [options, setOptions] = useState<string[]>(link.options ?? []);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   // True while CatalogueEditor is uploading photos: Save stays
   // disabled until every photo has a URL to save.
@@ -77,6 +80,8 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
     setDesc(link.description ?? "");
     setImages(link.image_urls ?? []);
     setCategory(link.category ?? "");
+    setOptionLabel(link.option_label ?? "");
+    setOptions(link.options ?? []);
     setEditing(true);
   }
 
@@ -88,12 +93,24 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
     setDesc(link.description ?? "");
     setImages(link.image_urls ?? []);
     setCategory(link.category ?? "");
+    setOptionLabel(link.option_label ?? "");
+    setOptions(link.options ?? []);
     setEditing(false);
   }
 
   function save() {
     if (!title.trim()) return void toast.error("Add a title");
-    onUpdate(link.id, { title: title.trim().slice(0, 80), price: price.trim().slice(0, 30) || null, description: desc.trim().slice(0, 4000) || null, image_urls: images, category: category.trim().slice(0, 60) || null });
+    const cleanOptions = sanitizeOptions(options);
+    const cleanLabel = cleanOptions.length > 0 ? sanitizeOptionLabel(optionLabel) : null;
+    onUpdate(link.id, {
+      title: title.trim().slice(0, 80),
+      price: price.trim().slice(0, 30) || null,
+      description: desc.trim().slice(0, 4000) || null,
+      image_urls: images,
+      category: category.trim().slice(0, 60) || null,
+      option_label: cleanLabel,
+      options: cleanLabel ? cleanOptions : [],
+    });
     setEditing(false);
   }
 
@@ -127,16 +144,21 @@ export function DashboardLinkItem({ link, onUpdate, onDelete, userId, justCreate
             )}
             <p className="pt-1 text-sm font-medium">Product photos</p>
             <p className="text-sm text-muted-foreground">Add up to 4 photos — big phone photos are shrunk automatically. The first photo is the one shown on the product card in your store.</p>
-            <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} description={desc} onDescription={setDesc} onUploadingChange={setPhotosUploading} />
+            <CatalogueEditor userId={userId} images={images} onImages={setImages} category={category} onCategory={setCategory} optionLabel={optionLabel} onOptionLabel={setOptionLabel} options={options} onOptions={setOptions} description={desc} onDescription={setDesc} onUploadingChange={setPhotosUploading} />
             <div className="flex gap-2">
               <Button size="sm" onClick={save} disabled={photosUploading}><Check className="h-4 w-4" /> {photosUploading ? "Uploading photos…" : "Save"}</Button>
               <Button size="sm" variant="outline" onClick={cancel}><X className="h-4 w-4" /> Cancel</Button>
             </div>
           </div>
         ) : (
-          <button className="block w-full text-left" onClick={startEditing}>
-            <p className="flex items-center gap-1.5 truncate font-semibold">{link.title} <Pencil className="h-3.5 w-3.5 text-muted-foreground" /></p>
-            <p className="truncate text-sm text-muted-foreground">{summary}</p>
+          <button className="flex min-h-[44px] w-full items-center gap-3 text-left" onClick={startEditing}>
+            {link.image_urls?.[0]
+              ? <img src={link.image_urls[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
+              : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-bold text-muted-foreground">{(link.title || "?")[0]?.toUpperCase()}</span>}
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-1.5 truncate font-semibold">{link.title} <Pencil className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /></span>
+              <span className="block truncate text-sm text-muted-foreground">{summary} · {link.enabled ? "Live" : "Hidden"}</span>
+            </span>
           </button>
         )}
       </div>
