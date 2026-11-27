@@ -1,21 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { Camera, Eye, MessageCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Eye, Pencil } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
-import { BUSINESS_CATEGORIES } from "@/lib/categories";
-import { processCataloguePhoto } from "@/lib/catalogue";
-import { effectiveTheme, THEMES, waCardLink } from "@/lib/themes";
+import { effectiveTheme, THEMES } from "@/lib/themes";
 import { TESTING_FREE, testingBanner, effectiveIsPro } from "@/lib/billing";
 import { useRegion } from "@/lib/useRegion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { BusinessDetails } from "@/components/BusinessDetails";
 import { PhonePreview } from "@/components/PhonePreview";
-
 import { DashboardLoading } from "@/components/DashboardLoading";
 
 export const Route = createFileRoute("/_authenticated/dashboard/store")({
@@ -28,233 +20,84 @@ export const Route = createFileRoute("/_authenticated/dashboard/store")({
 });
 
 /**
- * My Shop — shop identity only: name, logo, description, category
- * and the WhatsApp number orders go to, plus the shop link and its
- * publishing status. Products live on the Products page. Identity
- * saves automatically when a field loses focus (the Save button
- * calls the same path), exactly as the old Store tab behaved.
+ * My Shop — Preview and Edit modes (2026-11-27).
+ * Preview (selected by default) shows the shop as buyers see it.
+ * Edit shows the business details — logo, name, category, short
+ * description, WhatsApp number — tap a detail to change it, then
+ * tap Save to update. Business details also live on the Home
+ * tab; both edit the same profile. Shop look stays as one row
+ * into the appearance page.
  */
 function MyShopPage() {
   const region = useRegion();
   const { data: acc } = useSuspenseQuery(accountQuery);
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
-  const qc = useQueryClient();
   const p = acc.profile;
-  const [name, setName] = useState(p.display_name ?? "");
-  const [bio, setBio] = useState(p.bio ?? "");
-  const [category, setCategory] = useState(p.category ?? "");
-  const [whatsapp, setWhatsapp] = useState(p.whatsapp ?? "");
-  const [avatar, setAvatar] = useState(p.avatar_url);
-  const [showPreview, setShowPreview] = useState(false);
-  // Desktop side preview only mounts on large screens. Mounting it
-  // hidden on phones made My Shop load every product photo twice
-  // (once hidden, once in the mobile preview) and felt slow.
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const [saveNote, setSaveNote] = useState("");
-  const [whatsappError, setWhatsappError] = useState<string | null>(null);
-  const lastSaved = useRef({ name: p.display_name ?? "", bio: p.bio ?? "", category: p.category ?? "", whatsapp: p.whatsapp ?? "" });
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [pageUrl, setPageUrl] = useState(`/${p.username}`);
-  useEffect(() => setPageUrl(`${window.location.origin}/${p.username}`), [p.username]);
   const pro = effectiveIsPro(acc.isPro);
-
-
-  // The WhatsApp number is normalised to digits first: empty is
-  // fine, a bare 10-digit Indian number gets the 91 country code,
-  // 11–15 digits are taken as already complete, and anything else is
-  // an inline error that is never saved.
-  function normalizeWhatsapp(raw: string): { value: string | null; prefixed?: string } | { error: string } {
-    const digits = raw.replace(/\D/g, "");
-    if (!raw.trim() || !digits) return { value: null };
-    if (digits.length === 10) return { value: `91${digits}`, prefixed: digits };
-    if (digits.length >= 11 && digits.length <= 15) return { value: digits };
-    return { error: "That doesn't look like a complete WhatsApp number — include the country code, e.g. 91 98765 43210." };
-  }
-
-  async function saveProfile(): Promise<boolean> {
-    const norm = normalizeWhatsapp(whatsapp);
-    if ("error" in norm) {
-      setWhatsappError(norm.error);
-      return false;
-    }
-    setWhatsappError(null);
-    const savedWhatsapp = norm.value ?? "";
-    if (norm.value && whatsapp !== norm.value) setWhatsapp(norm.value);
-    if (lastSaved.current.name === name && lastSaved.current.bio === bio && lastSaved.current.category === category && lastSaved.current.whatsapp === savedWhatsapp) return true;
-    setSaveStatus("saving");
-    setSaveNote("");
-    const { error } = await supabase.from("profiles").update({ display_name: name.slice(0, 60), bio: bio.slice(0, 160), category: category || null, whatsapp: norm.value }).eq("id", acc.user.id);
-    if (error) {
-      setSaveStatus("idle");
-      toast.error(error.message);
-      return false;
-    }
-    lastSaved.current = { name, bio, category, whatsapp: savedWhatsapp };
-    setSaveStatus("saved");
-    if (norm.prefixed) setSaveNote(`Saved as +91 ${norm.prefixed}`);
-    qc.invalidateQueries({ queryKey: ["account"] });
-    return true;
-  }
-
-  function editField(set: (v: string) => void) {
-    return (v: string) => {
-      set(v);
-      setSaveStatus("idle");
-      setSaveNote("");
-    };
-  }
-
-  async function uploadAvatar(f: File) {
-    // Same in-browser pipeline as catalogue photos: big phone photos
-    // are shrunk and re-encoded as JPEG instead of being rejected
-    // for being over 2MB.
-    try {
-      const processed = await processCataloguePhoto(f);
-      const path = `${acc.user.id}/avatar-${Date.now()}.jpg`;
-      const { error } = await supabase.storage.from("avatars").upload(path, processed, { upsert: true, contentType: "image/jpeg" });
-      if (error) throw error;
-      const { data: s } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-      if (!s) return;
-      await supabase.from("profiles").update({ avatar_url: s.signedUrl }).eq("id", acc.user.id);
-      setAvatar(s.signedUrl);
-      qc.invalidateQueries({ queryKey: ["account"] });
-      toast.success("Logo updated");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't upload the logo. Please try again.");
-    }
-  }
+  const [mode, setMode] = useState<"preview" | "edit">("preview");
 
   const preview = {
-    ...p, display_name: name, bio, category: category || null, avatar_url: avatar, whatsapp: whatsapp || null,
+    ...p,
     socials: (p.socials as Record<string, string>) ?? {},
     links: links.filter((l) => l.enabled && l.kind !== "link"),
   };
 
-  // Example customer enquiry (Step 04): the exact message the
-  // storefront's WhatsApp button prepares, built with the same
-  // waCardLink the live shop uses — a sample product against the
-  // number in the field above. Shown only when the number looks
-  // dialable; it is an example, not a real message.
-  let enquiryText: string | null = null;
-  if (whatsapp.replace(/\D/g, "").length >= 6) {
-    try {
-      enquiryText = new URL(
-        waCardLink(whatsapp, "product", "Sample product", pageUrl, { price: "₹499", shopName: name || "Your shop" }),
-      ).searchParams.get("text");
-    } catch {
-      enquiryText = null;
-    }
-  }
-
   return (
-    <div>
-      <div className="mb-6 lg:hidden">
-        <Button variant="outline" size="sm" onClick={() => setShowPreview((v) => !v)} aria-expanded={showPreview}>
-          <Eye className="h-4 w-4" /> {showPreview ? "Hide preview" : "Preview"}
-        </Button>
-        {showPreview && (
-          <div className="mt-4">
-            <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
-          </div>
-        )}
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold sm:text-3xl">My Shop</h1>
+        <p className="mt-1 text-base text-muted-foreground">See your shop as buyers see it, or tap Edit to change your details.</p>
       </div>
-      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">My Shop</h1>
-            <p className="mt-1 text-base text-muted-foreground">Your business details, shown at the top of your shop page.</p>
-          </div>
 
-          {TESTING_FREE && (
-            <p className="rounded-xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
-          )}
+      {/* Preview / Edit toggle — Preview selected by default */}
+      <div className="flex rounded-full border bg-card p-1" role="tablist" aria-label="My Shop mode">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "preview"}
+          onClick={() => setMode("preview")}
+          className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full text-base font-semibold transition-colors ${mode === "preview" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          <Eye className="h-4 w-4" /> Preview
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "edit"}
+          onClick={() => setMode("edit")}
+          className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full text-base font-semibold transition-colors ${mode === "edit" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          <Pencil className="h-4 w-4" /> Edit
+        </button>
+      </div>
 
-          {/* Shop look — one row into the existing appearance page */}
-          <section className="rounded-xl border bg-card">
-            <Link to="/dashboard/appearance" className="flex min-h-[56px] items-center gap-3 px-5 py-3 transition hover:bg-muted/60">
-              <span className="flex gap-1.5" aria-hidden="true">
-                <span className="h-5 w-5 rounded-full border bg-foreground" />
-                <span className="h-5 w-5 rounded-full border bg-background" />
-                <span className="h-5 w-5 rounded-full border bg-muted" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold">Shop look</span>
-                <span className="block truncate text-sm text-muted-foreground">Theme: {THEMES.find((t) => t.id === (p.theme ?? "light"))?.name ?? "Light"} · Social links · UPI</span>
-              </span>
-              <span className="text-sm font-semibold text-primary">Change</span>
-            </Link>
-          </section>
+      {TESTING_FREE && (
+        <p className="rounded-xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
+      )}
 
-          {/* Business details */}
-          <section className="rounded-xl border bg-card p-5 sm:p-6">
-            <h2 className="text-xl font-bold">Business details</h2>
-            <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row">
-              <button type="button" onClick={() => fileRef.current?.click()} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted" aria-label="Upload shop logo">
-                {avatar ? <img src={avatar} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold text-muted-foreground">{(name || "?")[0]}</span>}
-                <span className="absolute inset-x-0 bottom-0 flex justify-center bg-foreground/60 py-1 text-background"><Camera className="h-4 w-4" /></span>
-              </button>
-              <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
-              <div className="w-full flex-1 space-y-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="shop-name">Business name</Label>
-                  <Input id="shop-name" value={name} onChange={(e) => editField(setName)(e.target.value)} onBlur={() => void saveProfile()} placeholder="Business name" maxLength={60} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="shop-category">Business category</Label>
-                  <div className="relative">
-                    <select id="shop-category" value={category} onChange={(e) => editField(setCategory)(e.target.value)} onBlur={() => void saveProfile()}
-                      className="h-10 w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-base text-foreground">
-                      <option value="">Choose a category…</option>
-                      {BUSINESS_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">▾</span>
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="shop-bio">Short description</Label>
-                  <Textarea id="shop-bio" value={bio} onChange={(e) => editField(setBio)(e.target.value)} onBlur={() => void saveProfile()} placeholder="Short business description (160 characters)" maxLength={160} rows={2} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="shop-wa">WhatsApp number for orders</Label>
-                  <Input id="shop-wa" value={whatsapp} onChange={(e) => editField(setWhatsapp)(e.target.value)} onBlur={() => void saveProfile()} placeholder="98765 43210" inputMode="tel" />
-                  <p className="text-sm text-muted-foreground">Visitors use this number to order on WhatsApp. Include the country code — for India, start with 91.</p>
-                  {whatsappError && <p className="text-sm font-medium text-destructive">{whatsappError}</p>}
-                </div>
-                {enquiryText && (
-                  <div className="rounded-xl bg-muted p-4">
-                    <p className="flex items-center gap-2 text-sm font-semibold">
-                      <MessageCircle className="h-4 w-4 text-primary" /> Example — what a customer sends you
-                    </p>
-                    <p className="mt-2 rounded-lg rounded-tl-none bg-card p-3 text-sm leading-relaxed shadow-sm">{enquiryText}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      This is the message WhatsApp opens with when a customer taps Order on a product (shown
-                      here for a “Sample product” at ₹499), addressed to the number above. The customer can
-                      edit it before sending. Changing the number changes where future enquiries go.
-                    </p>
-                  </div>
-                )}
-                <div className="flex items-center gap-3">
-                  <Button size="sm" onClick={async () => { if (await saveProfile()) toast.success("Shop saved"); }}>Save shop</Button>
-                  {saveStatus === "saving" && <span className="text-sm text-muted-foreground">Saving…</span>}
-                  {saveStatus === "saved" && <span className="text-sm text-muted-foreground">{saveNote || "Saved"}</span>}
-                </div>
-              </div>
-            </div>
-            <p className="mt-3 text-base text-muted-foreground">Logo is optional — if you skip it, we show your business initial instead. To manage what you sell, go to <Link to="/dashboard/products" className="font-semibold text-primary underline">Products</Link>.</p>
-          </section>
+      {mode === "preview" ? (
+        <div className="mx-auto w-full max-w-[420px]">
+          <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />
         </div>
-        <aside className="hidden lg:block lg:sticky lg:top-6 lg:self-start">
-          {isDesktop && <PhonePreview data={preview} theme={effectiveTheme(p.theme, pro)} showBranding={!pro} />}
-        </aside>
-      </div>
+      ) : (
+        <BusinessDetails profile={p} userId={acc.user.id} />
+      )}
+
+      {/* Shop look — one row into the existing appearance page */}
+      <section className="rounded-xl border bg-card">
+        <Link to="/dashboard/appearance" className="flex min-h-[56px] items-center gap-3 px-5 py-3 transition hover:bg-muted/60">
+          <span className="flex gap-1.5" aria-hidden="true">
+            <span className="h-5 w-5 rounded-full border bg-foreground" />
+            <span className="h-5 w-5 rounded-full border bg-background" />
+            <span className="h-5 w-5 rounded-full border bg-muted" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">Shop look</span>
+            <span className="block truncate text-sm text-muted-foreground">Theme: {THEMES.find((t) => t.id === (p.theme ?? "light"))?.name ?? "Light"} · Social links · UPI</span>
+          </span>
+          <span className="text-sm font-semibold text-primary">Change</span>
+        </Link>
+      </section>
     </div>
   );
 }
