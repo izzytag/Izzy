@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Lock, Check } from "lucide-react";
+import { ArrowLeft, Lock, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { SOCIALS, THEMES, type ThemeId } from "@/lib/themes";
@@ -51,6 +51,12 @@ function AppearancePage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
+        <div>
+          <Button variant="ghost" asChild className="min-h-[44px] px-2">
+            <Link to="/dashboard/store"><ArrowLeft className="h-4 w-4" /> Back to My Shop</Link>
+          </Button>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Shop look</h1>
+        </div>
         <section className="rounded-3xl border bg-card p-5 sm:p-6">
           <h2 className="text-xl font-bold">Theme</h2>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">

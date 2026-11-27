@@ -32,7 +32,6 @@ function HomePage() {
   const [origin, setOrigin] = useState("https://izzytag.shop");
   useEffect(() => setOrigin(window.location.origin), []);
   const shopUrl = `${origin}/${p.username}`;
-  const shopUrlDisplay = shopUrl.replace(/^https?:\/\//, "");
 
   const products = links.filter((l) => l.kind !== "link");
   const liveProducts = products.filter((l) => l.enabled);
@@ -54,7 +53,7 @@ function HomePage() {
 
   return (
     <div className="space-y-6">
-      {/* Shop header — name, photo, link, See my shop (each action once) */}
+      {/* Shop header — name, photo, See my shop (each action once) */}
       <section className="rounded-xl border bg-card p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {p.avatar_url
@@ -77,7 +76,6 @@ function HomePage() {
                 </span>
               )}
             </div>
-            <p className="mt-1 break-all text-base font-medium text-primary">{shopUrlDisplay}</p>
             <p className="mt-1 text-base text-muted-foreground">
               {liveProducts.length > 0
                 ? `${liveProducts.length} ${liveProducts.length === 1 ? "product is" : "products are"} live on your shop.`

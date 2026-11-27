@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, Camera, Eye, MessageCircle } from "lucide-react";
+import { Camera, Eye, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { BUSINESS_CATEGORIES } from "@/lib/categories";
@@ -66,7 +66,6 @@ function MyShopPage() {
   useEffect(() => setPageUrl(`${window.location.origin}/${p.username}`), [p.username]);
   const pro = effectiveIsPro(acc.isPro);
 
-  const liveCount = links.filter((l) => l.enabled && l.kind !== "link").length;
 
   // The WhatsApp number is normalised to digits first: empty is
   // fine, a bare 10-digit Indian number gets the 91 country code,
@@ -177,35 +176,6 @@ function MyShopPage() {
           {TESTING_FREE && (
             <p className="rounded-xl border bg-primary-soft p-4 text-base font-medium text-accent-foreground">{testingBanner(region)}</p>
           )}
-
-          {/* Shop link + publishing status */}
-          <section className="rounded-xl border bg-card p-5 sm:p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold">Your shop link</h2>
-              {liveCount === 0 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-sm font-semibold text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-muted-foreground" /> Not published yet
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-sm font-semibold text-primary">
-                  <span className="h-2 w-2 rounded-full bg-primary" /> Live
-                </span>
-              )}
-            </div>
-            <p className="mt-2 break-all text-base font-medium text-primary">{pageUrl.replace(/^https?:\/\//, "")}</p>
-            <p className="mt-1 text-base text-muted-foreground">
-              {liveCount > 0
-                ? `${liveCount} ${liveCount === 1 ? "product is" : "products are"} live on your shop.`
-                : <>No products live yet — visitors will see your shop with nothing to order. <Link to="/dashboard/products" className="font-semibold text-primary underline">Add your first product</Link>.</>}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Your shop link is permanent — it never changes, so links you've already shared keep working.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="outline" asChild className="min-h-[44px]"><a href={pageUrl} target="_blank" rel="noreferrer"><Eye className="h-4 w-4" /> See my shop</a></Button>
-              <Button variant="outline" onClick={() => { navigator.clipboard.writeText(pageUrl); toast.success("Shop link copied"); }} className="min-h-[44px]"><Copy className="h-4 w-4" /> Copy shop link</Button>
-            </div>
-          </section>
 
           {/* Shop look — one row into the existing appearance page */}
           <section className="rounded-xl border bg-card">

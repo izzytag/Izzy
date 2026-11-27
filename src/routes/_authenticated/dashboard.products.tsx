@@ -14,6 +14,7 @@ import { useRegion } from "@/lib/useRegion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardLinkItem, reorderSubset, type LinkRow } from "@/components/DashboardLinkItem";
+import { ProductFormPopup, type ProductFormData } from "@/components/ProductFormPopup";
 import { hasOptionFields, isMissingOptionColumnError, withoutOptionFields } from "@/lib/product-categories";
 
 import { DashboardLoading } from "@/components/DashboardLoading";
@@ -30,8 +31,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/products")({
 /**
  * Products — the catalogue manager. Products show as Home-style
  * photo cards (2-column grid on phone, name + price) with a
- * Live/Hidden toggle on each card; tapping a card opens its edit
- * form full-width. New items start as drafts (switched off),
+ * Live/Hidden toggle on each card; tapping a card (or Add
+ * product) opens the Add/Edit pop-up — nothing is saved until
+ * Save is tapped there. New items start as drafts (switched off),
  * photos are processed on upload, ordering is drag-and-drop, and
  * the free-plan item limit counts product rows only (legacy link
  * rows are never shown here).
@@ -42,7 +44,7 @@ function ProductsPage() {
   const { data: links } = useSuspenseQuery(linksQuery(acc.user.id));
   const qc = useQueryClient();
   const p = acc.profile;
-  const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
+  const [popup, setPopup] = useState<{ mode: "new" } | { mode: "edit"; link: LinkRow } | null>(null);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "live" | "drafts">("all");
 
@@ -60,24 +62,34 @@ function ProductsPage() {
     (!q || l.title.toLowerCase().includes(q)),
   );
 
-  async function addItem() {
+  function openAdd() {
     // The free-item limit is enforced by this UI check (the database
-    // trigger currently enforces no limit). If a server-side limit is
-    // ever added, its error is still translated below — the raw
-    // database message is never shown to the seller.
+    // trigger currently enforces no limit). Checked again on save.
     if (!canAddLink(itemCount, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
-    const { data, error } = await supabase.from("links").insert({ user_id: acc.user.id, kind: "product", title: "New product", url: "", position: links.length, enabled: false }).select().single();
+    setPopup({ mode: "new" });
+  }
+
+  // The row is created only here, when Save is tapped in the pop-up.
+  // Buyer options go through updateLink afterwards so the pre-0011
+  // fallback (save everything else, honest toast) still applies.
+  async function createProduct(data: ProductFormData) {
+    if (!canAddLink(itemCount, acc.isPro)) return void toast.error(`Free plan allows ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited.`);
+    const { data: row, error } = await supabase.from("links").insert({
+      user_id: acc.user.id, kind: "product", title: data.title, url: "", position: links.length, enabled: false,
+      price: data.price, description: data.description, image_urls: data.image_urls, category: data.category,
+    }).select().single();
     if (error) {
       const hitLimit = /limit|maximum|free plan/i.test(error.message);
       return void toast.error(hitLimit
         ? `You've reached the free plan limit of ${FREE_LINK_LIMIT} items. Upgrade to Pro for unlimited items.`
         : "Couldn't add that item — please try again.");
     }
-    // Clear any search/filter so the new draft is visible in edit mode.
+    // Clear any search/filter so the new draft is visible in the grid.
     setQuery("");
     setStatusFilter("all");
-    setJustCreatedId(data.id);
-    setLinks((l) => [...l, data]);
+    setLinks((l) => [...l, row]);
+    if (data.option_label) void updateLink(row.id, { option_label: data.option_label, options: data.options });
+    toast.success("Product saved as draft — switch it on to publish.");
   }
 
   async function updateLink(id: string, patch: Partial<LinkRow>) {
@@ -136,7 +148,7 @@ function ProductsPage() {
       </div>
 
       <section className="rounded-xl border bg-card p-5 sm:p-6">
-        <Button onClick={() => addItem()} className="min-h-[52px] w-full text-base font-semibold"><ShoppingBag className="h-4 w-4" /> Add product</Button>
+        <Button onClick={openAdd} className="min-h-[52px] w-full text-base font-semibold"><ShoppingBag className="h-4 w-4" /> Add product</Button>
         {!p.whatsapp && storeRows.some((l) => l.enabled) && (
           <p className="mt-3 rounded-xl bg-primary-soft p-3 text-sm text-accent-foreground">
             Add your WhatsApp number in <Link to="/dashboard/store" className="font-semibold underline">My Shop</Link>, so visitors can order on WhatsApp.
@@ -186,7 +198,7 @@ function ProductsPage() {
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={visibleRows.map((l) => l.id)} strategy={rectSortingStrategy}>
             <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-              {visibleRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onDelete={deleteLink} userId={acc.user.id} justCreated={l.id === justCreatedId} hasWhatsApp={Boolean(p.whatsapp)} />)}
+              {visibleRows.map((l) => <DashboardLinkItem key={l.id} link={l} onUpdate={updateLink} onEdit={(link) => setPopup({ mode: "edit", link })} hasWhatsApp={Boolean(p.whatsapp)} />)}
             </ul>
           </SortableContext>
         </DndContext>
@@ -204,6 +216,15 @@ function ProductsPage() {
           </div>
         )}
       </section>
+      <ProductFormPopup
+        open={popup !== null}
+        onOpenChange={(o) => { if (!o) setPopup(null); }}
+        userId={acc.user.id}
+        link={popup?.mode === "edit" ? popup.link : null}
+        onSaveNew={(data) => void createProduct(data)}
+        onSaveEdit={(id, data) => void updateLink(id, data)}
+        onDelete={(id) => void deleteLink(id)}
+      />
     </div>
   );
 }
