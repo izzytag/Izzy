@@ -50,42 +50,48 @@
 }
 
 :root {
-  /* Izzytag V1 design tokens: warm off-white surfaces, near-black text,
-     one violet accent used sparingly, WhatsApp green only for WhatsApp.
-     Radius scale: --radius 12px → cards (rounded-xl) 16px, inputs and
-     buttons (rounded-lg) 12px, small elements (rounded-md) 10px. */
-  --radius: 0.75rem;
-  --background: #FAF9F6;
-  --foreground: #171717;
+  /* Wise-inspired brand tokens (board 2026-11-27): white pages,
+     near-black text, deep forest #163300 as the primary ink/action
+     (buttons are forest with lime text, links and icons are forest),
+     and Izzy Lime #9FE870 reserved for hero bands, accents, and text
+     on forest. Light mint #E2F6D5 for soft surfaces, sage #E8EBE6
+     for muted surfaces and borders. WhatsApp green #25D366 stays
+     separate and is only for buying actions (Order on WhatsApp,
+     floating chat) — never lime, never forest. No violet.
+     Radius scale: --radius 16px → cards (rounded-xl) 20px, buttons
+     are pill-shaped (rounded-full in the Button component). */
+  --radius: 1rem;
+  --background: #FFFFFF;
+  --foreground: #0E0F0C;
   --card: #FFFFFF;
-  --card-foreground: #171717;
+  --card-foreground: #0E0F0C;
   --popover: #FFFFFF;
-  --popover-foreground: #171717;
-  --primary: #7457E8;
-  --primary-foreground: #FFFFFF;
-  --primary-soft: #EFEAFB;
-  --secondary: #F2F0EC;
-  --secondary-foreground: #171717;
-  --muted: #F2F0EC;
-  --muted-foreground: #737373;
-  --accent: #F2F0EC;
-  --accent-foreground: #171717;
-  --highlight: #EFEAFB;
+  --popover-foreground: #0E0F0C;
+  --primary: #163300;
+  --primary-foreground: #9FE870;
+  --primary-soft: #E2F6D5;
+  --secondary: #E8EBE6;
+  --secondary-foreground: #163300;
+  --muted: #E8EBE6;
+  --muted-foreground: #454745;
+  --accent: #E2F6D5;
+  --accent-foreground: #163300;
+  --highlight: #E2F6D5;
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: #EAE8E3;
-  --input: #E7E4DC;
-  --ring: #7457E8;
+  --border: #E8EBE6;
+  --input: #E8EBE6;
+  --ring: #163300;
   --whatsapp: #25D366;
   --whatsapp-foreground: #FFFFFF;
-  --chart-1: #7457E8;
+  --chart-1: #163300;
   --chart-2: oklch(0.72 0.16 160);
   --chart-3: oklch(0.8 0.15 80);
   --chart-4: oklch(0.65 0.2 20);
   --chart-5: oklch(0.6 0.15 230);
-  --shadow-soft: 0 12px 32px -16px rgb(23 23 23 / 0.16);
-  --gradient-hero: radial-gradient(60% 50% at 80% 10%, color-mix(in oklab, var(--primary) 4%, transparent), transparent),
-    radial-gradient(50% 40% at 0% 30%, color-mix(in oklab, var(--primary) 3%, transparent), transparent);
+  --shadow-soft: 0 12px 32px -16px rgb(22 51 0 / 0.18);
+  --gradient-hero: radial-gradient(60% 50% at 80% 10%, rgb(159 232 112 / 0.35), transparent),
+    radial-gradient(50% 40% at 0% 30%, rgb(159 232 112 / 0.22), transparent);
 }
 
 /* ---------- Public page themes ---------- */
@@ -111,7 +117,7 @@
   }
   input, textarea, select { font-size: 16px; }
   :focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
-  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.03em; }
 }
 
 @utility bg-hero { background-image: var(--gradient-hero); }

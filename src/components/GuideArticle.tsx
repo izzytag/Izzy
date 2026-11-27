@@ -24,12 +24,12 @@ export function GuideArticle({ title, intro, children }: { title: string; intro:
         </article>
       </Section>
       <Section className="pt-0">
-        <div className="mx-auto max-w-3xl rounded-xl bg-primary px-6 py-12 text-center text-primary-foreground sm:px-10">
-          <h2 className="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">Your products deserve their own space.</h2>
+        <div className="mx-auto max-w-3xl rounded-3xl bg-primary px-6 py-12 text-center text-primary-foreground sm:px-10">
+          <h2 className="text-2xl font-black uppercase leading-tight tracking-tight sm:text-3xl">Your products deserve their own space.</h2>
           <p className="mx-auto mt-3 max-w-xl leading-relaxed text-primary-foreground/85">
             Create your shop free — add your products, share one link, and receive enquiries directly on WhatsApp.
           </p>
-          <Button asChild size="lg" className="mt-7 min-h-[52px] bg-white text-primary hover:bg-white/90">
+          <Button asChild size="lg" className="mt-7 min-h-[52px] bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90">
             <Link to="/auth">Create your free shop</Link>
           </Button>
         </div>

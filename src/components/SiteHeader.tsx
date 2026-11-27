@@ -24,19 +24,19 @@ export function SiteHeader() {
         <Logo />
         <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
           {anchors.map((a) => (
-            <Link key={a.hash} to="/" hash={a.hash} className="flex h-11 items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground">
+            <Link key={a.hash} to="/" hash={a.hash} className="flex h-11 items-center rounded-full px-3 text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground">
               {a.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link to="/auth" className="hidden h-11 items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:flex">
+          <Link to="/auth" className="hidden h-11 items-center rounded-full px-3 text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:flex">
             Log in
           </Link>
           <Button asChild className="hidden sm:inline-flex">
             <Link to="/auth">Create your free shop</Link>
           </Button>
-          <button onClick={() => setOpen((o) => !o)} className="flex h-11 w-11 items-center justify-center rounded-lg border border-input bg-card md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open}>
+          <button onClick={() => setOpen((o) => !o)} className="flex h-11 w-11 items-center justify-center rounded-full border border-input bg-card md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>

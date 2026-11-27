@@ -142,23 +142,23 @@ export function Landing() {
       <SiteHeader />
 
       {/* ---------- Hero ---------- */}
-      <section className="overflow-hidden">
+      <section className="overflow-hidden bg-[#9FE870] text-[#163300]">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-2 lg:px-8 lg:pb-28">
           <div className="text-center lg:text-left">
-            <span className="anim-hero-1 inline-flex items-center rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground">
+            <span className="anim-hero-1 inline-flex items-center rounded-full border border-[#163300]/20 bg-white/60 px-3.5 py-1.5 text-sm font-medium text-[#163300]">
               For small businesses, creators &amp; local shops
             </span>
-            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-[2.75rem] font-bold leading-[1.08] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
-            <p className="anim-hero-3 mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted-foreground lg:mx-0">Create your own online shop, showcase your products and get orders directly on WhatsApp.</p>
+            <h1 className="anim-hero-2 mx-auto mt-6 max-w-xl text-[2.75rem] font-black uppercase leading-[1.02] tracking-tight sm:text-6xl lg:mx-0">Your business deserves more than an Instagram bio.</h1>
+            <p className="anim-hero-3 mx-auto mt-5 max-w-xl text-xl leading-relaxed text-[#163300]/80 lg:mx-0">Create your own online shop, showcase your products and get orders directly on WhatsApp.</p>
             <div className="anim-hero-4 mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild size="lg" className="anim-press min-h-[52px] text-base">
                 <Link to="/auth">Create your free shop</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="anim-press min-h-[52px] text-base">
+              <Button asChild size="lg" variant="outline" className="anim-press min-h-[52px] border-[#163300] bg-transparent text-base text-[#163300] hover:bg-white/40 hover:text-[#163300]">
                 <a href="#examples">See shop designs</a>
               </Button>
             </div>
-            <p className="anim-hero-5 mt-4 text-base text-muted-foreground">Free to start · No card needed · Set up in minutes</p>
+            <p className="anim-hero-5 mt-4 text-base text-[#163300]/70">Free to start · No card needed · Set up in minutes</p>
           </div>
           <div>
             <PhoneMockup data={HERO_SHOP} theme="light" height={600} />
@@ -307,10 +307,10 @@ export function Landing() {
       {/* ---------- Final CTA ---------- */}
       <Section className="py-20 sm:py-28">
         <Reveal>
-          <div className="rounded-xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
-            <h2 className="mx-auto max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Your products deserve their own space.</h2>
+          <div className="rounded-3xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
+            <h2 className="mx-auto max-w-2xl text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl">Your products deserve their own space.</h2>
             <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-primary-foreground/85">Create your shop and start sharing your products with the world.</p>
-            <Button asChild size="lg" className="anim-press mt-9 min-h-[52px] bg-white text-primary hover:bg-white/90">
+            <Button asChild size="lg" className="anim-press mt-9 min-h-[52px] bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90">
               <Link to="/auth">Create your free shop</Link>
             </Button>
           </div>
