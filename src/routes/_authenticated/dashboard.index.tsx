@@ -6,6 +6,7 @@ import { ArrowRight, Copy, Eye, MessageCircle, Package } from "lucide-react";
 import { accountQuery, linksQuery } from "@/lib/account";
 import { getHomeNextStep } from "@/lib/dashboard-home";
 import { Button } from "@/components/ui/button";
+import { BusinessDetails } from "@/components/BusinessDetails";
 import { DashboardLoading } from "@/components/DashboardLoading";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
@@ -20,8 +21,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 /**
  * Home (Dashboard A) — less things, one next step.
  * Shop name, photo and link at the top with See my shop. One
- * next-step card. Then the products with photos. Nothing else:
- * referrals, views and the rest live under More.
+ * next-step card. Then Business details (moved here from My
+ * Shop on 2026-11-27; the Your products grid was removed from
+ * Home the same day — products live on the Products tab).
+ * Referrals, views and the rest live under More.
  */
 function HomePage() {
   const { data: acc } = useSuspenseQuery(accountQuery);
@@ -121,32 +124,8 @@ function HomePage() {
         )}
       </section>
 
-      {/* Products with photos */}
-      <section>
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Your products</h2>
-          <Link to="/dashboard/products" className="flex min-h-[44px] items-center gap-1 text-sm font-semibold text-primary">Products <ArrowRight className="h-4 w-4" /></Link>
-        </div>
-        {liveProducts.length === 0 ? (
-          <div className="mt-3 rounded-xl border bg-card p-5 text-center">
-            <p className="text-base text-muted-foreground">No live products yet. Your products will appear here with their photos.</p>
-          </div>
-        ) : (
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {liveProducts.map((l) => (
-              <Link key={l.id} to="/dashboard/products" className="overflow-hidden rounded-xl border bg-card transition hover:border-primary/40">
-                {l.image_urls?.[0]
-                  ? <img src={l.image_urls[0]} alt="" className="aspect-square w-full object-cover" loading="lazy" decoding="async" />
-                  : <span className="flex aspect-square w-full items-center justify-center bg-muted text-2xl font-bold text-muted-foreground">{(l.title || "?")[0]?.toUpperCase()}</span>}
-                <span className="block p-3">
-                  <span className="block truncate font-semibold">{l.title}</span>
-                  {l.price && <span className="block truncate text-base font-bold">{l.price}</span>}
-                </span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Business details (moved from My Shop, 2026-11-27) */}
+      <BusinessDetails profile={p} userId={acc.user.id} />
     </div>
   );
 }
