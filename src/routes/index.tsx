@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  LayoutGrid, Link2, MessageCircle,
+  ChevronLeft, ChevronRight, LayoutGrid, Link2, MessageCircle,
   PackagePlus, Palette, Store,
 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -93,14 +93,115 @@ export const SHOWCASE: { label: string; theme: ThemeId; data: PublicData; demoPa
     the whole frame is non-interactive, exactly like a product photo).
     No WhatsApp button inside the frame: the mockup is a static
     illustration, and a floating button would cover catalogue cards. */
-function PhoneMockup({ data, theme, height }: { data: PublicData; theme: ThemeId; height: number }) {
+function PhoneMockup({ data, theme, height, float = true }: { data: PublicData; theme: ThemeId; height: number; float?: boolean }) {
   return (
-    <div className="anim-float relative mx-auto w-full max-w-[320px]">
+    <div className={`${float ? "anim-float " : ""}relative mx-auto w-full max-w-[320px]`}>
       <div className="overflow-hidden rounded-[2.5rem] border-[10px] border-foreground bg-card shadow-soft">
         <div className="pointer-events-none overflow-hidden" style={{ height }} aria-hidden>
           <PublicProfile data={data} theme={theme} showBranding={false} compact />
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Phone-frame previews of the demo shops, in a slide row visitors
+    can swipe (phones) or step through with the arrows (desktop) —
+    so the actual shop design is visible before anyone signs up.
+    Each slide is the real storefront component in its showcase
+    theme, with the shop name, bio and demo link below the frame. */
+function PhoneSlider() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  // Slide controls only make sense while the row actually
+  // overflows (phones). On wide screens all three phones fit, so
+  // the arrows/dots would be dead controls — hide them then.
+  const [canScroll, setCanScroll] = useState(true);
+
+  useEffect(() => {
+    const measure = () => {
+      const track = trackRef.current;
+      if (!track || track.clientWidth === 0) return;
+      setCanScroll(track.scrollWidth > track.clientWidth + 4);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  const scrollToSlide = (i: number) => {
+    const track = trackRef.current;
+    const slide = track?.children[i] as HTMLElement | undefined;
+    if (!track || !slide) return;
+    track.scrollTo({ left: slide.offsetLeft - track.offsetLeft, behavior: "smooth" });
+  };
+
+  const onScroll = () => {
+    const track = trackRef.current;
+    if (!track || track.children.length === 0) return;
+    const first = track.children[0] as HTMLElement;
+    const slideWidth = first.offsetWidth + 20; // slide + gap-5
+    const i = Math.round(track.scrollLeft / slideWidth);
+    setActive(Math.min(SHOWCASE.length - 1, Math.max(0, i)));
+  };
+
+  return (
+    <div className="mt-12">
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        role="region"
+        aria-label="Demo shop previews"
+        className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:justify-center"
+      >
+        {SHOWCASE.map((s) => (
+          <div key={s.label} className="w-[80%] max-w-[320px] shrink-0 snap-start sm:w-[320px]">
+            <PhoneMockup data={s.data} theme={s.theme} height={600} float={false} />
+            <div className="px-2 pt-6 text-center">
+              <h3 className="text-xl font-semibold">{s.data.display_name}</h3>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">{s.label}</p>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{s.data.bio}</p>
+              <Link to={s.demoPath} className="mt-4 inline-flex min-h-[44px] items-center gap-1 font-semibold text-primary">
+                View demo shop <span aria-hidden>→</span>
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+      {canScroll && (
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => scrollToSlide(active - 1)}
+          disabled={active === 0}
+          aria-label="Previous shop"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition disabled:opacity-40"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <div className="flex items-center gap-2">
+          {SHOWCASE.map((s, i) => (
+            <button
+              key={s.label}
+              type="button"
+              onClick={() => scrollToSlide(i)}
+              aria-label={`Show ${s.data.display_name}`}
+              aria-current={active === i}
+              className={`h-2.5 rounded-full transition-all ${active === i ? "w-7 bg-primary" : "w-2.5 bg-border"}`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => scrollToSlide(active + 1)}
+          disabled={active === SHOWCASE.length - 1}
+          aria-label="Next shop"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card transition disabled:opacity-40"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+      )}
     </div>
   );
 }
@@ -190,36 +291,16 @@ export function Landing() {
       </Section>
 
       {/* ---------- Storefront showcase ----------
-          Listing-style cards: one big photo, the shop name and kind,
-          a quiet bio line, and a single action — the whole card opens
-          the demo shop. */}
+          Phone-frame previews of the demo shops in a slide row:
+          visitors swipe or step through the actual shop designs,
+          then open the full demo shop from the link below. */}
       <Section id="examples" className="bg-card py-20 sm:py-28">
         <Reveal>
           <SectionHeading
             title="A beautiful shop that represents your business."
-            sub="Shops built with izzy, across different kinds of businesses."
+            sub="Shops built with izzy, across different kinds of businesses. Slide to see each one."
           />
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {SHOWCASE.map((s, i) => {
-              const photo = s.data.links[0]?.image_urls?.[0] ?? s.data.avatar_url ?? "";
-              const photoAlt = s.data.links[0]?.title ?? s.data.display_name ?? "";
-              return (
-                <Reveal key={s.label} delay={i * 90} className="h-full">
-                  <Link to={s.demoPath} className="block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-pin transition-transform duration-300 hover:-translate-y-1">
-                    <img src={photo} alt={photoAlt} className="aspect-[4/3] w-full object-cover" />
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold">{s.data.display_name}</h3>
-                      <p className="mt-1 text-sm font-medium text-muted-foreground">{s.label}</p>
-                      <p className="mt-2 leading-relaxed text-muted-foreground">{s.data.bio}</p>
-                      <span className="mt-4 inline-flex items-center gap-1 font-semibold text-primary">
-                        View demo shop <span aria-hidden>→</span>
-                      </span>
-                    </div>
-                  </Link>
-                </Reveal>
-              );
-            })}
-          </div>
+          <PhoneSlider />
         </Reveal>
       </Section>
 

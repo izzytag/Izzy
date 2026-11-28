@@ -76,7 +76,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
             {socials.map(([k, v]) => {
               const Icon = ICONS[k] ?? LinkIcon;
               return (
-                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="flex h-11 w-11 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-fg shadow-sm transition hover:scale-110 active:scale-95">
+                <a key={k} href={socialUrl(k, v)} target="_blank" rel="noopener noreferrer" aria-label={k} className="flex h-11 w-11 items-center justify-center rounded-full border border-page-border bg-page-btn text-page-btn-fg shadow-sm transition hover:scale-110 active:scale-95">
                   <Icon className="h-6 w-6" />
                 </a>
               );
@@ -93,7 +93,7 @@ export function PublicProfile({ data, theme, showBranding, onLinkClick, onProduc
               <div className="mt-3.5 flex flex-col items-center gap-3 rounded-2xl border border-page-border bg-page-btn p-5 text-page-btn-fg">
                 <div className="rounded-xl bg-card p-3"><QRCodeSVG value={upiLink(data.upi_id, name)} size={168} /></div>
                 <p className="text-sm font-medium">{data.upi_id}</p>
-                <p className="text-xs text-page-muted">Buyers enter the amount themselves in their UPI app.</p>
+                <p className="text-xs text-page-card-muted">Buyers enter the amount themselves in their UPI app.</p>
                 <a href={upiLink(data.upi_id, name)} className="flex min-h-[44px] w-full items-center justify-center rounded-xl bg-page-fg px-4 py-3 text-center text-sm font-semibold text-page-bg">Tap to pay with UPI app</a>
               </div>
             )}

@@ -50,14 +50,14 @@ export function CatalogueCard({ item, whatsapp, shopName, pageUrl, onLinkClick, 
       <div className="space-y-1 p-3.5 sm:p-4">
         <h3 className="break-words text-[15px] font-semibold leading-snug">{item.title}</h3>
         {item.price && <p className="break-words text-[17px] font-bold tracking-tight">{item.price}</p>}
-        {item.description && <p className="line-clamp-2 break-words pt-0.5 text-sm font-normal leading-relaxed text-page-muted">{item.description}</p>}
+        {item.description && <p className="line-clamp-2 break-words pt-0.5 text-sm font-normal leading-relaxed text-page-card-muted">{item.description}</p>}
       </div>
     </>);
   if (!interactive) {
     return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">{pinBody}</article>;
   }
   return <article id={`item-${item.id}`} className="mb-4 break-inside-avoid overflow-hidden rounded-[24px] border border-page-border bg-page-btn text-page-btn-fg shadow-pin">
-    <Button variant="ghost" className="block h-auto w-full touch-manipulation whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
+    <Button variant="ghost" className="block h-auto w-full touch-manipulation whitespace-normal rounded-none p-0 text-left transition-transform duration-150 hover:bg-page-btn hover:text-page-btn-fg active:scale-[0.99]" onClick={() => { setOpen(true); onProductView?.(item.id); }} aria-label={`View ${item.title}`}>
       {pinBody}
     </Button>
     {/* No order button on the pin itself: tapping the pin opens the

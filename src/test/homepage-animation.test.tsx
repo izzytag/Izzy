@@ -127,13 +127,16 @@ describe("animated homepage", () => {
     expect(container.querySelectorAll(".reveal-visible").length).toBeGreaterThan(0);
   });
 
-  it("shows the example shops as listing cards with one action each", async () => {
-    await renderPage("/", Landing);
+  it("shows the example shops as phone previews in a slider with one action each", async () => {
+    const { container } = await renderPage("/", Landing);
 
-    expect(screen.getByText("Thread Studio")).toBeInTheDocument();
-    expect(screen.getByText("Glow Lab")).toBeInTheDocument();
+    // Each demo shop appears as a phone-frame preview in the slide
+    // row, with its name as the caption heading and one demo link.
+    expect(container.querySelector('[aria-label="Demo shop previews"]')).not.toBeNull();
+    expect(screen.getByRole("heading", { name: "Thread Studio" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Glow Lab" })).toBeInTheDocument();
     expect(screen.getAllByText("View demo shop")).toHaveLength(3);
-    // The old phone-mockup grid and its separate button are gone.
+    expect(screen.getByRole("button", { name: "Next shop" })).toBeInTheDocument();
     expect(screen.queryByText("Try a demo shop")).toBeNull();
   });
 });
